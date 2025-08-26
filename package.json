@@ -17,6 +17,8 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "idb": "^8.0.3",
+    "nanoid": "^5.1.5",
     "pinia": "^3.0.3",
     "vue": "^3.5.18"
   },
@@ -34,6 +36,7 @@
     "eslint-plugin-vue": "~10.3.0",
     "jiti": "^2.4.2",
     "jsdom": "^26.1.0",
+    "msw": "^2.10.5",
     "npm-run-all2": "^8.0.4",
     "prettier": "3.6.2",
     "typescript": "~5.8.0",
