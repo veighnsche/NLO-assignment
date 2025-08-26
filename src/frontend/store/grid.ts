@@ -6,9 +6,6 @@ export const useGridStore = defineStore('grid', {
     meta: null as null | {
       version: number
       etag: string
-      seed?: number
-      revealOrder?: string[]
-      revealIndex?: number
     },
     revealed: [] as Array<{
       id: string

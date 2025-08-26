@@ -107,7 +107,7 @@ export async function bootDatabase(seed?: number): Promise<void> {
 }
 
 export function getSnapshotForClient(): {
-  meta: GridMeta;
+  meta: { version: number; etag: string };
   revealed: Cell[];
   openedCount: number;
   total: number;
@@ -115,7 +115,7 @@ export function getSnapshotForClient(): {
   ensureBooted(memory);
   const revealed = Object.values(memory!.cells).filter((c) => c.revealed);
   return {
-    meta: memory!.meta,
+    meta: { version: memory!.meta.version, etag: memory!.meta.etag },
     revealed,
     openedCount: revealed.length,
     total: GRID_TOTAL,

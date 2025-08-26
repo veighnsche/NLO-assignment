@@ -2,9 +2,6 @@ export interface Snapshot {
   meta: {
     version: number
     etag: string
-    seed?: number
-    revealOrder?: string[]
-    revealIndex?: number
   }
   revealed: Array<{
     id: string
