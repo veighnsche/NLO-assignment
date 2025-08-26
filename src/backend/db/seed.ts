@@ -48,14 +48,21 @@ export function seedGrid(rows = GRID_ROWS, cols = GRID_COLS, seed?: number): See
     }
   }
 
-  // Determine targets using deterministic RNG and a reproducible shuffle of cell ids.
+  // Determine targets and reveal order using deterministic RNGs but independent shuffles
+  // so that bot reveal sequence is not correlated with prize placement.
   const s = typeof seed === 'number' ? seed : 0x9e3779b9; // default non-zero seed
-  const rng = createXorShift32(s);
-  // Shuffle ids once; selection is then just taking the first items.
-  // This avoids bias compared to repeatedly sampling with replacement.
-  shuffleInPlace(allIds, rng);
-  // Preserve the full shuffled order for deterministic bot reveals later.
-  const revealOrder: CellId[] = allIds.slice();
+  const rngTargets = createXorShift32(s);
+  const rngReveal = createXorShift32((s ^ 0xa5a5a5a5) | 0);
+
+  // Create independent arrays for shuffling
+  const idsForTargets = allIds.slice();
+  const idsForReveal = allIds.slice();
+
+  // Shuffle for target selection (grand + consolation positions)
+  shuffleInPlace(idsForTargets, rngTargets);
+  // Shuffle independently for deterministic bot reveal order
+  shuffleInPlace(idsForReveal, rngReveal);
+  const revealOrder: CellId[] = idsForReveal;
 
   const targets: Targets = {};
   if (allIds.length !== GRID_TOTAL) {
@@ -63,14 +70,14 @@ export function seedGrid(rows = GRID_ROWS, cols = GRID_COLS, seed?: number): See
     // but proceed anyway using available length
   }
 
-  if (allIds.length > 0) {
-    const grandId = allIds[0];
+  if (idsForTargets.length > 0) {
+    const grandId = idsForTargets[0];
     targets[grandId] = PrizeGrand;
   }
   // Cap consolation targets to 100 or fewer if the grid is very small.
-  const consolationCount = Math.min(100, Math.max(0, allIds.length - 1));
+  const consolationCount = Math.min(100, Math.max(0, idsForTargets.length - 1));
   for (let i = 1; i <= consolationCount; i++) {
-    const id = allIds[i];
+    const id = idsForTargets[i];
     if (!targets[id]) {
       targets[id] = PrizeConsolation;
     }
