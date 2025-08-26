@@ -84,10 +84,7 @@ const emit = defineEmits<{
     },
   ): void
   (e: 'leave'): void
-  (
-    e: 'request-reveal',
-    payload: { id: string; index: number; row: number; col: number },
-  ): void
+  (e: 'request-reveal', payload: { id: string; index: number; row: number; col: number }): void
 }>()
 
 function onGridMove(e: MouseEvent) {
@@ -178,7 +175,9 @@ function onGridLeave() {
   background-image: url('/top-half.png'), url('/bottom-half.png');
   background-repeat: no-repeat, no-repeat;
   background-position: top, bottom;
-  background-size: 100% 50%, 100% 50%;
+  background-size:
+    100% 50%,
+    100% 50%;
 }
 
 .cell {

@@ -53,12 +53,20 @@ const onOverlayClick = () => {
 function getFocusable(container: HTMLElement | null): HTMLElement[] {
   if (!container) return []
   const selectors = [
-    'a[href]','area[href]','button:not([disabled])','input:not([disabled])',
-    'select:not([disabled])','textarea:not([disabled])','iframe','object','embed',
-    '[contenteditable]','[tabindex]:not([tabindex="-1"])'
+    'a[href]',
+    'area[href]',
+    'button:not([disabled])',
+    'input:not([disabled])',
+    'select:not([disabled])',
+    'textarea:not([disabled])',
+    'iframe',
+    'object',
+    'embed',
+    '[contenteditable]',
+    '[tabindex]:not([tabindex="-1"])',
   ]
   const nodes = Array.from(container.querySelectorAll<HTMLElement>(selectors.join(',')))
-  return nodes.filter(el => !el.hasAttribute('disabled') && !el.getAttribute('aria-hidden'))
+  return nodes.filter((el) => !el.hasAttribute('disabled') && !el.getAttribute('aria-hidden'))
 }
 
 const onTabKey = (e: KeyboardEvent) => {
@@ -68,7 +76,7 @@ const onTabKey = (e: KeyboardEvent) => {
   if (focusables.length === 0) return
   const current = document.activeElement as HTMLElement | null
   const idx = current ? focusables.indexOf(current) : -1
-  const dir = (e.shiftKey ? -1 : 1)
+  const dir = e.shiftKey ? -1 : 1
   let nextIdx = idx + dir
   if (nextIdx < 0) nextIdx = focusables.length - 1
   if (nextIdx >= focusables.length) nextIdx = 0
@@ -105,7 +113,7 @@ watch(
       previouslyFocused.value?.focus?.()
     }
   },
-  { immediate: false }
+  { immediate: false },
 )
 
 onMounted(() => {

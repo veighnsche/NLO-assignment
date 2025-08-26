@@ -115,7 +115,9 @@ function cancelReveal() {
 }
 
 // Whether the user can open a cell now
-const canOpen = computed(() => !grid.isRevealing && !grid.userHasRevealed() && grid.openedCount < grid.total)
+const canOpen = computed(
+  () => !grid.isRevealing && !grid.userHasRevealed() && grid.openedCount < grid.total,
+)
 </script>
 
 <template>
