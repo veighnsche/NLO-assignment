@@ -35,8 +35,10 @@ defineEmits<{ (e: 'toggle'): void }>()
   left: 0;
   right: 0;
   height: 56px;
-  background: #ffffff;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  background: var(--surface-elevated);
+  color: var(--text);
+  border-bottom: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-md);
   z-index: 1500;
 }
 
