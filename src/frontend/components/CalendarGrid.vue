@@ -59,7 +59,15 @@ const getRow = (i: number) => Math.floor(i / cols)
 const getCol = (i: number) => i % cols
 
 const emit = defineEmits<{
-  (e: 'hover', payload: { text: string; x: number; y: number }): void
+  (e: 'hover', payload: {
+    text: string
+    x: number
+    y: number
+    opener: string | null
+    revealed: boolean
+    prizeType?: 'none' | 'consolation' | 'grand'
+    prizeAmount?: 0 | 100 | 25000
+  }): void
   (e: 'leave'): void
 }>()
 
@@ -80,7 +88,17 @@ function onGridMove(e: MouseEvent) {
     return
   }
   const text = `Rij ${getRow(idx)}, Kolom ${getCol(idx)}`
-  emit('hover', { text, x: e.clientX, y: e.clientY })
+  const id = cellIdFromIndex(idx)
+  const cell = revealedMap.value.get(id)
+  emit('hover', {
+    text,
+    x: e.clientX,
+    y: e.clientY,
+    opener: cell?.revealedBy ?? null,
+    revealed: !!cell?.revealed,
+    prizeType: cell?.prize?.type,
+    prizeAmount: cell?.prize?.amount,
+  })
 }
 
 function onGridLeave() {
@@ -109,14 +127,20 @@ function onGridLeave() {
         'closed-playable': !isRevealed(id) && !isCellDisabled(id),
         'closed-blocked': !isRevealed(id) && isCellDisabled(id),
         grand: cellPrizeType(id) === 'grand',
-        consolation: cellPrizeType(id) === 'consolation'
+        consolation: cellPrizeType(id) === 'consolation',
       }"
       :disabled="isCellDisabled(id)"
       :data-index="id"
       @click="onReveal(id)"
     >
       <span v-if="isRevealed(id)" class="reveal">
-        {{ cellPrize(id)?.type === 'grand' ? '💎' : cellPrize(id)?.type === 'consolation' ? '🎁' : '•' }}
+        {{
+          cellPrize(id)?.type === 'grand'
+            ? '💎'
+            : cellPrize(id)?.type === 'consolation'
+              ? '🎁'
+              : '•'
+        }}
       </span>
     </button>
   </div>
@@ -192,7 +216,9 @@ function onGridLeave() {
 .cell .reveal {
   opacity: 0;
   transform: scale(0.8);
-  transition: opacity 300ms ease, transform 300ms ease;
+  transition:
+    opacity 300ms ease,
+    transform 300ms ease;
 }
 
 .cell.revealed .reveal {

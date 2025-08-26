@@ -18,6 +18,7 @@ export const useGridStore = defineStore('grid', {
     }>,
     openedCount: 0,
     total: 0,
+    consolationTotal: 100,
     isBooting: false,
     isRefreshing: false,
     isRevealing: false,
