@@ -1,0 +1,18 @@
+@import './theme.css';
+/* Global resets to ensure no gap around the viewport */
+html, body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  font-family: var(--font-sans);
+  line-height: var(--line-height-base);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Optional: make the app fill the viewport height */
+#app {
+  min-height: 100vh;
+  /* Account for fixed topbar height */
+  padding-top: 56px;
+}
