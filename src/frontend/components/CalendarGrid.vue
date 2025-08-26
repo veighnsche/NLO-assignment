@@ -67,6 +67,7 @@ const emit = defineEmits<{
     revealed: boolean
     prizeType?: 'none' | 'consolation' | 'grand'
     prizeAmount?: 0 | 100 | 25000
+    revealedAt?: string | null
   }): void
   (e: 'leave'): void
 }>()
@@ -98,6 +99,7 @@ function onGridMove(e: MouseEvent) {
     revealed: !!cell?.revealed,
     prizeType: cell?.prize?.type,
     prizeAmount: cell?.prize?.amount,
+    revealedAt: cell?.revealedAt ?? null,
   })
 }
 

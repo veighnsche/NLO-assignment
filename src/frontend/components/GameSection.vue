@@ -23,6 +23,46 @@ const tipOpener = ref<string | null>(null)
 const tipRevealed = ref(false)
 const tipPrizeType = ref<'none' | 'consolation' | 'grand' | undefined>(undefined)
 const tipPrizeAmount = ref<0 | 100 | 25000 | undefined>(undefined)
+const tipRevealedAt = ref<string | null>(null)
+
+// Localization helpers
+const nfCurrency = new Intl.NumberFormat('nl-NL', {
+  style: 'currency',
+  currency: 'EUR',
+  maximumFractionDigits: 0,
+})
+const dfDateTime = new Intl.DateTimeFormat('nl-NL', {
+  dateStyle: 'medium',
+  timeStyle: 'short',
+})
+
+const prizeLabel = computed(() => {
+  if (tipPrizeType.value === 'grand') return 'Hoofdprijs'
+  if (tipPrizeType.value === 'consolation') return 'Troostprijs'
+  if (tipPrizeType.value === 'none') return 'Geen prijs'
+  return 'Onbekend'
+})
+
+const prizeEmoji = computed(() => {
+  if (tipPrizeType.value === 'grand') return '💎'
+  if (tipPrizeType.value === 'consolation') return '🎁'
+  return '—'
+})
+
+const prizeAmountText = computed(() =>
+  tipPrizeAmount.value != null ? nfCurrency.format(tipPrizeAmount.value) : '',
+)
+
+const prizeClass = computed(() => {
+  return tipPrizeType.value === 'grand'
+    ? 'prize--grand'
+    : tipPrizeType.value === 'consolation'
+      ? 'prize--consolation'
+      : 'prize--none'
+})
+
+const statusClass = computed(() => (tipRevealed.value ? 'status--open' : 'status--closed'))
+const whenText = computed(() => (tipRevealedAt.value ? dfDateTime.format(new Date(tipRevealedAt.value)) : null))
 
 function onHover(payload: {
   text: string
@@ -32,6 +72,7 @@ function onHover(payload: {
   revealed: boolean
   prizeType?: 'none' | 'consolation' | 'grand'
   prizeAmount?: 0 | 100 | 25000
+  revealedAt?: string | null
 }) {
   tipText.value = payload.text
   tipX.value = payload.x
@@ -40,6 +81,7 @@ function onHover(payload: {
   tipRevealed.value = payload.revealed
   tipPrizeType.value = payload.prizeType
   tipPrizeAmount.value = payload.prizeAmount
+  tipRevealedAt.value = payload.revealedAt ?? null
   tipOpen.value = true
 }
 
@@ -61,7 +103,7 @@ function onLeave() {
   </section>
 
   <!-- Global tooltip following cursor -->
-  <Tooltip :open="tipOpen" :x="tipX" :y="tipY" placement="top" :offset="12" :max-width="'320px'">
+  <Tooltip :open="tipOpen" :x="tipX" :y="tipY" placement="top" :offset="12" :max-width="'340px'">
     <div class="tt-card">
       <div class="tt-row">
         <span class="tt-emoji">📍</span>
@@ -71,18 +113,21 @@ function onLeave() {
         <span class="tt-emoji">👤</span>
         <span>Geopend door: <strong>{{ tipOpener ?? '—' }}</strong></span>
       </div>
-      <div class="tt-row">
+      <div class="tt-row" :class="statusClass">
         <span class="tt-emoji">🎯</span>
         <span>Status: <strong>{{ tipRevealed ? 'Geopend' : 'Gesloten' }}</strong></span>
       </div>
-      <div class="tt-row">
+      <div v-if="whenText" class="tt-row">
+        <span class="tt-emoji">⏰</span>
+        <span>Geopend op: <strong>{{ whenText }}</strong></span>
+      </div>
+      <div class="tt-row" :class="prizeClass">
         <span class="tt-emoji">🏆</span>
         <span>
-          Prijs:
-          <strong v-if="tipPrizeType === 'grand'">💎 Hoofdprijs {{ tipPrizeAmount ?? '' }}</strong>
-          <strong v-else-if="tipPrizeType === 'consolation'">🎁 Troostprijs {{ tipPrizeAmount ?? '' }}</strong>
-          <strong v-else-if="tipPrizeType === 'none'">—</strong>
-          <strong v-else>—</strong>
+          Prijs: <strong>{{ prizeEmoji }} {{ prizeLabel }}</strong>
+          <template v-if="prizeAmountText">
+            <span class="tt-amount">— {{ prizeAmountText }}</span>
+          </template>
         </span>
       </div>
     </div>
@@ -123,4 +168,14 @@ function onLeave() {
   gap: 8px;
 }
 .tt-emoji { width: 1.2em; text-align: center; }
+
+/* Color coding */
+.status--open { color: #9be09b; }
+.status--closed { color: #bbbbbb; }
+
+.prize--grand { color: #ffd700; }
+.prize--consolation { color: #9be09b; }
+.prize--none { color: #bfbfbf; }
+
+.tt-amount { color: #ffffff; font-weight: 600; margin-left: 4px; }
 </style>
