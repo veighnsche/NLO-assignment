@@ -132,15 +132,15 @@ function onGridLeave() {
   user-select: none;
   box-sizing: border-box;
   max-width: 100vw; /* ensure grid stays within viewport */
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--border-subtle);
 }
 
 .cell {
   /* Keep cells square regardless of width */
   aspect-ratio: 1 / 1;
-  background: #f2f2f2;
+  background: var(--surface-alt);
   border: 0; /* avoid affecting track sizing */
-  box-shadow: inset 0 0 0 1px #e0e0e0;
+  box-shadow: inset 0 0 0 1px var(--border-subtle);
   padding: 0;
   cursor: pointer;
   display: flex;
@@ -153,13 +153,13 @@ function onGridLeave() {
 
 .cell.revealed {
   /* Stronger contrast for opened cells */
-  background: #dbeafe; /* light blue */
-  box-shadow: inset 0 0 0 1px #93c5fd;
+  background: color-mix(in srgb, var(--surface-elevated) 75%, var(--color-accent-gold));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-accent-gold) 65%, black);
 }
 
 /* Closed (not yet opened) */
 .cell.closed {
-  background: #f2f2f2;
+  background: var(--surface-alt);
 }
 
 /* Closed + playable vs blocked distinction */
@@ -167,26 +167,26 @@ function onGridLeave() {
   cursor: pointer;
 }
 .cell.closed.closed-playable:hover {
-  background: #e6e6e6;
+  background: color-mix(in srgb, var(--surface-alt) 80%, white);
 }
 
 .cell.closed.closed-blocked,
 .cell:disabled.closed {
   cursor: not-allowed;
-  background: #f8f8f8;
-  box-shadow: inset 0 0 0 1px #ececec;
+  background: color-mix(in srgb, var(--surface-alt) 85%, white);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--border-subtle) 75%, white);
   filter: grayscale(0.2);
 }
 
 /* Revealed + prize variants */
 .cell.revealed.consolation {
-  background: #bbf7d0; /* vivid green */
-  box-shadow: inset 0 0 0 1px #86efac;
+  background: color-mix(in srgb, var(--color-primary-green) 22%, white);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-primary-green) 65%, white);
 }
 
 .cell.revealed.grand {
-  background: #fde68a; /* amber */
-  box-shadow: inset 0 0 0 1px #f59e0b;
+  background: color-mix(in srgb, var(--color-accent-gold) 38%, white);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-accent-gold) 65%, black);
 }
 
 .cell .reveal {
@@ -206,7 +206,9 @@ function onGridLeave() {
 }
 
 .cell:focus-visible {
-  outline: 2px solid #2b6cb0;
-  outline-offset: -2px;
+  outline: 0;
+  box-shadow:
+    inset 0 0 0 2px var(--color-accent-gold),
+    inset 0 0 0 4px color-mix(in srgb, var(--color-primary-green) 30%, transparent);
 }
 </style>
