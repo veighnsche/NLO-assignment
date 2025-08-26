@@ -30,17 +30,22 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, defineEmits } from 'vue'
 
 const showModal = ref(false)
 const seed = ref<number | null>(null)
+
+const emit = defineEmits<{ (e: 'reset', seed?: number): void }>()
 
 function closeModal() {
   showModal.value = false
 }
 
 function confirmReset() {
-  // Alleen visueel; geen echte reset logica
+  // Parse the seed to a number if valid; otherwise undefined
+  const raw = seed.value
+  const parsed = typeof raw === 'number' && !Number.isNaN(raw) ? raw : undefined
+  emit('reset', parsed)
   showModal.value = false
 }
 </script>
