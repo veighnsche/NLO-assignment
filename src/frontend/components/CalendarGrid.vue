@@ -200,8 +200,8 @@ function onGridLeave() {
 .cell.revealed {
   /* Reveal underlying grid background image */
   background: transparent;
-  /* Keep a subtle grid line to delineate cells */
-  box-shadow: inset 0 0 0 1px var(--border-subtle);
+  /* Remove per-cell border so adjacent revealed cells blend seamlessly */
+  box-shadow: none;
 }
 
 /* Closed (not yet opened) */
@@ -226,14 +226,13 @@ function onGridLeave() {
 }
 
 /* Revealed + prize variants */
+/* Avoid outlines on revealed cells to prevent seams between adjacent revealed tiles */
 .cell.revealed.consolation {
-  /* Do not cover the image; add a subtle green outline */
-  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--color-primary-green) 65%, white);
+  box-shadow: none;
 }
 
 .cell.revealed.grand {
-  /* Do not cover the image; add a subtle gold outline */
-  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--color-accent-gold) 65%, black);
+  box-shadow: none;
 }
 
 .cell .reveal {
