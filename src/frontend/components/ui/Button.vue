@@ -5,7 +5,7 @@
       `color-${color}`,
       `variant-${variant}`,
       `size-${size}`,
-      { 'is-block': block, 'is-loading': loading },
+      { 'is-block': block, 'is-loading': loading, 'is-icon': icon },
     ]"
     :type="type"
     :disabled="disabled || loading"
@@ -26,18 +26,20 @@ interface Props {
   variant?: 'filled' | 'outline' | 'text'
   size?: 'sm' | 'md' | 'lg'
   block?: boolean
+  icon?: boolean
   disabled?: boolean
   loading?: boolean
   type?: 'button' | 'submit' | 'reset'
 }
 
-const { color, variant, size, block, disabled, loading, type } = withDefaults(
+const { color, variant, size, block, icon, disabled, loading, type } = withDefaults(
   defineProps<Props>(),
   {
     color: 'default',
     variant: 'filled',
     size: 'md',
     block: false,
+    icon: false,
     disabled: false,
     loading: false,
     type: 'button',
@@ -197,5 +199,12 @@ const { color, variant, size, block, disabled, loading, type } = withDefaults(
 }
 .btn.is-loading .btn__content {
   opacity: 0.85;
+}
+
+/* Icon-only */
+.btn.is-icon {
+  width: 32px;
+  height: 32px;
+  padding: 0;
 }
 </style>

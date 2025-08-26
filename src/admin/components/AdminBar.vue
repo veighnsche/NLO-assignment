@@ -3,43 +3,44 @@
     <div class="section left">
       <span class="label">Actieve speler:</span>
       <span class="value">—</span>
-      <button class="btn" type="button">Verander van speler</button>
+      <Button>Verander van speler</Button>
     </div>
 
     <div class="section right">
-      <button class="btn" type="button" @click="showModal = true">Reset spel…</button>
-      <button
-        class="btn btn-icon"
-        type="button"
+      <Button color="danger" variant="outline" @click="showModal = true">Reset spel…</Button>
+      <Button
+        icon
+        variant="text"
+        size="sm"
         aria-label="Sluit adminbalk"
         title="Sluit adminbalk"
         @click="$emit('toggle')"
       >
         ✕
-      </button>
+      </Button>
     </div>
   </div>
 
-  <div v-if="showModal" class="modal-overlay" @click.self="closeModal">
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="reset-title">
-      <h2 id="reset-title">Weet je zeker dat je wilt resetten?</h2>
-      <p class="subtext">Optioneel: geef een seednummer op.</p>
+  <Modal v-model="showModal" :ariaLabelledby="'reset-title'">
+    <h2 id="reset-title">Weet je zeker dat je wilt resetten?</h2>
+    <p class="subtext">Optioneel: geef een seednummer op.</p>
 
-      <label class="seed-label">
-        <span>Seed</span>
-        <input type="number" inputmode="numeric" v-model="seed" placeholder="Bijv. 42" />
-      </label>
+    <label class="seed-label">
+      <span>Seed</span>
+      <input type="number" inputmode="numeric" v-model="seed" placeholder="Bijv. 42" />
+    </label>
 
-      <div class="modal-actions">
-        <button class="btn" type="button" @click="closeModal">Annuleren</button>
-        <button class="btn btn-danger" type="button" @click="confirmReset">Resetten</button>
-      </div>
-    </div>
-  </div>
+    <template #footer>
+      <Button @click="closeModal">Annuleren</Button>
+      <Button color="danger" @click="confirmReset">Resetten</Button>
+    </template>
+  </Modal>
 </template>
 
 <script setup lang="ts">
 import { ref, defineEmits } from 'vue'
+import Modal from '@/frontend/components/ui/Modal.vue'
+import Button from '@/frontend/components/ui/Button.vue'
 
 const showModal = ref(false)
 const seed = ref<number | null>(null)
@@ -147,42 +148,7 @@ function confirmReset() {
 }
 
 /* Icon button */
-.btn-icon {
-  width: 32px;
-  height: 32px;
-  padding: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-  line-height: 1;
-}
-
-/* Modal */
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 2000;
-  padding: 16px;
-}
-
-.modal {
-  background: #fff;
-  color: #222;
-  width: min(520px, 100%);
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-  padding: 20px;
-}
-
-.modal h2 {
-  margin: 0 0 6px;
-  font-size: 1.2rem;
-}
+/* Icon button now uses UiButton's icon mode */
 
 .subtext {
   margin: 0 0 12px;
@@ -209,9 +175,5 @@ function confirmReset() {
   box-shadow: 0 0 0 3px rgba(100, 150, 255, 0.2);
 }
 
-.modal-actions {
-  display: flex;
-  gap: 8px;
-  justify-content: flex-end;
-}
+/* Modal actions now provided by Modal.vue footer styling */
 </style>

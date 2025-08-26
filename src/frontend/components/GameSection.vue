@@ -3,6 +3,8 @@ import { ref, computed } from 'vue'
 import Tooltip from './ui/Tooltip.vue'
 import GameHeader from './GameHeader.vue'
 import CalendarGrid from './CalendarGrid.vue'
+import Modal from '@/frontend/components/ui/Modal.vue'
+import Button from '@/frontend/components/ui/Button.vue'
 import { useGridStore } from '@/frontend/store/grid'
 
 // Store (for header counts)
@@ -90,6 +92,27 @@ function onHover(payload: {
 function onLeave() {
   tipOpen.value = false
 }
+
+// Confirm before reveal state
+const confirmOpen = ref(false)
+const pending = ref<{ id: string; row: number; col: number } | null>(null)
+
+function onRequestReveal(payload: { id: string; index: number; row: number; col: number }) {
+  pending.value = { id: payload.id, row: payload.row, col: payload.col }
+  confirmOpen.value = true
+}
+
+async function confirmReveal() {
+  if (!pending.value) return
+  await grid.reveal(pending.value.id)
+  confirmOpen.value = false
+  pending.value = null
+}
+
+function cancelReveal() {
+  confirmOpen.value = false
+  pending.value = null
+}
 </script>
 
 <template>
@@ -101,7 +124,12 @@ function onLeave() {
       :grand-opened="grandOpened"
       :consolation-total="grid.consolationTotal"
     />
-    <CalendarGrid @hover="onHover" @leave="onLeave" />
+    <CalendarGrid
+      :confirmBeforeReveal="true"
+      @request-reveal="onRequestReveal"
+      @hover="onHover"
+      @leave="onLeave"
+    />
   </section>
 
   <!-- Global tooltip following cursor -->
@@ -140,6 +168,20 @@ function onLeave() {
       </div>
     </div>
   </Tooltip>
+
+  <!-- Confirm reveal modal -->
+  <Modal v-model="confirmOpen" :ariaLabelledby="'confirm-title'">
+    <h2 id="confirm-title">Vakje openen bevestigen</h2>
+    <p class="confirm-text">
+      Weet je zeker dat je vakje
+      <strong>Rij {{ pending?.row }}, Kolom {{ pending?.col }}</strong>
+      wilt openen?
+    </p>
+    <template #footer>
+      <Button @click="cancelReveal">Annuleren</Button>
+      <Button color="danger" @click="confirmReveal">Openen</Button>
+    </template>
+  </Modal>
 </template>
 
 <style scoped>
@@ -202,5 +244,9 @@ function onLeave() {
   color: #ffffff;
   font-weight: 600;
   margin-left: 4px;
+}
+
+.confirm-text {
+  margin: 0 0 12px;
 }
 </style>

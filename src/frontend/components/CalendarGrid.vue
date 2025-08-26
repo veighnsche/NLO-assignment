@@ -50,8 +50,19 @@ function isCellDisabled(i: number): boolean {
   return grid.isRevealing || grid.userHasRevealed() || isRevealed(i)
 }
 
+const props = defineProps<{ confirmBeforeReveal?: boolean }>()
+
 async function onReveal(i: number) {
   if (grid.isRevealing || isRevealed(i) || grid.userHasRevealed()) return
+  if (props.confirmBeforeReveal) {
+    emit('request-reveal', {
+      id: cellIdFromIndex(i),
+      index: i,
+      row: getRow(i),
+      col: getCol(i),
+    })
+    return
+  }
   await grid.reveal(cellIdFromIndex(i))
 }
 
@@ -73,6 +84,10 @@ const emit = defineEmits<{
     },
   ): void
   (e: 'leave'): void
+  (
+    e: 'request-reveal',
+    payload: { id: string; index: number; row: number; col: number },
+  ): void
 }>()
 
 function onGridMove(e: MouseEvent) {
