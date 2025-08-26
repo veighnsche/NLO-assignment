@@ -17,17 +17,43 @@ const revealedMap = computed(() => {
   return m
 })
 
+// Backend cell ids are like: r{row}-c{col}
+function cellIdFromIndex(i: number): string {
+  return `r${getRow(i)}-c${getCol(i)}`
+}
+
 function isRevealed(i: number): boolean {
-  return revealedSet.value.has(String(i))
+  return revealedSet.value.has(cellIdFromIndex(i))
 }
 
 function cellPrize(i: number) {
-  return revealedMap.value.get(String(i))?.prize
+  return revealedMap.value.get(cellIdFromIndex(i))?.prize
+}
+
+// Prize type helper: 'grand' | 'consolation' | undefined
+function cellPrizeType(i: number): 'grand' | 'consolation' | undefined {
+  return cellPrize(i)?.type as 'grand' | 'consolation' | undefined
+}
+
+// Accessible label helper
+function ariaLabelForCell(i: number): string {
+  if (!isRevealed(i)) {
+    return isCellDisabled(i) ? 'Gesloten vakje (niet speelbaar)' : 'Gesloten vakje (speelbaar)'
+  }
+  const t = cellPrizeType(i)
+  if (t === 'grand') return 'Geopend vakje (Hoofdprijs)'
+  if (t === 'consolation') return 'Geopend vakje (Troostprijs)'
+  return 'Geopend vakje'
+}
+
+// Disabled helper: mirrors :disabled binding in template
+function isCellDisabled(i: number): boolean {
+  return grid.isRevealing || grid.userHasRevealed() || isRevealed(i)
 }
 
 async function onReveal(i: number) {
   if (grid.isRevealing || isRevealed(i) || grid.userHasRevealed()) return
-  await grid.reveal(String(i))
+  await grid.reveal(cellIdFromIndex(i))
 }
 
 // Tooltip state
@@ -84,9 +110,16 @@ function onGridLeave() {
         :key="id"
         class="cell"
         role="gridcell"
-        :aria-label="isRevealed(id) ? 'Geopend vakje' : 'Gesloten vakje'"
-        :class="{ revealed: isRevealed(id) }"
-        :disabled="grid.isRevealing || grid.userHasRevealed() || isRevealed(id)"
+        :aria-label="ariaLabelForCell(id)"
+        :class="{
+          revealed: isRevealed(id),
+          closed: !isRevealed(id),
+          'closed-playable': !isRevealed(id) && !isCellDisabled(id),
+          'closed-blocked': !isRevealed(id) && isCellDisabled(id),
+          grand: cellPrizeType(id) === 'grand',
+          consolation: cellPrizeType(id) === 'consolation'
+        }"
+        :disabled="isCellDisabled(id)"
         :data-index="id"
         @click="onReveal(id)"
       >
@@ -143,8 +176,41 @@ function onGridLeave() {
 }
 
 .cell.revealed {
-  background: #fff;
-  box-shadow: inset 0 0 0 1px #d6d6d6;
+  /* Stronger contrast for opened cells */
+  background: #dbeafe; /* light blue */
+  box-shadow: inset 0 0 0 1px #93c5fd;
+}
+
+/* Closed (not yet opened) */
+.cell.closed {
+  background: #f2f2f2;
+}
+
+/* Closed + playable vs blocked distinction */
+.cell.closed.closed-playable {
+  cursor: pointer;
+}
+.cell.closed.closed-playable:hover {
+  background: #e6e6e6;
+}
+
+.cell.closed.closed-blocked,
+.cell:disabled.closed {
+  cursor: not-allowed;
+  background: #f8f8f8;
+  box-shadow: inset 0 0 0 1px #ececec;
+  filter: grayscale(0.2);
+}
+
+/* Revealed + prize variants */
+.cell.revealed.consolation {
+  background: #bbf7d0; /* vivid green */
+  box-shadow: inset 0 0 0 1px #86efac;
+}
+
+.cell.revealed.grand {
+  background: #fde68a; /* amber */
+  box-shadow: inset 0 0 0 1px #f59e0b;
 }
 
 .cell .reveal {
@@ -156,6 +222,11 @@ function onGridLeave() {
 .cell.revealed .reveal {
   opacity: 1;
   transform: scale(1);
+}
+
+/* Optional: tweak emoji sizing */
+.cell .reveal {
+  font-size: 0.9rem;
 }
 
 .cell:focus-visible {
