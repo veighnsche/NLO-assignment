@@ -8,6 +8,7 @@ const props = defineProps<{
   consolationOpenedCount: number
   grandOpened: boolean
   consolationTotal: number
+  canOpen: boolean
 }>()
 </script>
 
@@ -37,6 +38,16 @@ const props = defineProps<{
         <span class="label">Hoofdprijs:</span>
         <span class="value">{{ props.grandOpened ? 'Geopend' : 'Nog verborgen' }}</span>
         <span v-if="props.grandOpened" class="burst" aria-hidden="true"></span>
+      </div>
+
+      <div
+        class="metric can-open"
+        :class="{ closed: !props.canOpen }"
+        aria-label="Kan gebruiker nog een vakje openen?"
+      >
+        <span class="emoji" aria-hidden="true">{{ props.canOpen ? '🔓' : '🔒' }}</span>
+        <span class="label">Kan openen:</span>
+        <span class="value">{{ props.canOpen ? 'Ja' : 'Nee' }}</span>
       </div>
     </div>
   </header>
@@ -144,5 +155,16 @@ h2::after {
   height: 3px;
   background: var(--color-accent-gold);
   border-radius: var(--radius-sm);
+}
+
+/* Can-open metric styling */
+.metric.can-open {
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-primary-green) 50%, white);
+  background: color-mix(in srgb, var(--color-primary-green) 20%, transparent);
+}
+.metric.can-open.closed {
+  box-shadow: inset 0 0 0 1px var(--border-subtle);
+  background: color-mix(in srgb, var(--surface-elevated) 55%, transparent);
+  color: color-mix(in srgb, var(--text) 60%, var(--color-silver));
 }
 </style>

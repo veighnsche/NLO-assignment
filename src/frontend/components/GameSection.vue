@@ -113,6 +113,9 @@ function cancelReveal() {
   confirmOpen.value = false
   pending.value = null
 }
+
+// Whether the user can open a cell now
+const canOpen = computed(() => !grid.isRevealing && !grid.userHasRevealed() && grid.openedCount < grid.total)
 </script>
 
 <template>
@@ -123,6 +126,7 @@ function cancelReveal() {
       :consolation-opened-count="consolationOpenedCount"
       :grand-opened="grandOpened"
       :consolation-total="grid.consolationTotal"
+      :can-open="canOpen"
     />
     <CalendarGrid
       :confirmBeforeReveal="true"
