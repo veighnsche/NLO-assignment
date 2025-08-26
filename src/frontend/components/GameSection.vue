@@ -1,11 +1,34 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import Tooltip from './ui/Tooltip.vue'
+import { useGridStore } from '@/frontend/store/grid'
 
 // 100x100 grid (10,000 cells)
 const rows = 100
 const cols = 100
 const cells = Array.from({ length: rows * cols }, (_, i) => i)
+
+// Store
+const grid = useGridStore()
+const revealedSet = computed(() => grid.revealedSet)
+const revealedMap = computed(() => {
+  const m = new Map<string, (typeof grid.revealed)[number]>()
+  for (const c of grid.revealed) m.set(c.id, c)
+  return m
+})
+
+function isRevealed(i: number): boolean {
+  return revealedSet.value.has(String(i))
+}
+
+function cellPrize(i: number) {
+  return revealedMap.value.get(String(i))?.prize
+}
+
+async function onReveal(i: number) {
+  if (grid.isRevealing || isRevealed(i) || grid.userHasRevealed()) return
+  await grid.reveal(String(i))
+}
 
 // Tooltip state
 const tipOpen = ref(false)
@@ -46,6 +69,7 @@ function onGridLeave() {
 <template>
   <section class="game-section">
     <h2>Verrassingskalender</h2>
+    <p class="counts">Geopend: {{ grid.openedCount }} / {{ grid.total }}</p>
 
     <div
       class="calendar-grid"
@@ -60,9 +84,16 @@ function onGridLeave() {
         :key="id"
         class="cell"
         role="gridcell"
-        aria-label="Gesloten vakje"
+        :aria-label="isRevealed(id) ? 'Geopend vakje' : 'Gesloten vakje'"
+        :class="{ revealed: isRevealed(id) }"
+        :disabled="grid.isRevealing || grid.userHasRevealed() || isRevealed(id)"
         :data-index="id"
-      />
+        @click="onReveal(id)"
+      >
+        <span v-if="isRevealed(id)" class="reveal">
+          {{ cellPrize(id)?.type === 'grand' ? '💎' : cellPrize(id)?.type === 'consolation' ? '🎁' : '•' }}
+        </span>
+      </button>
     </div>
   </section>
 
@@ -75,6 +106,12 @@ function onGridLeave() {
 <style scoped>
 .game-section {
   padding: 1rem;
+}
+
+.counts {
+  margin: 0 0 0.5rem 0;
+  color: #666;
+  font-size: 0.95rem;
 }
 
 .calendar-grid {
@@ -103,6 +140,22 @@ function onGridLeave() {
   min-width: 0; /* allow shrinking inside 1fr tracks */
   min-height: 0;
   box-sizing: border-box;
+}
+
+.cell.revealed {
+  background: #fff;
+  box-shadow: inset 0 0 0 1px #d6d6d6;
+}
+
+.cell .reveal {
+  opacity: 0;
+  transform: scale(0.8);
+  transition: opacity 300ms ease, transform 300ms ease;
+}
+
+.cell.revealed .reveal {
+  opacity: 1;
+  transform: scale(1);
 }
 
 .cell:focus-visible {
