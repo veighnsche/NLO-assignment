@@ -13,7 +13,7 @@ const props = defineProps<{
 
 <template>
   <header class="game-header">
-    <h2>{{ props.title ?? 'Verrassingskalender' }}</h2>
+    <h2 v-if="props.title">{{ props.title }}</h2>
     <div class="meta-row" role="group" aria-label="Spelstatistieken">
       <div class="metric opened" aria-label="Aantal geopende vakjes">
         <span class="emoji" aria-hidden="true">📦</span>
@@ -44,7 +44,13 @@ const props = defineProps<{
 
 <style scoped>
 .game-header {
-  padding: 1rem 1rem 0.5rem 1rem;
+  /* Sticky positioning beneath TopBar (56px) */
+  position: sticky;
+  top: 56px;
+  z-index: 10;
+  padding: 0.5rem 1rem;
+  background: transparent; /* fully transparent header */
+  pointer-events: none; /* allow clicks to pass through to the grid */
 }
 
 .meta-row {
@@ -60,32 +66,40 @@ const props = defineProps<{
   gap: 0.4rem;
   padding: 0.35rem 0.6rem;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--surface-alt) 90%, white);
+  /* Semi-transparent chip with subtle glass effect */
+  background: color-mix(in srgb, var(--surface-elevated) 65%, transparent);
   box-shadow: inset 0 0 0 1px var(--border-subtle);
-  color: color-mix(in srgb, var(--text) 75%, var(--color-silver));
+  color: color-mix(in srgb, var(--text) 85%, var(--color-silver));
   font-size: 0.9rem;
+  -webkit-backdrop-filter: saturate(1.1) blur(2px);
+  backdrop-filter: saturate(1.1) blur(2px);
 }
 
-.metric .emoji { font-size: 1rem; }
-.metric .label { font-weight: 600; color: var(--text); }
-.metric .value { font-variant-numeric: tabular-nums; }
+.metric .emoji {
+  font-size: 1rem;
+}
+.metric .label {
+  font-weight: 600;
+  color: var(--text);
+}
+.metric .value {
+  font-variant-numeric: tabular-nums;
+}
 
 .metric.consolation {
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-primary-green) 55%, white);
-  background: color-mix(in srgb, var(--color-primary-green) 10%, white);
+  background: color-mix(in srgb, var(--color-primary-green) 25%, transparent);
 }
 
 .metric.grand {
   position: relative;
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-accent-gold) 60%, black);
-  background: linear-gradient(135deg, color-mix(in srgb, var(--color-accent-gold) 18%, white), white 60%);
+  background: color-mix(in srgb, var(--color-accent-gold) 30%, transparent);
 }
 
 .metric.grand.active {
   color: black;
-  background: linear-gradient(135deg,
-    color-mix(in srgb, var(--color-accent-gold) 45%, white),
-    color-mix(in srgb, var(--color-accent-gold) 75%, white) 60%);
+  background: color-mix(in srgb, var(--color-accent-gold) 45%, transparent);
   box-shadow:
     inset 0 0 0 1px color-mix(in srgb, var(--color-accent-gold) 80%, black),
     0 0 0 3px color-mix(in srgb, var(--color-accent-gold) 25%, transparent),
@@ -98,14 +112,19 @@ const props = defineProps<{
   inset: -4px;
   border-radius: inherit;
   pointer-events: none;
-  background: radial-gradient(circle at 20% 35%, rgba(255,255,255,0.7), transparent 35%),
-              radial-gradient(circle at 80% 65%, rgba(255,255,255,0.5), transparent 40%);
+  background:
+    radial-gradient(circle at 20% 35%, rgba(255, 255, 255, 0.7), transparent 35%),
+    radial-gradient(circle at 80% 65%, rgba(255, 255, 255, 0.5), transparent 40%);
   filter: blur(2px);
 }
 
 @keyframes grandGlow {
-  from { filter: drop-shadow(0 0 0px rgba(255, 215, 0, 0.0)); }
-  to   { filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.45)); }
+  from {
+    filter: drop-shadow(0 0 0px rgba(255, 215, 0, 0));
+  }
+  to {
+    filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.45));
+  }
 }
 
 h2 {

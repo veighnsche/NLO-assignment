@@ -30,7 +30,7 @@
   border-radius: 12px;
   background: #fff;
   color: #111827; /* gray-900 */
-  box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
   text-align: center;
 }
 
@@ -44,7 +44,9 @@
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 h2 {

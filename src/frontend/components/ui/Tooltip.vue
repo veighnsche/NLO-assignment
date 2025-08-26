@@ -90,7 +90,9 @@ const placementClass = computed(() => `tt-${props.placement}`)
   padding: 8px 10px;
   font-size: 12px;
   line-height: 1.2;
-  box-shadow: 0 6px 24px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.12);
+  box-shadow:
+    0 6px 24px rgba(0, 0, 0, 0.18),
+    0 2px 8px rgba(0, 0, 0, 0.12);
 }
 
 /* Arrow */

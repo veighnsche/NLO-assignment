@@ -62,7 +62,9 @@ const prizeClass = computed(() => {
 })
 
 const statusClass = computed(() => (tipRevealed.value ? 'status--open' : 'status--closed'))
-const whenText = computed(() => (tipRevealedAt.value ? dfDateTime.format(new Date(tipRevealedAt.value)) : null))
+const whenText = computed(() =>
+  tipRevealedAt.value ? dfDateTime.format(new Date(tipRevealedAt.value)) : null,
+)
 
 function onHover(payload: {
   text: string
@@ -111,15 +113,21 @@ function onLeave() {
       </div>
       <div class="tt-row">
         <span class="tt-emoji" aria-hidden="true">👤</span>
-        <span>Geopend door: <strong>{{ tipOpener ?? '—' }}</strong></span>
+        <span
+          >Geopend door: <strong>{{ tipOpener ?? '—' }}</strong></span
+        >
       </div>
       <div class="tt-row" :class="statusClass">
         <span class="tt-emoji" aria-hidden="true">🎯</span>
-        <span>Status: <strong>{{ tipRevealed ? 'Geopend' : 'Gesloten' }}</strong></span>
+        <span
+          >Status: <strong>{{ tipRevealed ? 'Geopend' : 'Gesloten' }}</strong></span
+        >
       </div>
       <div v-if="whenText" class="tt-row">
         <span class="tt-emoji" aria-hidden="true">⏰</span>
-        <span>Geopend op: <strong>{{ whenText }}</strong></span>
+        <span
+          >Geopend op: <strong>{{ whenText }}</strong></span
+        >
       </div>
       <div class="tt-row" :class="prizeClass">
         <span class="tt-emoji" aria-hidden="true">🏆</span>
@@ -167,15 +175,32 @@ function onLeave() {
   align-items: center;
   gap: 8px;
 }
-.tt-emoji { width: 1.2em; text-align: center; }
+.tt-emoji {
+  width: 1.2em;
+  text-align: center;
+}
 
 /* Color coding */
-.status--open { color: #9be09b; }
-.status--closed { color: #bbbbbb; }
+.status--open {
+  color: #9be09b;
+}
+.status--closed {
+  color: #bbbbbb;
+}
 
-.prize--grand { color: #ffd700; }
-.prize--consolation { color: #9be09b; }
-.prize--none { color: #bfbfbf; }
+.prize--grand {
+  color: #ffd700;
+}
+.prize--consolation {
+  color: #9be09b;
+}
+.prize--none {
+  color: #bfbfbf;
+}
 
-.tt-amount { color: #ffffff; font-weight: 600; margin-left: 4px; }
+.tt-amount {
+  color: #ffffff;
+  font-weight: 600;
+  margin-left: 4px;
+}
 </style>

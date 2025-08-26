@@ -47,8 +47,12 @@ async function onReset(seed?: number) {
   }
 }
 
-onMounted(() => { void initApp() })
-onUnmounted(() => { grid.stopBotPolling() })
+onMounted(() => {
+  void initApp()
+})
+onUnmounted(() => {
+  grid.stopBotPolling()
+})
 </script>
 
 <template>
@@ -58,5 +62,4 @@ onUnmounted(() => { grid.stopBotPolling() })
   <AdminBar v-if="showAdminBar" @reset="onReset" />
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>

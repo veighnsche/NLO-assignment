@@ -1,6 +1,7 @@
 @import './theme.css';
 /* Global resets to ensure no gap around the viewport */
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
   min-height: 100%;

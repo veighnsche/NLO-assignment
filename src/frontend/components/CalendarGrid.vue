@@ -59,16 +59,19 @@ const getRow = (i: number) => Math.floor(i / cols)
 const getCol = (i: number) => i % cols
 
 const emit = defineEmits<{
-  (e: 'hover', payload: {
-    text: string
-    x: number
-    y: number
-    opener: string | null
-    revealed: boolean
-    prizeType?: 'none' | 'consolation' | 'grand'
-    prizeAmount?: 0 | 100 | 25000
-    revealedAt?: string | null
-  }): void
+  (
+    e: 'hover',
+    payload: {
+      text: string
+      x: number
+      y: number
+      opener: string | null
+      revealed: boolean
+      prizeType?: 'none' | 'consolation' | 'grand'
+      prizeAmount?: 0 | 100 | 25000
+      revealedAt?: string | null
+    },
+  ): void
   (e: 'leave'): void
 }>()
 

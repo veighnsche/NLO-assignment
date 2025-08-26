@@ -2,7 +2,7 @@
   <header class="topbar">
     <div class="topbar-inner">
       <div class="topbar-left">
-        <!-- Voeg hier eventueel een titel/logo toe -->
+        <h1 class="topbar-title">{{ title }}</h1>
       </div>
       <div class="topbar-spacer"></div>
       <div class="topbar-right">
@@ -21,10 +21,15 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps } from 'vue'
+import { withDefaults, defineProps } from 'vue'
 import UiButton from './ui/Button.vue'
 
-defineProps<{ showAdminBar: boolean }>()
+const { showAdminBar, title } = withDefaults(
+  defineProps<{ showAdminBar: boolean; title?: string }>(),
+  {
+    title: 'Verrassingskalender',
+  },
+)
 defineEmits<{ (e: 'toggle'): void }>()
 </script>
 
@@ -51,7 +56,16 @@ defineEmits<{ (e: 'toggle'): void }>()
   padding: 0 12px;
 }
 
-.topbar-spacer { flex: 1; }
+.topbar-spacer {
+  flex: 1;
+}
 
 /* Button-specific rules removed; UiButton uses theme tokens */
+
+/* Title */
+.topbar-title {
+  margin: 0;
+  font-size: 1.125rem;
+  line-height: 1;
+}
 </style>

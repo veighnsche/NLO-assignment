@@ -10,10 +10,10 @@
  * - `nextInt(maxExclusive)` returns an integer in [0, maxExclusive-1].
  */
 export interface RNG {
-  seed: number;
-  nextUint32(): number;
-  nextFloat(): number; // [0,1)
-  nextInt(maxExclusive: number): number; // 0..maxExclusive-1
+  seed: number
+  nextUint32(): number
+  nextFloat(): number // [0,1)
+  nextInt(maxExclusive: number): number // 0..maxExclusive-1
 }
 
 /**
@@ -31,38 +31,38 @@ export interface RNG {
  * @returns RNG instance with `nextUint32`, `nextFloat`, and `nextInt` methods.
  */
 export function createXorShift32(seed: number): RNG {
-  let state = seed | 0;
-  if (state === 0) state = 0x9e3779b9 | 0; // avoid zero lock
+  let state = seed | 0
+  if (state === 0) state = 0x9e3779b9 | 0 // avoid zero lock
 
   return {
     seed: state,
     nextUint32() {
       // Core xorshift32 step: shift/xor the internal 32-bit state.
       // The sequence is deterministic given the initial seed.
-      let x = state | 0;
-      x ^= x << 13;
-      x ^= x >>> 17;
-      x ^= x << 5;
-      state = x | 0;
+      let x = state | 0
+      x ^= x << 13
+      x ^= x >>> 17
+      x ^= x << 5
+      state = x | 0
       // Convert to unsigned 32-bit range [0, 2^32-1].
-      return (state >>> 0);
+      return state >>> 0
     },
     nextFloat() {
       // Use the upper 24 bits to build a float in [0,1).
       // Shifting by 8 drops the lower 8 bits (often noisier),
       // dividing by 2^24 (16777216) yields a uniform float in [0,1).
-      return (this.nextUint32() >>> 8) / 16777216; // 24-bit mantissa
+      return (this.nextUint32() >>> 8) / 16777216 // 24-bit mantissa
     },
     nextInt(maxExclusive: number) {
       // Return integer in [0, maxExclusive-1].
       // Defensive: avoid division by zero/negative.
-      if (maxExclusive <= 0) return 0;
+      if (maxExclusive <= 0) return 0
       // For many typical small bounds, modulo is acceptable. If strict
       // unbiasedness is needed for arbitrary bounds, use rejection sampling.
-      const r = this.nextUint32();
-      return r % maxExclusive;
+      const r = this.nextUint32()
+      return r % maxExclusive
     },
-  };
+  }
 }
 
 /**
@@ -76,11 +76,11 @@ export function createXorShift32(seed: number): RNG {
  */
 export function shuffleInPlace<T>(arr: T[], rng: RNG): void {
   for (let i = arr.length - 1; i > 0; i--) {
-    const j = rng.nextInt(i + 1);
+    const j = rng.nextInt(i + 1)
     if (j !== i) {
-      const tmp = arr[i];
-      arr[i] = arr[j];
-      arr[j] = tmp;
+      const tmp = arr[i]
+      arr[i] = arr[j]
+      arr[j] = tmp
     }
   }
 }

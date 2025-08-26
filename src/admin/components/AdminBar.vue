@@ -66,11 +66,7 @@ function confirmReset() {
   /* Softer, larger stripes with a subtle white overlay to reduce busyness */
   background:
     linear-gradient(rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0.35)),
-    repeating-linear-gradient(
-      30deg,
-      #ffe14d 0 40px,
-      #2b2b2b 40px 80px
-    );
+    repeating-linear-gradient(30deg, #ffe14d 0 40px, #2b2b2b 40px 80px);
   box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.2);
 }
 

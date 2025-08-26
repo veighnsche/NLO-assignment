@@ -10,7 +10,7 @@
     :type="type"
     :disabled="disabled || loading"
     :aria-busy="loading ? 'true' : undefined"
-    :aria-disabled="(disabled || loading) ? 'true' : undefined"
+    :aria-disabled="disabled || loading ? 'true' : undefined"
   >
     <span class="btn__content">
       <slot />
@@ -31,15 +31,18 @@ interface Props {
   type?: 'button' | 'submit' | 'reset'
 }
 
-const { color, variant, size, block, disabled, loading, type } = withDefaults(defineProps<Props>(), {
-  color: 'default',
-  variant: 'filled',
-  size: 'md',
-  block: false,
-  disabled: false,
-  loading: false,
-  type: 'button',
-})
+const { color, variant, size, block, disabled, loading, type } = withDefaults(
+  defineProps<Props>(),
+  {
+    color: 'default',
+    variant: 'filled',
+    size: 'md',
+    block: false,
+    disabled: false,
+    loading: false,
+    type: 'button',
+  },
+)
 </script>
 
 <style scoped>
@@ -74,10 +77,16 @@ const { color, variant, size, block, disabled, loading, type } = withDefaults(de
   font: inherit;
   line-height: 1.2;
   cursor: pointer;
-  transition: background-color 120ms ease, color 120ms ease, box-shadow 120ms ease, transform 50ms ease;
+  transition:
+    background-color 120ms ease,
+    color 120ms ease,
+    box-shadow 120ms ease,
+    transform 50ms ease;
 }
 
-.btn:hover:not(:disabled) { background: var(--_hover-bg); }
+.btn:hover:not(:disabled) {
+  background: var(--_hover-bg);
+}
 
 .btn:active:not(:disabled) {
   transform: translateY(0.5px);
@@ -163,15 +172,30 @@ const { color, variant, size, block, disabled, loading, type } = withDefaults(de
 }
 
 /* Sizes */
-.btn.size-sm { padding: 0.35rem 0.6rem; font-size: 0.875rem; }
-.btn.size-md { padding: 0.5rem 0.9rem; font-size: 1rem; }
-.btn.size-lg { padding: 0.7rem 1.1rem; font-size: 1.0625rem; }
+.btn.size-sm {
+  padding: 0.35rem 0.6rem;
+  font-size: 0.875rem;
+}
+.btn.size-md {
+  padding: 0.5rem 0.9rem;
+  font-size: 1rem;
+}
+.btn.size-lg {
+  padding: 0.7rem 1.1rem;
+  font-size: 1.0625rem;
+}
 
 /* Block */
-.btn.is-block { display: inline-flex; width: 100%; }
+.btn.is-block {
+  display: inline-flex;
+  width: 100%;
+}
 
 /* Loading */
-.btn.is-loading { position: relative; }
-.btn.is-loading .btn__content { opacity: 0.85; }
-
+.btn.is-loading {
+  position: relative;
+}
+.btn.is-loading .btn__content {
+  opacity: 0.85;
+}
 </style>

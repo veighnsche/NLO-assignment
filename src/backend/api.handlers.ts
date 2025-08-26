@@ -1,7 +1,13 @@
 // Endpoint definitions live in backend to reflect a real server layout.
 // MSW under src/mocks/ just mounts these handlers in browser/tests.
 import { http, HttpResponse } from 'msw'
-import { bootDatabase, getSnapshotForClient, adminReset, revealCell, botStep } from '@/backend/db/idb'
+import {
+  bootDatabase,
+  getSnapshotForClient,
+  adminReset,
+  revealCell,
+  botStep,
+} from '@/backend/db/idb'
 
 export const handlers = [
   http.post('/api/boot', async ({ request }) => {
@@ -46,7 +52,10 @@ export const handlers = [
 
   http.post('/api/admin/reset', async ({ request }) => {
     try {
-      const body = (await request.json().catch(() => ({}))) as { mode?: 'soft' | 'hard'; seed?: number }
+      const body = (await request.json().catch(() => ({}))) as {
+        mode?: 'soft' | 'hard'
+        seed?: number
+      }
       const mode = body.mode ?? 'hard'
       const res = await adminReset(mode, typeof body?.seed === 'number' ? body.seed : undefined)
       return HttpResponse.json(res)
