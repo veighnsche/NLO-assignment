@@ -3,7 +3,7 @@
 </script>
 
 <template>
-  <section class="init-screen" role="status" aria-live="polite">
+  <section class="init-screen" role="status" aria-live="polite" aria-busy="true">
     <div class="card">
       <div class="spinner" aria-hidden="true" />
       <h2>Preparing your experience…</h2>

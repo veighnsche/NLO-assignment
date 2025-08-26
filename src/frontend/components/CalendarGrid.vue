@@ -111,9 +111,7 @@ function onGridLeave() {
 <template>
   <div
     class="calendar-grid"
-    role="grid"
-    :aria-rowcount="rows"
-    :aria-colcount="cols"
+    aria-label="Speelraster"
     @mousemove="onGridMove"
     @mouseleave="onGridLeave"
   >
@@ -121,7 +119,6 @@ function onGridLeave() {
       v-for="id in cells"
       :key="id"
       class="cell"
-      role="gridcell"
       :aria-label="ariaLabelForCell(id)"
       :class="{
         revealed: isRevealed(id),

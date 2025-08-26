@@ -91,7 +91,7 @@ function onLeave() {
 </script>
 
 <template>
-  <section class="game-section">
+  <section class="game-section" aria-label="Spel">
     <GameHeader
       :opened-count="grid.openedCount"
       :total="grid.total"
@@ -106,23 +106,23 @@ function onLeave() {
   <Tooltip :open="tipOpen" :x="tipX" :y="tipY" placement="top" :offset="12" :max-width="'340px'">
     <div class="tt-card">
       <div class="tt-row">
-        <span class="tt-emoji">📍</span>
+        <span class="tt-emoji" aria-hidden="true">📍</span>
         <span>{{ tipText }}</span>
       </div>
       <div class="tt-row">
-        <span class="tt-emoji">👤</span>
+        <span class="tt-emoji" aria-hidden="true">👤</span>
         <span>Geopend door: <strong>{{ tipOpener ?? '—' }}</strong></span>
       </div>
       <div class="tt-row" :class="statusClass">
-        <span class="tt-emoji">🎯</span>
+        <span class="tt-emoji" aria-hidden="true">🎯</span>
         <span>Status: <strong>{{ tipRevealed ? 'Geopend' : 'Gesloten' }}</strong></span>
       </div>
       <div v-if="whenText" class="tt-row">
-        <span class="tt-emoji">⏰</span>
+        <span class="tt-emoji" aria-hidden="true">⏰</span>
         <span>Geopend op: <strong>{{ whenText }}</strong></span>
       </div>
       <div class="tt-row" :class="prizeClass">
-        <span class="tt-emoji">🏆</span>
+        <span class="tt-emoji" aria-hidden="true">🏆</span>
         <span>
           Prijs: <strong>{{ prizeEmoji }} {{ prizeLabel }}</strong>
           <template v-if="prizeAmountText">

@@ -10,6 +10,7 @@
           color="primary"
           variant="outline"
           size="sm"
+          :aria-pressed="showAdminBar ? 'true' : 'false'"
           @click="$emit('toggle')"
         >
           {{ showAdminBar ? 'Verberg adminbalk' : 'Toon adminbalk' }}
