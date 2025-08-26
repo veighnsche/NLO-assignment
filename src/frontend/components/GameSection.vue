@@ -81,11 +81,12 @@ function onGridLeave() {
   /* 100 columns grid */
   display: grid;
   grid-template-columns: repeat(100, 1fr);
-  gap: 2px;
+  gap: 0;
   width: 100%;
   user-select: none;
   box-sizing: border-box;
   max-width: 100vw; /* ensure grid stays within viewport */
+  border: 1px solid #e0e0e0;
 }
 
 .cell {
