@@ -8,6 +8,15 @@
 
     <div class="section right">
       <button class="btn" type="button" @click="showModal = true">Reset spel…</button>
+      <button
+        class="btn btn-icon"
+        type="button"
+        aria-label="Sluit adminbalk"
+        title="Sluit adminbalk"
+        @click="$emit('toggle')"
+      >
+        ✕
+      </button>
     </div>
   </div>
 
@@ -35,7 +44,10 @@ import { ref, defineEmits } from 'vue'
 const showModal = ref(false)
 const seed = ref<number | null>(null)
 
-const emit = defineEmits<{ (e: 'reset', seed?: number): void }>()
+const emit = defineEmits<{
+  (e: 'reset', seed?: number): void
+  (e: 'toggle'): void
+}>()
 
 function closeModal() {
   showModal.value = false
@@ -132,6 +144,18 @@ function confirmReset() {
 
 .btn-danger:active {
   background: #ef9a9a;
+}
+
+/* Icon button */
+.btn-icon {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  line-height: 1;
 }
 
 /* Modal */

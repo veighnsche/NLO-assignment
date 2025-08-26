@@ -59,7 +59,7 @@ onUnmounted(() => {
   <TopBar :showAdminBar="showAdminBar" @toggle="showAdminBar = !showAdminBar" />
   <InitScreen v-if="isInitializing" />
   <GameSection v-else />
-  <AdminBar v-if="showAdminBar" @reset="onReset" />
+  <AdminBar v-if="showAdminBar" @reset="onReset" @toggle="showAdminBar = false" />
 </template>
 
 <style scoped></style>

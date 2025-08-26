@@ -159,6 +159,11 @@ function onGridLeave() {
   box-sizing: border-box;
   max-width: 100vw; /* ensure grid stays within viewport */
   border: 1px solid var(--border-subtle);
+  /* Background image composed of two halves stacked vertically */
+  background-image: url('/top-half.png'), url('/bottom-half.png');
+  background-repeat: no-repeat, no-repeat;
+  background-position: top, bottom;
+  background-size: 100% 50%, 100% 50%;
 }
 
 .cell {
@@ -178,9 +183,10 @@ function onGridLeave() {
 }
 
 .cell.revealed {
-  /* Stronger contrast for opened cells */
-  background: color-mix(in srgb, var(--surface-elevated) 75%, var(--color-accent-gold));
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-accent-gold) 65%, black);
+  /* Reveal underlying grid background image */
+  background: transparent;
+  /* Keep a subtle grid line to delineate cells */
+  box-shadow: inset 0 0 0 1px var(--border-subtle);
 }
 
 /* Closed (not yet opened) */
@@ -206,13 +212,13 @@ function onGridLeave() {
 
 /* Revealed + prize variants */
 .cell.revealed.consolation {
-  background: color-mix(in srgb, var(--color-primary-green) 22%, white);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-primary-green) 65%, white);
+  /* Do not cover the image; add a subtle green outline */
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--color-primary-green) 65%, white);
 }
 
 .cell.revealed.grand {
-  background: color-mix(in srgb, var(--color-accent-gold) 38%, white);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-accent-gold) 65%, black);
+  /* Do not cover the image; add a subtle gold outline */
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--color-accent-gold) 65%, black);
 }
 
 .cell .reveal {
