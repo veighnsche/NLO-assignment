@@ -1,8 +1,8 @@
-import { openDatabase, STORE_META } from '../core/storage'
-import { getMemory, getUsersMemory, ensureBooted } from '../core/state'
-import { mixSeedWithString } from '../rng'
-import type { User } from '../users'
-import { makeEtag } from '../schema'
+import { openDatabase, STORE_META } from '../infra/idb'
+import { getMemory, getUsersMemory, ensureBooted } from '../infra/state'
+import { mixSeedWithString } from '../domain/shared/rng'
+import type { User } from '../domain/users/model'
+import { makeEtag } from '../domain/grid/schema'
 
 function bumpVersion(): void {
   const memory = getMemory()

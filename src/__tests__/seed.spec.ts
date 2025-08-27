@@ -1,8 +1,9 @@
 import { describe, it, expect } from 'vitest'
-import { seedGrid, getNextBotReveal } from '@/backend/db/seed'
-import { GRID_TOTAL, PrizeConsolation, PrizeGrand } from '@/backend/db/schema'
+import { seedGrid, getNextBotReveal } from '@/backend/db/domain/grid/seed'
+import { GRID_TOTAL, PrizeConsolation, PrizeGrand } from '@/backend/db/domain/grid/schema'
+import type { Targets } from '@/backend/db/domain/grid/seed'
 
-function countPrizes(targets: Record<string, { amount: number }>) {
+function countPrizes(targets: Targets) {
   let grand = 0
   let consolation = 0
   for (const prize of Object.values(targets)) {
@@ -35,7 +36,7 @@ describe('seedGrid', () => {
 
   it('places exactly 1 grand prize and up to 100 consolations', () => {
     const { targets } = seedGrid()
-    const { grand, consolation } = countPrizes(targets as any)
+    const { grand, consolation } = countPrizes(targets)
     expect(grand).toBe(1)
     expect(consolation).toBeLessThanOrEqual(100)
     // For default 100x100 grid we expect exactly 100 consolation

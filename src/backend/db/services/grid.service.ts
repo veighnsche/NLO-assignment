@@ -1,8 +1,8 @@
-import type { Cell, CellId, GridMeta, Prize } from '../schema'
-import { GRID_COLS, GRID_ROWS, GRID_TOTAL, PrizeNone, makeEtag } from '../schema'
-import { seedGrid, getNextBotReveal } from '../seed'
-import { generateDutchUsers, indexUsers } from '../users'
-import { openDatabase, STORE_GRID, STORE_META, STORE_USERS } from '../core/storage'
+import type { Cell, CellId, GridMeta, Prize } from '../domain/grid/schema'
+import { GRID_COLS, GRID_ROWS, GRID_TOTAL, PrizeNone, makeEtag } from '../domain/grid/schema'
+import { seedGrid, getNextBotReveal } from '../domain/grid/seed'
+import { generateDutchUsers, indexUsers } from '../domain/users/generator'
+import { openDatabase, STORE_GRID, STORE_META, STORE_USERS } from '../infra/idb'
 import {
   getMemory,
   setMemory,
@@ -11,9 +11,9 @@ import {
   getUsersMemory,
   setUsersMemory,
   ensureBooted,
-} from '../core/state'
+} from '../infra/state'
 import { getBotDelayRange as _getBotDelayRange } from './bot.service'
-import { mixSeedWithString } from '../rng'
+import { mixSeedWithString } from '../domain/shared/rng'
 
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms))

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { createXorShift32, shuffleInPlace } from '@/backend/db/rng'
+import { createXorShift32, shuffleInPlace } from '@/backend/db/domain/shared/rng'
 
 function genSequenceUInt32(seed: number, n: number): number[] {
   const rng = createXorShift32(seed)

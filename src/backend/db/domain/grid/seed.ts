@@ -12,7 +12,7 @@ import {
   type GridState,
   type Prize,
 } from './schema'
-import { createXorShift32, shuffleInPlace } from './rng'
+import { createXorShift32, shuffleInPlace } from '../shared/rng'
 
 /**
  * Mapping from cell id to hidden prize for targeted cells only.
