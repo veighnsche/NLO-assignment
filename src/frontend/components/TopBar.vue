@@ -21,15 +21,13 @@
 </template>
 
 <script setup lang="ts">
-import { withDefaults, defineProps } from 'vue'
+import { withDefaults, defineProps, toRefs } from 'vue'
 import UiButton from './ui/Button.vue'
 
-const { showAdminBar, title } = withDefaults(
-  defineProps<{ showAdminBar: boolean; title?: string }>(),
-  {
-    title: 'Verrassingskalender',
-  },
-)
+const props = withDefaults(defineProps<{ showAdminBar: boolean; title?: string }>(), {
+  title: 'Verrassingskalender',
+})
+const { showAdminBar, title } = toRefs(props)
 defineEmits<{ (e: 'toggle'): void }>()
 </script>
 
