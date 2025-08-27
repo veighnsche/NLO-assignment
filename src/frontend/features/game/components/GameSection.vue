@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import GameMetrics from './GameMetrics.vue'
 import CalendarGrid from './CalendarGrid.vue'
 import GridTooltip from './GridTooltip.vue'
-import type { GridTooltipApi } from './GridTooltip.vue'
+import type { GridTooltipApi } from '@/frontend/features/game/composables/useGridTooltip'
 
 // Tooltip instance owned here and passed down to grid as an imperative API
 const tooltipRef = ref<GridTooltipApi | null>(null)
