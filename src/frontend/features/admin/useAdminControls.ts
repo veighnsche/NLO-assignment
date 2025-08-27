@@ -5,6 +5,7 @@ import {
   apiAdminGetBotDelay,
   apiAdminGetTargets,
   apiAdminSetCurrentPlayer,
+  apiAdminPickRandomPlayer,
 } from '@/frontend/features/admin/api'
 
 export function useAdminControls() {
@@ -53,5 +54,16 @@ export function useAdminControls() {
     return res.targets
   }
 
-  return { reset, setBotSpeed, getBotDelay, getTargets }
+  async function pickRandomPlayer(): Promise<void> {
+    try {
+      const res = await apiAdminPickRandomPlayer()
+      if ('ok' in res && res.ok) {
+        await grid.refreshCurrentPlayer()
+      }
+    } catch {
+      // ignore in dev
+    }
+  }
+
+  return { reset, setBotSpeed, getBotDelay, getTargets, pickRandomPlayer }
 }

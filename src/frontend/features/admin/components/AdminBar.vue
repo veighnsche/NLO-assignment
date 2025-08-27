@@ -63,7 +63,6 @@ import Button from '@/frontend/ui/Button.vue'
 import Slider from '@/frontend/ui/Slider.vue'
 import { useAdminControls } from '@/frontend/features/admin/useAdminControls'
 import { useGridStore } from '@/frontend/features/game/store/grid'
-import { apiAdminPickRandomPlayer } from '@/frontend/features/admin/api'
 
 const showModal = ref(false)
 const seed = ref<number | null>(null)
@@ -71,7 +70,7 @@ const seed = ref<number | null>(null)
 // Slider now represents actions per second (Hz). Right = faster
 const botSpeedHz = ref(1.0)
 let speedTimer: number | null = null
-const { reset: adminReset, setBotSpeed, getBotDelay } = useAdminControls()
+const { reset: adminReset, setBotSpeed, getBotDelay, pickRandomPlayer } = useAdminControls()
 const grid = useGridStore()
 
 // Current player display is provided by grid store (activePlayerName)
@@ -91,17 +90,6 @@ async function confirmReset() {
 }
 
 // --- Change active player (admin) ---
-async function pickRandomPlayer() {
-  try {
-    const res = await apiAdminPickRandomPlayer()
-    if ('ok' in res && res.ok) {
-      await grid.refreshCurrentPlayer()
-      return
-    }
-  } catch {
-    // ignore
-  }
-}
 
 function scheduleSetSpeed() {
   if (speedTimer != null) window.clearTimeout(speedTimer)
