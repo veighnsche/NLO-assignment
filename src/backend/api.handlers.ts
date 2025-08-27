@@ -27,13 +27,14 @@ async function safeJson<T>(request: Request, fallback: T): Promise<T> {
   }
 }
 
-function statusForDomainError(err:
-  | 'NOT_FOUND'
-  | 'ALREADY_REVEALED'
-  | 'ALREADY_PLAYED'
-  | 'NOT_ELIGIBLE'
-  | 'NO_ELIGIBLE'
-  | 'NOT_BOOTED',
+function statusForDomainError(
+  err:
+    | 'NOT_FOUND'
+    | 'ALREADY_REVEALED'
+    | 'ALREADY_PLAYED'
+    | 'NOT_ELIGIBLE'
+    | 'NO_ELIGIBLE'
+    | 'NOT_BOOTED',
 ): number {
   switch (err) {
     case 'NOT_FOUND':

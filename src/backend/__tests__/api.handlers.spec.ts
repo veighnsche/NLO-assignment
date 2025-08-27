@@ -136,7 +136,9 @@ describe('api.handlers (MSW integration)', () => {
     expect(j1).toHaveProperty('userId')
 
     // Use the cookie to assign again and expect a valid response
-    const r2 = await post('/api/users/assign', undefined, { headers: { cookie: String(setCookie) } })
+    const r2 = await post('/api/users/assign', undefined, {
+      headers: { cookie: String(setCookie) },
+    })
     expect(r2.status).toBe(200)
     const j2 = await r2.json()
     expect(j2).toHaveProperty('userId')

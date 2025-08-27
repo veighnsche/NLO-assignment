@@ -29,7 +29,10 @@ describe('services/grid.service', () => {
     expect(snap0.revealed.length).toBe(0)
 
     const id = cellId(0, 0)
-    const res = await revealCell(id, undefined, { bypassEligibility: true, overrideRevealedBy: 'bot' })
+    const res = await revealCell(id, undefined, {
+      bypassEligibility: true,
+      overrideRevealedBy: 'bot',
+    })
     if ('error' in res) throw new Error('expected ok reveal')
 
     const snap1 = getSnapshotForClient()
@@ -105,7 +108,10 @@ describe('services/grid.service', () => {
 
     it('supports overrideRevealedBy and bypassEligibility', async () => {
       const id = cellId(0, 5)
-      const res = await revealCell(id, 'bot', { bypassEligibility: true, overrideRevealedBy: 'user-123' })
+      const res = await revealCell(id, 'bot', {
+        bypassEligibility: true,
+        overrideRevealedBy: 'user-123',
+      })
       if ('error' in res) throw new Error('expected ok')
       expect(res.cell.revealedBy).toBe('user-123')
     })
@@ -141,7 +147,9 @@ describe('services/grid.service', () => {
   it('bootDatabase backfills revealOrder/revealIndex when missing in stored meta', async () => {
     await adminReset('hard', SEED)
     const mem = getMemory()!
-    const legacyMeta: Record<string, unknown> = { ...(mem.meta as unknown as Record<string, unknown>) }
+    const legacyMeta: Record<string, unknown> = {
+      ...(mem.meta as unknown as Record<string, unknown>),
+    }
     delete (legacyMeta as Record<string, unknown>).revealOrder
     delete (legacyMeta as Record<string, unknown>).revealIndex
     // Overwrite META store with legacyMeta

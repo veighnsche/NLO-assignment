@@ -2,17 +2,12 @@
 
 A Vue 3 + Vite project implementing a 100x100 surprise calendar with a mocked backend, deterministic seeding, IndexedDB persistence, and MSW-driven API.
 
-## Recommended IDE Setup
+## Tech stack
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
-
-## Type Support for `.vue` Imports in TS
-
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vite.dev/config/).
+- Vue 3 + Vite 7 + TypeScript
+- Pinia (state), Vue Test Utils + Vitest (tests)
+- MSW 2 (API mocking) for dev/tests
+- IndexedDB via `idb` for persistence
 
 ## Project Setup
 
@@ -52,139 +47,112 @@ pnpm lint
 
 ---
 
-# Assignment Implementation: Surprise Calendar (100x100)
+## Features
 
-This app implements the Nederlandse Loterij assignment:
-
-* __[Grid]__ A 100x100 (10,000 cells) grid rendered in `src/frontend/components/GameSection.vue`.
-* __[Interaction]__ A user can reveal one cell. The prize appears with a short animation.
-* __[Persistence]__ Opened cells and prizes persist across reloads via IndexedDB.
-* __[Simulated multi-user]__ A bot periodically reveals cells to emulate other users.
+- **Grid** 100x100 (10,000 cells) rendered in `src/frontend/features/game/components/GameSection.vue`.
+- **Interaction** One reveal per user with a short prize animation.
+- **Persistence** Opened cells and prizes persist via IndexedDB.
+- **Simulated multi-user** A bot periodically reveals cells to emulate other users.
 
 ## Quick start
 
-1) Install deps
+1. Install deps
 
 ```sh
 pnpm install
 ```
 
-2) Ensure MSW worker exists (already added to `public/` but command here for reference):
+2. Ensure MSW worker exists (already added to `public/` but command here for reference):
 
 ```sh
 pnpm dlx msw init public --save
 ```
 
-3) Run dev server
+3. Run dev server
 
 ```sh
 pnpm dev
 ```
 
-4) Verify MSW
+4. Verify MSW
 
-* __[Expected]__ Network shows `GET /mockServiceWorker.js` 200 (content-type JavaScript).
-* __[Code path]__ `src/main.ts` dynamically imports `src/backend/msw/browser.ts` in dev and starts the worker.
-
-## Recent changes
-
-* __Reusable Modal component__ (`src/frontend/components/ui/Modal.vue`)
-  * v-model, ESC/overlay close, focus trap, teleport to body, ARIA attributes, footer slot.
-* __Confirmation before reveal__
-  * `CalendarGrid.vue` emits `request-reveal` when `confirmBeforeReveal` is true.
-  * `GameSection.vue` shows `Modal` to confirm opening a cell, then calls `grid.reveal(...)`.
-* __Consistent buttons__
-  * `UiButton` (`src/frontend/components/ui/Button.vue`) enhanced with `icon` prop for icon-only buttons.
-  * `AdminBar.vue` now uses `UiButton` including icon-only close button.
-* __Seamless revealed image__
-  * Inner borders removed between adjacent revealed cells in `CalendarGrid.vue` so the background image shows without seams.
-* __Header “can open” indicator__
-  * `GameHeader.vue` displays whether the user can currently open a cell (`canOpen`).
+- **[Expected]** Network shows `GET /mockServiceWorker.js` 200 (content-type JavaScript).
+- **[Code path]** `src/main.ts` dynamically imports `src/backend/msw/browser.ts` in dev and starts the worker.
 
 ## Architecture
 
 Directories of interest:
 
-* __`src/backend/`__
-  * `api.handlers.ts` — HTTP endpoints (boot, snapshot, reveal, bot step, admin reset). Single source of truth for API routes.
-  * `domain/` — Domain models and logic
-    * `grid/` — `schema.ts` (types, helpers), `seed.ts` (grid seed + bot reveal order)
-    * `users/` — `model.ts` (User), `generator.ts` (deterministic user generation)
-    * `shared/` — `rng.ts` (deterministic PRNG utilities)
-  * `infra/` — Infrastructure
-    * `idb.ts` — IndexedDB config and open helper
-    * `state.ts` — In-memory state singletons and accessors
-  * `services/` — Application services orchestrating domain + infra
-  * `msw/browser.ts` — MSW worker setup for the browser (dev only)
-  * `msw/server.ts` — MSW server setup for tests (Node/Vitest)
+- **`src/backend/`**
+  - `api.handlers.ts` — HTTP endpoints (boot, snapshot, reveal, bot step, admin reset). Single source of truth for API routes.
+  - `domain/` — Domain models and logic
+    - `grid/` — `schema.ts` (types, helpers), `seed.ts` (grid seed + bot reveal order)
+    - `users/` — `model.ts` (User), `generator.ts` (deterministic user generation)
+    - `shared/` — `rng.ts` (deterministic PRNG utilities)
+  - `infra/` — Infrastructure
+    - `idb.ts` — IndexedDB config and open helper
+    - `state.ts` — In-memory state singletons and accessors
+    - `meta.ts` — App meta and counters persistence helpers
+    - `util.ts` — Small infra utilities
+  - `services/` — Application services orchestrating domain + infra
+  - `index.ts` — Backend barrel exports used by handlers
+  - `msw/browser.ts` — MSW worker setup for the browser (dev only)
+  - `msw/server.ts` — MSW server setup for tests (Node/Vitest)
 
-* __`src/frontend/`__
-  * `api.ts` — Thin HTTP client for `/api/*` endpoints.
-  * `store/grid.ts` — Pinia store for grid state: boot, refresh, reveal, bot polling, single-reveal enforcement.
-  * `components/CalendarGrid.vue` — 100x100 cell grid over a two-half background image; emits hover/leave; when `confirmBeforeReveal` is on, emits `request-reveal` instead of revealing directly; revealed cells have no inner borders to keep image seamless.
-  * `components/GameSection.vue` — Orchestrates grid, tooltip, confirmation modal flow; computes header metrics and `canOpen`; confirms reveal via `Modal` before calling `grid.reveal`.
-  * `components/GameHeader.vue` — Displays counters, grand prize status, and a "Kan openen" chip based on `canOpen`.
-  * `components/ui/Modal.vue` — Reusable accessible modal.
-  * `components/ui/Button.vue` — Reusable button with variants/sizes and `icon` mode for icon-only buttons.
-  * `components/ui/Tooltip.vue` — Positioned tooltip used for hover details.
-  * `components/InitScreen.vue` — Simple init/loading screen.
-  * `components/TopBar.vue` — App bar.
-  * `admin/components/AdminBar.vue` — Admin controls; reset dialog now uses `Modal` and `UiButton`.
+- **`src/frontend/`**
+  - `App.vue` — App shell.
+  - `features/game/`
+    - `api.ts` — Client for game endpoints.
+    - `components/` — `CalendarGrid.vue`, `GameSection.vue`, `GameMetrics.vue`, `GridTooltip.vue`, `InitScreen.vue`, `RevealModal.vue`.
+    - `composables/` — `useInitApp.ts`, `useGridCells.ts`, `useGridHoverTooltip.ts`, `useGridTooltip.ts`.
+    - `store/` — `grid.ts`, `bot.ts`, `session.ts`, `status.ts`.
+  - `features/admin/`
+    - `api.ts` — Client for admin endpoints.
+    - `components/` — `AdminBar.vue`.
+    - `store/` — `adminUI.ts`, `exposed.ts`; `useAdminControls.ts`.
+  - `features/chrome/`
+    - `components/` — `TopBar.vue`, `Header.vue`, `Footer.vue`.
+  - `ui/` — Reusable UI: `Button.vue`, `Modal.vue`, `Tooltip.vue`, `Slider.vue`.
+  - `lib/` — Helpers: `http.ts`, `clientId.ts`, `format.ts`, `botSpeed.ts`.
+  - `styles/` — Global styles: `global.css`, `theme.css`.
+  - `types/` — Shared types: `api.ts`.
 
-* __`public/`__
-  * `mockServiceWorker.js` — MSW worker script (served by Vite at `/mockServiceWorker.js`).
+- **`public/`**
+  - `mockServiceWorker.js` — MSW worker script (served by Vite at `/mockServiceWorker.js`).
 
 Other entry points:
 
-* __`src/main.ts`__ — Starts MSW in dev, mounts Vue app and Pinia.
-* __`src/setupTests.ts`__ — Starts MSW server for unit tests.
+- **`src/main.ts`** — Starts MSW in dev, mounts Vue app and Pinia.
+- **`src/setupTests.ts`** — Starts MSW server for unit tests.
 
 ## API surface
 
 All endpoints are defined once in `src/backend/api.handlers.ts` and mounted by MSW.
 
-* `POST /api/boot` — Initialize state with optional `seed`.
-* `GET /api/snapshot` — Current snapshot: meta, revealed cells, counts.
-* `POST /api/reveal` — Reveal a cell: `{ id, playerId? }`.
-* `POST /api/bot/step` — Deterministic bot reveal step.
-* `POST /api/admin/reset` — Reset state; optional `{ mode, seed }`.
+Core:
 
-Client functions in `src/frontend/api.ts` map 1:1 to these endpoints.
+- `POST /api/boot` — Initialize state with optional `seed`.
+- `GET /api/snapshot` — Current snapshot: meta, revealed cells, counts.
+- `POST /api/reveal` — Reveal a cell: `{ id, playerId? }`.
+- `POST /api/bot/step` — Deterministic bot reveal step.
 
-## Behavior details
+Admin:
 
-* __One reveal per visitor__
-  * Enforced in store via `localStorage('nlo-user-revealed')`.
-  * Cleared on Admin reset to ease demoing.
+- `POST /api/admin/reset` — Reset state; optional `{ mode: 'soft'|'hard', seed }`.
+- `POST /api/admin/bot-delay` — Set bot delay range `{ minMs, maxMs }`.
+- `GET /api/admin/bot-delay` — Get current bot delay range.
+- `GET /api/admin/targets` — Reveal hidden target cells (grand + consolation) for admin.
+- `POST /api/admin/pick-random-player` — Pick a random eligible user.
+- `GET /api/admin/current-player` — Get current selected player.
+- `POST /api/admin/current-player` — Set current player `{ playerId|null }`.
+- `GET /api/admin/eligible-users?offset=&limit=&query=` — Paginated eligible users.
 
-* __Persistence__
-  * `src/backend/infra/idb.ts` persists grid + meta to IndexedDB.
-  * On boot, state is loaded; frontend hydrates via `snapshot`.
+Users:
 
-* __Simulated multi-user__
-  * `src/App.vue` starts `grid.startBotPolling(1500)` after boot.
-  * Each tick calls `/api/bot/step` then refreshes snapshot.
+- `POST /api/users/assign` — Assign or retrieve a user for a client; sets `nlo-client-id` cookie when missing.
+- `POST /api/users/resolve` — Resolve user details by ids `{ ids: string[] }`.
 
-* __Reveal animation__
-  * In `GameSection.vue`, revealed content fades/scales in via CSS.
-
-* __Confirmation before reveal__
-  * `CalendarGrid.vue` emits `request-reveal` and `GameSection.vue` shows a confirmation `Modal`.
-
-* __Seamless revealed image__
-  * Revealed cells remove per-cell borders and prize outlines to avoid seams between adjacent tiles.
-
-* __Header indicator__
-  * `GameHeader.vue` shows if user can open a cell now (`canOpen` computed from store state).
-
-## Common troubleshooting
-
-* __MIME type 'text/html' for Service Worker__
-  * Ensure `public/mockServiceWorker.js` exists. Generate via `pnpm dlx msw init public --save`.
-  * Hard refresh or Unregister SW in DevTools → Application → Service Workers.
-
-* __No cells reveal / NOT_BOOTED__
-  * Ensure `apiBoot()` ran on app init (`src/App.vue` → `grid.boot(...)`).
+Client functions live under `src/frontend/features/game/api.ts` and `src/frontend/features/admin/api.ts`, mapping 1:1 to these endpoints.
 
 ## Tests
 
@@ -195,4 +163,3 @@ pnpm test:unit
 ```
 
 MSW server auto-starts in `src/setupTests.ts`.
-
