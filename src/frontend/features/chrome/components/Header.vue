@@ -11,6 +11,7 @@ const props = defineProps<{
 const grid = useGridStore()
 // Current player id is the backend-assigned user id
 const playerId = computed(() => grid.getAssignedUserId() ?? '')
+const playerName = computed(() => grid.assignedUser?.name ?? grid.userNameById(playerId.value) ?? '')
 
 // Derived state for the status card
 const canOpen = computed(
@@ -37,7 +38,7 @@ const cardState = computed(() => {
 <template>
   <div class="game-header">
     <h2 v-if="props.title">{{ props.title }}</h2>
-    <div class="greeting" aria-live="polite">Hallo, -</div>
+    <div class="greeting" aria-live="polite">Hallo, {{ playerName || '—' }}</div>
     <!-- Status Card with 4 states -->
     <div
       class="status-card"

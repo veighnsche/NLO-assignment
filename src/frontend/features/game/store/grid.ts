@@ -6,6 +6,7 @@ import {
   apiBotStep,
   apiAdminGetTargets,
   apiUsersAssign,
+  apiUsersResolve,
 } from '@/frontend/shared/api/client'
 
 // Strong type for revealed cell entries
@@ -55,6 +56,8 @@ export const useGridStore = defineStore('grid', {
     >,
     // Assigned backend user identity
     assignedUser: null as null | { id: string; name: string },
+    // Cache of user id -> name (populated from resolve endpoint and assignments)
+    userNames: new Map<string, string>() as Map<string, string>,
   }),
 
   getters: {
@@ -68,6 +71,12 @@ export const useGridStore = defineStore('grid', {
     revealedById(state): Map<string, RevealedCellEntry> {
       // Return stable Map
       return state.revealedByIdMap as Map<string, RevealedCellEntry>
+    },
+    userNameById(state): (id?: string | null) => string | null {
+      return (id?: string | null) => {
+        if (!id) return null
+        return state.userNames.get(id) ?? null
+      }
     },
   },
 
@@ -83,6 +92,8 @@ export const useGridStore = defineStore('grid', {
       if (this.assignedUser) return
       const u = await apiUsersAssign()
       this.assignedUser = { id: u.userId, name: u.name }
+      // Seed names cache with our own assignment
+      this.userNames.set(u.userId, u.name)
     },
     async boot(seed?: number) {
       this.isBooting = true
@@ -114,13 +125,24 @@ export const useGridStore = defineStore('grid', {
         // Mutate stable revealedIds Set and revealedByIdMap in place
         this.revealedIds.clear()
         this.revealedByIdMap.clear()
+        const idsToResolve = new Set<string>()
         for (const c of snap.revealed) {
           this.revealedIds.add(c.id)
           this.revealedByIdMap.set(c.id, c)
+          if (c.revealedBy && !this.userNames.has(c.revealedBy)) idsToResolve.add(c.revealedBy)
         }
         this.openedCount = snap.openedCount
         this.total = snap.total
         this.lastEtag = snap.meta.etag
+        // Resolve any new user ids to names and cache them
+        if (idsToResolve.size > 0) {
+          try {
+            const res = await apiUsersResolve(Array.from(idsToResolve))
+            for (const u of res.users) this.userNames.set(u.id, u.name)
+          } catch {
+            // ignore resolve errors in dev
+          }
+        }
       } catch {
         this.networkOk = false
       } finally {

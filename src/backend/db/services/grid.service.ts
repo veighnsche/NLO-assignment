@@ -13,6 +13,7 @@ import {
   ensureBooted,
 } from '../core/state'
 import { getBotDelayRange as _getBotDelayRange } from './bot.service'
+import { mixSeedWithString } from '../rng'
 
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms))
@@ -140,14 +141,16 @@ export function getAdminTargets(): Array<{ id: CellId; row: number; col: number;
 export async function revealCell(
   id: CellId,
   playerId?: string,
+  options?: { overrideRevealedBy?: string; bypassEligibility?: boolean },
 ): Promise<
   | { ok: true; cell: Cell; meta: GridMeta }
   | { error: 'NOT_FOUND' | 'ALREADY_REVEALED' | 'ALREADY_PLAYED' | 'NOT_YOUR_TURN' | 'NOT_ELIGIBLE' }
 > {
   const memory = getMemory()
   ensureBooted(memory)
-  // Enforce one reveal per player (except for the deterministic bot)
-  if (playerId && playerId !== 'bot') {
+  const bypass = options?.bypassEligibility === true
+  // Enforce one reveal per player unless bypassing (used for bot attribution)
+  if (!bypass && playerId && playerId !== 'bot') {
     // Turn gating if currentPlayerId is set
     const current = memory!.meta.currentPlayerId
     if (current && playerId !== current) {
@@ -177,12 +180,13 @@ export async function revealCell(
   // Mutate in-memory state
   cell.revealed = true
   cell.prize = prize
-  if (playerId) cell.revealedBy = playerId
+  const revealedBy = options?.overrideRevealedBy ?? playerId
+  if (revealedBy) cell.revealedBy = revealedBy
   cell.revealedAt = new Date().toISOString()
 
   // Mark user as played when applicable
   const usersMemory2 = getUsersMemory()
-  if (playerId && playerId !== 'bot' && usersMemory2) {
+  if (!bypass && playerId && playerId !== 'bot' && usersMemory2) {
     const u = usersMemory2[playerId]
     if (u) u.played = true
   }
@@ -237,8 +241,32 @@ export async function botStep(): Promise<
     return { ok: true, revealed: undefined, meta: memory.meta, done: true }
   }
 
-  // Reveal chosen cell as bot
-  const res = await revealCell(id, 'bot')
+  // Choose a deterministic user for this bot step based on seed and step index
+  const usersMemory = getUsersMemory()
+  let asUserId: string | undefined = undefined
+  if (usersMemory) {
+    const baseSeed = (memory.meta.seed ?? 0x9e3779b9) | 0
+    const key = `bot-step-${index}`
+    const rng = mixSeedWithString(baseSeed, key)
+    const ids = Object.keys(usersMemory)
+    if (ids.length > 0) {
+      // Start from a deterministic index, then pick first not-yet-played user scanning forward
+      const start = rng.nextInt(ids.length)
+      for (let offset = 0; offset < ids.length; offset++) {
+        const uid = ids[(start + offset) % ids.length]
+        const u = usersMemory[uid]
+        if (!u.played) {
+          asUserId = uid
+          break
+        }
+      }
+      // Fallback: if all played, still attribute deterministically to starting id
+      if (!asUserId) asUserId = ids[start]
+    }
+  }
+
+  // Reveal chosen cell, bypassing eligibility/turn checks but attributing to deterministic user
+  const res = await revealCell(id, 'bot', { overrideRevealedBy: asUserId, bypassEligibility: true })
   if ('error' in res) {
     // In case of a race where the cell got revealed between selection and reveal,
     // just persist meta and return done=false to try again on next tick.

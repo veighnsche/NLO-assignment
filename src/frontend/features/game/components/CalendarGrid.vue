@@ -154,11 +154,12 @@ function onGridMove(e: MouseEvent) {
     const text = `Rij ${getRow(idx)}, Kolom ${getCol(idx)}`
     const id = cellIdFromIndex(idx)
     const cell = revealedById.value.get(id)
+    const openerName = grid.userNameById(cell?.revealedBy) || cell?.revealedBy || null
     props.tooltip?.hover({
       text,
       x: e.clientX,
       y: e.clientY,
-      opener: cell?.revealedBy ?? null,
+      opener: openerName,
       revealed: !!cell?.revealed,
       prizeType: cell?.prize?.type,
       prizeAmount: cell?.prize?.amount,
