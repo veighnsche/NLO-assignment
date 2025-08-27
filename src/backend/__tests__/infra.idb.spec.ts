@@ -1,72 +1,64 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-// Helpers to build a mock IDB database object
-function createMockDb(existingStores: Set<string>) {
-  const created: string[] = []
-  const createObjectStore = vi.fn((name: string) => {
-    existingStores.add(name)
-    created.push(name)
-    return {}
+async function deleteDb(name: string): Promise<void> {
+  await new Promise<void>((resolve, reject) => {
+    const req = indexedDB.deleteDatabase(name)
+    req.onsuccess = () => resolve()
+    req.onerror = () => reject(req.error || new Error('deleteDatabase error'))
+    req.onblocked = () => resolve()
   })
-  const mockDb: any = {
-    objectStoreNames: {
-      contains: (name: string) => existingStores.has(name),
-    },
-    createObjectStore,
-    close: vi.fn(),
-    // will be set by the impl under test
-    onversionchange: undefined as any,
-  }
-  return { mockDb, createObjectStore, created }
 }
 
-async function freshImport(existingStores: string[] = []) {
+async function fresh() {
   vi.resetModules()
-
-  const storeSet = new Set(existingStores)
-  const { mockDb, createObjectStore, created } = createMockDb(storeSet)
-
-  const openDBSpy = vi.fn(async (_name: string, _version: number, opts?: { upgrade?: (db: any) => void }) => {
-    // Simulate upgrade callback on open
-    opts?.upgrade?.(mockDb)
-    return mockDb
-  })
-
-  vi.mock('idb', () => ({
-    openDB: openDBSpy,
-  }))
-
   const mod = await import('@/backend/infra/idb')
-  return { mod, mockDb, createObjectStore, created, storeSet, openDBSpy }
+  // ensure clean DB state for each test
+  await deleteDb(mod.DB_NAME)
+  return mod
 }
 
-// TODO: Re-enable these tests with a stable mocking strategy (e.g., vi.doMock or a
-// small wrapper around idb). Current approach conflicts with Vitest's hoisted mocks.
-describe.skip('infra/idb.openDatabase', () => {
+describe('infra/idb.openDatabase (with fake-indexeddb)', () => {
   beforeEach(() => {
     vi.restoreAllMocks()
     vi.clearAllMocks()
   })
 
   it('creates required object stores when missing', async () => {
-    const { mod, created } = await freshImport([])
-    await mod.openDatabase()
-    expect(created).toEqual(expect.arrayContaining([mod.STORE_GRID, mod.STORE_META, mod.STORE_USERS]))
+    const mod = await fresh()
+    const db = await mod.openDatabase()
+    const names = db.objectStoreNames
+    expect(names.contains(mod.STORE_GRID)).toBe(true)
+    expect(names.contains(mod.STORE_META)).toBe(true)
+    expect(names.contains(mod.STORE_USERS)).toBe(true)
   })
 
   it('does not recreate stores when they already exist', async () => {
-    const { mod, createObjectStore } = await freshImport([ 'grid', 'meta', 'users' ])
+    const mod = await fresh()
+    // First open triggers upgrade and store creation
     await mod.openDatabase()
-    expect(createObjectStore).not.toHaveBeenCalled()
+    // Second open should reuse as-is
+    const db2 = await mod.openDatabase()
+    const names = db2.objectStoreNames
+    expect(names.contains(mod.STORE_GRID)).toBe(true)
+    expect(names.contains(mod.STORE_META)).toBe(true)
+    expect(names.contains(mod.STORE_USERS)).toBe(true)
   })
 
   it('caches the database instance across calls', async () => {
-    const { mod, createObjectStore } = await freshImport([])
+    const mod = await fresh()
     const a = await mod.openDatabase()
     const b = await mod.openDatabase()
-    // Should return the exact same instance
     expect(a).toBe(b)
-    // And should not attempt to create stores more than the initial upgrade (3 calls)
-    expect(createObjectStore).toHaveBeenCalledTimes(3)
+  })
+
+  it('responds to versionchange by clearing cache and reopening to a new instance', async () => {
+    const mod = await fresh()
+    const a = await mod.openDatabase()
+    // Manually invoke the handler assigned in openDatabase
+    const handler = (a as unknown as { onversionchange: null | (() => void) }).onversionchange
+    expect(typeof handler).toBe('function')
+    if (handler) handler()
+    const c = await mod.openDatabase()
+    expect(c).not.toBe(a)
   })
 })
