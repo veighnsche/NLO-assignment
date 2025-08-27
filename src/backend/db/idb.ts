@@ -2,12 +2,15 @@ import { openDB, type IDBPDatabase } from 'idb'
 import type { Cell, CellId, GridState, GridMeta, Prize } from './schema'
 import { GRID_COLS, GRID_ROWS, GRID_TOTAL, PrizeNone, makeEtag } from './schema'
 import { seedGrid, type Targets, getNextBotReveal } from './seed'
+import { mixSeedWithString } from './rng'
+import { generateUsers, indexUsers, type User } from './users'
 
 // DB constants
 const DB_NAME = 'nlo-db'
-const DB_VERSION = 1
+const DB_VERSION = 2
 const STORE_GRID = 'grid'
 const STORE_META = 'meta'
+const STORE_USERS = 'users'
 
 // Simulated backend delay for bot actions (in milliseconds)
 let BOT_DELAY_MIN_MS = 300
@@ -38,6 +41,7 @@ function randomInt(min: number, max: number): number {
 let db: IDBPDatabase | null = null
 let memory: GridState | null = null
 let targets: Targets = {}
+let usersMemory: Record<string, User> | null = null
 
 // --- Internal helpers ---
 async function getDb(): Promise<IDBPDatabase> {
@@ -49,6 +53,9 @@ async function getDb(): Promise<IDBPDatabase> {
       }
       if (!database.objectStoreNames.contains(STORE_META)) {
         database.createObjectStore(STORE_META)
+      }
+      if (!database.objectStoreNames.contains(STORE_USERS)) {
+        database.createObjectStore(STORE_USERS)
       }
     },
   })
@@ -64,10 +71,11 @@ function ensureBooted(m: GridState | null): asserts m is GridState {
 async function persistAll(): Promise<void> {
   ensureBooted(memory)
   const database = await getDb()
-  const tx = database.transaction([STORE_GRID, STORE_META], 'readwrite')
+  const tx = database.transaction([STORE_GRID, STORE_META, STORE_USERS], 'readwrite')
   await Promise.all([
     tx.objectStore(STORE_GRID).put(memory!.cells, 'grid'),
     tx.objectStore(STORE_META).put(memory!.meta, 'meta'),
+    usersMemory ? tx.objectStore(STORE_USERS).put(usersMemory, 'users') : Promise.resolve(),
   ])
   await tx.done
 }
@@ -87,17 +95,31 @@ function reseedTargetsFromSeed(seed?: number): void {
 // --- Public API ---
 export async function bootDatabase(seed?: number): Promise<void> {
   const database = await getDb()
-  const tx = database.transaction([STORE_GRID, STORE_META], 'readonly')
+  const tx = database.transaction([STORE_GRID, STORE_META, STORE_USERS], 'readonly')
   const storedCells = (await tx.objectStore(STORE_GRID).get('grid')) as
     | Record<CellId, Cell>
     | undefined
   const storedMeta = (await tx.objectStore(STORE_META).get('meta')) as GridMeta | undefined
+  const storedUsers = (await tx.objectStore(STORE_USERS).get('users')) as
+    | Record<string, User>
+    | undefined
   await tx.done
 
   if (storedCells && storedMeta) {
     // Load into memory and reseed hidden targets deterministically from meta.seed
     memory = { cells: storedCells, meta: storedMeta }
     reseedTargetsFromSeed(storedMeta.seed)
+    // Users: load or generate once
+    if (storedUsers) {
+      usersMemory = storedUsers
+    } else {
+      const s = typeof storedMeta.seed === 'number' ? storedMeta.seed : 0x9e3779b9
+      const users = generateUsers(GRID_TOTAL, s)
+      usersMemory = indexUsers(users)
+      const txw = database.transaction([STORE_USERS], 'readwrite')
+      await txw.objectStore(STORE_USERS).put(usersMemory, 'users')
+      await txw.done
+    }
     // Backfill deterministic bot order if missing (older metas)
     if (!memory.meta.revealOrder || typeof memory.meta.revealIndex !== 'number') {
       const { state: seeded } = seedGrid(GRID_ROWS, GRID_COLS, storedMeta.seed)
@@ -112,10 +134,15 @@ export async function bootDatabase(seed?: number): Promise<void> {
   const { state, targets: t } = seedGrid(GRID_ROWS, GRID_COLS, seed)
   memory = state
   targets = t
-  const txw = database.transaction([STORE_GRID, STORE_META], 'readwrite')
+  // Generate users deterministically from the same seed
+  const s = typeof seed === 'number' ? seed : 0x9e3779b9
+  const users = generateUsers(GRID_TOTAL, s)
+  usersMemory = indexUsers(users)
+  const txw = database.transaction([STORE_GRID, STORE_META, STORE_USERS], 'readwrite')
   await Promise.all([
     txw.objectStore(STORE_GRID).put(state.cells, 'grid'),
     txw.objectStore(STORE_META).put(state.meta, 'meta'),
+    txw.objectStore(STORE_USERS).put(usersMemory, 'users'),
   ])
   await txw.done
 }
@@ -152,11 +179,23 @@ export async function revealCell(
   playerId?: string,
 ): Promise<
   | { ok: true; cell: Cell; meta: GridMeta }
-  | { error: 'NOT_FOUND' | 'ALREADY_REVEALED' | 'ALREADY_PLAYED' }
+  | { error: 'NOT_FOUND' | 'ALREADY_REVEALED' | 'ALREADY_PLAYED' | 'NOT_YOUR_TURN' | 'NOT_ELIGIBLE' }
 > {
   ensureBooted(memory)
   // Enforce one reveal per player (except for the deterministic bot)
   if (playerId && playerId !== 'bot') {
+    // Turn gating if currentPlayerId is set
+    const current = memory!.meta.currentPlayerId
+    if (current && playerId !== current) {
+      return { error: 'NOT_YOUR_TURN' }
+    }
+    // Ensure users are loaded
+    if (!usersMemory) {
+      throw new Error('Users not initialized')
+    }
+    const user = usersMemory[playerId]
+    if (!user) return { error: 'NOT_ELIGIBLE' }
+    if (user.played) return { error: 'ALREADY_PLAYED' }
     const already = Object.values(memory!.cells).some((c) => c.revealedBy === playerId)
     if (already) {
       return { error: 'ALREADY_PLAYED' }
@@ -175,6 +214,12 @@ export async function revealCell(
   if (playerId) cell.revealedBy = playerId
   cell.revealedAt = new Date().toISOString()
 
+  // Mark user as played when applicable
+  if (playerId && playerId !== 'bot' && usersMemory) {
+    const u = usersMemory[playerId]
+    if (u) u.played = true
+  }
+
   bumpVersion()
   await persistAll()
 
@@ -189,6 +234,10 @@ export async function adminReset(
   const { state, targets: t } = seedGrid(GRID_ROWS, GRID_COLS, seed)
   memory = state
   targets = t
+  // Regenerate users deterministically on reset
+  const s = typeof seed === 'number' ? seed : 0x9e3779b9
+  const users = generateUsers(GRID_TOTAL, s)
+  usersMemory = indexUsers(users)
   await persistAll()
   return { ok: true, meta: memory!.meta }
 }
@@ -233,4 +282,66 @@ export async function botStep(): Promise<
   }
   // revealCell already persisted the state (including updated meta version/etag)
   return { ok: true, revealed: res.cell, meta: res.meta, done: false }
+}
+
+// --- Users API ---
+
+export function getCurrentPlayer(): { currentPlayerId?: string } {
+  ensureBooted(memory)
+  return { currentPlayerId: memory!.meta.currentPlayerId }
+}
+
+export async function setCurrentPlayer(playerId: string | null): Promise<{ ok: true } | { error: 'NOT_ELIGIBLE' }> {
+  ensureBooted(memory)
+  if (playerId) {
+    if (!usersMemory || !usersMemory[playerId] || usersMemory[playerId].played) {
+      return { error: 'NOT_ELIGIBLE' }
+    }
+    memory!.meta.currentPlayerId = playerId
+  } else {
+    delete memory!.meta.currentPlayerId
+  }
+  bumpVersion()
+  await persistAll()
+  return { ok: true }
+}
+
+export function listEligibleUsers(
+  offset = 0,
+  limit = 100,
+  query?: string,
+): { total: number; users: Array<{ id: string; name: string }> } {
+  if (!usersMemory) return { total: 0, users: [] }
+  const all = Object.values(usersMemory).filter((u) => !u.played)
+  let filtered = all
+  if (query && query.trim()) {
+    const q = query.trim().toLowerCase()
+    filtered = all.filter((u) => u.id.toLowerCase().includes(q) || u.name.toLowerCase().includes(q))
+  }
+  const total = filtered.length
+  const page = filtered.slice(Math.max(0, offset), Math.max(0, offset) + Math.max(0, limit))
+  return { total, users: page.map((u) => ({ id: u.id, name: u.name })) }
+}
+
+export function assignUserForClient(clientId: string): { id: string; name: string } {
+  ensureBooted(memory)
+  if (!usersMemory) throw new Error('Users not initialized')
+  // Deterministic mapping using shared RNG helper: mix meta.seed with clientId
+  const baseSeed = (memory!.meta.seed ?? 0x9e3779b9) | 0
+  const rng = mixSeedWithString(baseSeed, clientId)
+  const ids = Object.keys(usersMemory)
+  const idx = rng.nextInt(ids.length)
+  const uid = ids[idx]
+  const u = usersMemory[uid]
+  return { id: u.id, name: u.name }
+}
+
+export function resolveUsers(ids: string[]): Array<{ id: string; name: string }> {
+  if (!usersMemory) return []
+  const out: Array<{ id: string; name: string }> = []
+  for (const id of ids) {
+    const u = usersMemory[id]
+    if (u) out.push({ id: u.id, name: u.name })
+  }
+  return out
 }

@@ -35,7 +35,7 @@ export interface Snapshot {
 // Response types mirroring backend contracts
 export type RevealResponse =
   | { ok: true; cell: Cell; meta: GridMeta }
-  | { error: 'NOT_FOUND' | 'ALREADY_REVEALED' | 'ALREADY_PLAYED' }
+  | { error: 'NOT_FOUND' | 'ALREADY_REVEALED' | 'ALREADY_PLAYED' | 'NOT_YOUR_TURN' | 'NOT_ELIGIBLE' }
 
 export type BotStepResponse =
   | { ok: true; revealed?: Cell; meta: GridMeta; done: boolean }
@@ -113,4 +113,43 @@ export async function apiAdminGetTargets(): Promise<{
   }>
 }> {
   return jsonFetch('/api/admin/targets')
+}
+
+// --- Users & Admin: Players ---
+
+export async function apiUsersAssign(clientId: string): Promise<{ userId: string; name: string }> {
+  return jsonFetch<{ userId: string; name: string }>('/api/users/assign', {
+    method: 'POST',
+    body: JSON.stringify({ clientId }),
+  })
+}
+
+export async function apiUsersResolve(ids: string[]): Promise<{ users: Array<{ id: string; name: string }> }> {
+  return jsonFetch('/api/users/resolve', {
+    method: 'POST',
+    body: JSON.stringify({ ids }),
+  })
+}
+
+export async function apiAdminGetCurrentPlayer(): Promise<{ currentPlayerId?: string }> {
+  return jsonFetch('/api/admin/current-player')
+}
+
+export async function apiAdminSetCurrentPlayer(playerId: string | null): Promise<{ ok: true } | { error: 'NOT_ELIGIBLE' }> {
+  return jsonFetch('/api/admin/current-player', {
+    method: 'POST',
+    body: JSON.stringify({ playerId }),
+  })
+}
+
+export async function apiAdminEligibleUsers(
+  offset = 0,
+  limit = 100,
+  query?: string,
+): Promise<{ total: number; users: Array<{ id: string; name: string }> }> {
+  const params = new URLSearchParams()
+  params.set('offset', String(offset))
+  params.set('limit', String(limit))
+  if (query) params.set('query', query)
+  return jsonFetch(`/api/admin/eligible-users?${params.toString()}`)
 }

@@ -10,6 +10,11 @@ import {
   setBotDelayRange,
   getBotDelayRange,
   getAdminTargets,
+  getCurrentPlayer,
+  setCurrentPlayer,
+  listEligibleUsers,
+  assignUserForClient,
+  resolveUsers,
 } from '@/backend/db/idb'
 
 export const handlers = [
@@ -97,6 +102,61 @@ export const handlers = [
     try {
       const targets = getAdminTargets()
       return HttpResponse.json({ targets })
+    } catch (err) {
+      return HttpResponse.json({ error: String(err) }, { status: 500 })
+    }
+  }),
+
+  // --- Users & Admin: Players ---
+  http.post('/api/users/assign', async ({ request }) => {
+    try {
+      const body = (await request.json().catch(() => ({}))) as { clientId?: string }
+      if (!body.clientId) return HttpResponse.json({ error: 'clientId required' }, { status: 400 })
+      const u = assignUserForClient(body.clientId)
+      return HttpResponse.json({ userId: u.id, name: u.name })
+    } catch (err) {
+      return HttpResponse.json({ error: String(err) }, { status: 500 })
+    }
+  }),
+
+  http.post('/api/users/resolve', async ({ request }) => {
+    try {
+      const body = (await request.json().catch(() => ({}))) as { ids?: string[] }
+      const ids = Array.isArray(body.ids) ? body.ids : []
+      const users = resolveUsers(ids)
+      return HttpResponse.json({ users })
+    } catch (err) {
+      return HttpResponse.json({ error: String(err) }, { status: 500 })
+    }
+  }),
+
+  http.get('/api/admin/current-player', () => {
+    try {
+      return HttpResponse.json(getCurrentPlayer())
+    } catch (err) {
+      return HttpResponse.json({ error: String(err) }, { status: 500 })
+    }
+  }),
+
+  http.post('/api/admin/current-player', async ({ request }) => {
+    try {
+      const body = (await request.json().catch(() => ({}))) as { playerId?: string | null }
+      const res = await setCurrentPlayer(body.playerId ?? null)
+      if ('error' in res) return HttpResponse.json(res, { status: 400 })
+      return HttpResponse.json(res)
+    } catch (err) {
+      return HttpResponse.json({ error: String(err) }, { status: 500 })
+    }
+  }),
+
+  http.get('/api/admin/eligible-users', ({ request }) => {
+    try {
+      const url = new URL(request.url)
+      const offset = Number(url.searchParams.get('offset') ?? '0')
+      const limit = Number(url.searchParams.get('limit') ?? '100')
+      const query = url.searchParams.get('query') ?? undefined
+      const res = listEligibleUsers(Number.isFinite(offset) ? offset : 0, Number.isFinite(limit) ? limit : 100, query)
+      return HttpResponse.json(res)
     } catch (err) {
       return HttpResponse.json({ error: String(err) }, { status: 500 })
     }

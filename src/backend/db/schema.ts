@@ -33,6 +33,11 @@ export interface GridMeta {
    * skipping entries already revealed by any player.
    */
   revealIndex?: number
+  /**
+   * Optional turn gating: when set, only this playerId (or the bot) is allowed
+   * to perform a reveal. Admin can clear it to allow any eligible player.
+   */
+  currentPlayerId?: string
 }
 
 export interface GridState {

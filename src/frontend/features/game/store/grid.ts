@@ -5,6 +5,7 @@ import {
   apiReveal,
   apiBotStep,
   apiAdminGetTargets,
+  apiUsersAssign,
 } from '@/frontend/shared/api/client'
 
 // Strong type for revealed cell entries
@@ -52,6 +53,8 @@ export const useGridStore = defineStore('grid', {
       string,
       RevealedCellEntry
     >,
+    // Assigned backend user identity
+    assignedUser: null as null | { id: string; name: string },
   }),
 
   getters: {
@@ -85,12 +88,35 @@ export const useGridStore = defineStore('grid', {
         return `anon-${Math.random().toString(36).slice(2)}`
       }
     },
+    getAssignedUserId(): string | null {
+      return this.assignedUser?.id ?? null
+    },
+    async ensureAssignedUser() {
+      if (this.assignedUser) return
+      // Cache in localStorage by clientId to avoid extra calls
+      const clientId = this.getPlayerId()
+      const cacheKey = `nlo-assigned-user-${clientId}`
+      try {
+        const cached = localStorage.getItem(cacheKey)
+        if (cached) {
+          const parsed = JSON.parse(cached) as { id: string; name: string }
+          this.assignedUser = { id: parsed.id, name: parsed.name }
+          return
+        }
+      } catch {}
+      const u = await apiUsersAssign(clientId)
+      this.assignedUser = { id: u.userId, name: u.name }
+      try {
+        localStorage.setItem(cacheKey, JSON.stringify({ id: u.userId, name: u.name }))
+      } catch {}
+    },
     async boot(seed?: number) {
       this.isBooting = true
       try {
         await apiBoot(seed)
         this.networkOk = true
         await this.refresh()
+        await this.ensureAssignedUser()
       } finally {
         this.isBooting = false
       }
@@ -129,7 +155,7 @@ export const useGridStore = defineStore('grid', {
     },
 
     userHasRevealed(): boolean {
-      const pid = this.getPlayerId()
+      const pid = this.getAssignedUserId() || this.getPlayerId()
       return this.revealed.some((c) => c.revealedBy === pid)
     },
 
@@ -143,8 +169,9 @@ export const useGridStore = defineStore('grid', {
       if (this.userHasRevealed()) return
       this.isRevealing = true
       try {
-        // Ensure a stable playerId is used for attribution
-        const pid = playerId || this.getPlayerId()
+        // Ensure we have a backend-assigned user id
+        await this.ensureAssignedUser()
+        const pid = playerId || this.getAssignedUserId() || this.getPlayerId()
         await apiReveal(id, pid)
         this.networkOk = true
         await this.refresh()
