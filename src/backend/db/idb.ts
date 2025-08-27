@@ -136,6 +136,17 @@ export function getSnapshotForClient(): {
   }
 }
 
+/** Admin-only: return hidden target cells without modifying reveal state. */
+export function getAdminTargets(): Array<{ id: CellId; row: number; col: number; prize: Prize }> {
+  ensureBooted(memory)
+  const out: Array<{ id: CellId; row: number; col: number; prize: Prize }> = []
+  for (const [id, prize] of Object.entries(targets) as Array<[CellId, Prize]>) {
+    const cell = memory!.cells[id]
+    if (cell) out.push({ id, row: cell.row, col: cell.col, prize })
+  }
+  return out
+}
+
 export async function revealCell(
   id: CellId,
   playerId?: string,

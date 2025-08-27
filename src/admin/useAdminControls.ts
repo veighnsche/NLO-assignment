@@ -1,5 +1,5 @@
 import { useGridStore } from '@/frontend/store/grid'
-import { apiAdminReset, apiAdminSetBotDelay, apiAdminGetBotDelay } from '@/frontend/api'
+import { apiAdminReset, apiAdminSetBotDelay, apiAdminGetBotDelay, apiAdminGetTargets } from '@/frontend/api'
 
 export function useAdminControls() {
   const grid = useGridStore()
@@ -8,6 +8,8 @@ export function useAdminControls() {
     await apiAdminReset('hard', seed)
     // Allow the current browser to reveal again after a reset
     localStorage.removeItem('nlo-user-revealed')
+    // Clear any admin-exposed overlay so it doesn't show stale targets after reseed
+    grid.clearExposedTargets(true)
     await grid.refresh()
   }
 
@@ -29,5 +31,17 @@ export function useAdminControls() {
     return apiAdminGetBotDelay()
   }
 
-  return { reset, setBotSpeed, getBotDelay }
+  async function getTargets(): Promise<
+    Array<{
+      id: string
+      row: number
+      col: number
+      prize: { type: 'consolation' | 'grand'; amount: 100 | 25000 }
+    }>
+  > {
+    const res = await apiAdminGetTargets()
+    return res.targets
+  }
+
+  return { reset, setBotSpeed, getBotDelay, getTargets }
 }

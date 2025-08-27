@@ -9,6 +9,7 @@ import {
   botStep,
   setBotDelayRange,
   getBotDelayRange,
+  getAdminTargets,
 } from '@/backend/db/idb'
 
 export const handlers = [
@@ -86,6 +87,16 @@ export const handlers = [
     try {
       const range = getBotDelayRange()
       return HttpResponse.json(range)
+    } catch (err) {
+      return HttpResponse.json({ error: String(err) }, { status: 500 })
+    }
+  }),
+
+  // Admin-only: expose hidden target cells (grand + consolation). Do not leak via snapshot.
+  http.get('/api/admin/targets', () => {
+    try {
+      const targets = getAdminTargets()
+      return HttpResponse.json({ targets })
     } catch (err) {
       return HttpResponse.json({ error: String(err) }, { status: 500 })
     }

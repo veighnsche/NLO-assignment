@@ -68,5 +68,16 @@ export async function apiAdminSetBotDelay(minMs: number, maxMs: number) {
 }
 
 export async function apiAdminGetBotDelay(): Promise<{ minMs: number; maxMs: number }> {
-  return jsonFetch('/api/admin/bot-delay')
+  return jsonFetch<{ minMs: number; maxMs: number }>('/api/admin/bot-delay')
+}
+
+export async function apiAdminGetTargets(): Promise<{
+  targets: Array<{
+    id: string
+    row: number
+    col: number
+    prize: { type: 'consolation' | 'grand'; amount: 100 | 25000 }
+  }>
+}> {
+  return jsonFetch('/api/admin/targets')
 }

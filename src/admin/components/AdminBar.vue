@@ -19,6 +19,9 @@
           @input="scheduleSetSpeed()"
         />
         <Button size="sm" variant="outline" @click="resetBotSpeed">Reset snelheid</Button>
+        <Button size="sm" variant="outline" @click="toggleExpose">
+          {{ grid.showExposed ? 'Verberg prijzen' : 'Toon prijzen' }}
+        </Button>
       </div>
 
       <div class="section right">
@@ -59,6 +62,7 @@ import Modal from '@/frontend/components/ui/Modal.vue'
 import Button from '@/frontend/components/ui/Button.vue'
 import Slider from '@/frontend/components/ui/Slider.vue'
 import { useAdminControls } from '@/admin/useAdminControls'
+import { useGridStore } from '@/frontend/store/grid'
 
 const showModal = ref(false)
 const seed = ref<number | null>(null)
@@ -66,6 +70,7 @@ const seed = ref<number | null>(null)
 const botSpeedHz = ref(1.0)
 let speedTimer: number | null = null
 const { reset: adminReset, setBotSpeed, getBotDelay } = useAdminControls()
+const grid = useGridStore()
 
 defineEmits<{ (e: 'toggle'): void }>()
 
@@ -97,6 +102,10 @@ function scheduleSetSpeed() {
     await setBotSpeed({ intervalMs: interval, minMs, maxMs })
     speedTimer = null
   }, 250)
+}
+
+function toggleExpose() {
+  grid.toggleExposed()
 }
 
 async function resetBotSpeed() {

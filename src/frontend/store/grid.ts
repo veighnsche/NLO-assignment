@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { apiBoot, apiSnapshot, apiReveal, apiBotStep } from '@/frontend/api'
+import { apiBoot, apiSnapshot, apiReveal, apiBotStep, apiAdminGetTargets } from '@/frontend/api'
 
 export const useGridStore = defineStore('grid', {
   state: () => ({
@@ -7,6 +7,7 @@ export const useGridStore = defineStore('grid', {
       version: number
       etag: string
     },
+    lastEtag: null as string | null,
     revealed: [] as Array<{
       id: string
       row: number
@@ -23,11 +24,23 @@ export const useGridStore = defineStore('grid', {
     isRefreshing: false,
     isRevealing: false,
     botTimerId: null as number | null,
+    // Admin-only exposure of hidden target cells
+    showExposed: false,
+    targetsEtag: null as string | null,
+    exposedTargets: [] as Array<{
+      id: string
+      row: number
+      col: number
+      prize: { type: 'consolation' | 'grand'; amount: 100 | 25000 }
+    }>,
   }),
 
   getters: {
     revealedSet(state): Set<string> {
       return new Set(state.revealed.map((c) => c.id))
+    },
+    exposedSet(state): Set<string> {
+      return new Set(state.exposedTargets.map((t) => t.id))
     },
   },
 
@@ -46,10 +59,15 @@ export const useGridStore = defineStore('grid', {
       this.isRefreshing = true
       try {
         const snap = await apiSnapshot()
+        const prevEtag = this.lastEtag
         this.meta = snap.meta
         this.revealed = snap.revealed
         this.openedCount = snap.openedCount
         this.total = snap.total
+        // Only record etag; do not clear exposed targets here to avoid flicker on bot reveals.
+        if (prevEtag !== snap.meta.etag) {
+          this.lastEtag = snap.meta.etag
+        }
       } finally {
         this.isRefreshing = false
       }
@@ -94,6 +112,39 @@ export const useGridStore = defineStore('grid', {
         clearInterval(this.botTimerId)
         this.botTimerId = null
       }
+    },
+
+    // --- Admin-only helpers ---
+    async loadExposedTargets() {
+      try {
+        const currentEtag = this.meta?.etag ?? null
+        if (this.targetsEtag && currentEtag && this.targetsEtag === currentEtag) {
+          // Already loaded for this grid state; skip
+          return
+        }
+        const res = await apiAdminGetTargets()
+        this.exposedTargets = res.targets
+        this.targetsEtag = currentEtag
+      } catch {
+        // ignore in dev
+      }
+    },
+    toggleExposed(force?: boolean) {
+      if (typeof force === 'boolean') {
+        this.showExposed = force
+      } else {
+        this.showExposed = !this.showExposed
+      }
+      // Lazy-load when enabling
+      if (this.showExposed && this.exposedTargets.length === 0) {
+        void this.loadExposedTargets()
+      }
+    },
+
+    clearExposedTargets(hide = true) {
+      this.exposedTargets = []
+      this.targetsEtag = null
+      if (hide) this.showExposed = false
     },
   },
 })

@@ -10,6 +10,7 @@ const cells = Array.from({ length: rows * cols }, (_, i) => i)
 // Store
 const grid = useGridStore()
 const revealedSet = computed(() => grid.revealedSet)
+const exposedSet = computed(() => grid.exposedSet)
 const revealedMap = computed(() => {
   const m = new Map<string, (typeof grid.revealed)[number]>()
   for (const c of grid.revealed) m.set(c.id, c)
@@ -25,6 +26,11 @@ function isRevealed(i: number): boolean {
   return revealedSet.value.has(cellIdFromIndex(i))
 }
 
+function isExposed(i: number): boolean {
+  // Only consider exposed when admin toggle is active and the cell is not revealed
+  return grid.showExposed && !isRevealed(i) && exposedSet.value.has(cellIdFromIndex(i))
+}
+
 function cellPrize(i: number) {
   return revealedMap.value.get(cellIdFromIndex(i))?.prize
 }
@@ -32,6 +38,13 @@ function cellPrize(i: number) {
 // Prize type helper: 'grand' | 'consolation' | undefined
 function cellPrizeType(i: number): 'grand' | 'consolation' | undefined {
   return cellPrize(i)?.type as 'grand' | 'consolation' | undefined
+}
+
+function exposedPrizeType(i: number): 'grand' | 'consolation' | undefined {
+  if (!isExposed(i)) return undefined
+  const id = cellIdFromIndex(i)
+  const t = grid.exposedTargets.find((x) => x.id === id)?.prize?.type
+  return (t === 'grand' || t === 'consolation') ? t : undefined
 }
 
 // Accessible label helper
@@ -142,6 +155,9 @@ function onGridLeave() {
         'closed-blocked': !isRevealed(id) && isCellDisabled(id),
         grand: cellPrizeType(id) === 'grand',
         consolation: cellPrizeType(id) === 'consolation',
+        exposed: isExposed(id),
+        'exposed-grand': exposedPrizeType(id) === 'grand',
+        'exposed-consolation': exposedPrizeType(id) === 'consolation',
       }"
       :disabled="isCellDisabled(id)"
       :data-index="id"
@@ -155,6 +171,9 @@ function onGridLeave() {
               ? '🎁'
               : '•'
         }}
+      </span>
+      <span v-else-if="isExposed(id)" class="expose" :data-type="exposedPrizeType(id)">
+        {{ exposedPrizeType(id) === 'grand' ? '★' : '●' }}
       </span>
     </button>
   </div>
@@ -251,6 +270,30 @@ function onGridLeave() {
 .cell .reveal {
   font-size: 0.9rem;
 }
+
+/* Admin-only exposure styles (closed cells only) */
+.cell.closed.exposed {
+  /* stronger outline + subtle glow */
+  box-shadow:
+    inset 0 0 0 2px color-mix(in srgb, var(--border-subtle) 40%, gold),
+    0 0 6px rgba(255, 215, 0, 0.35);
+}
+.cell .expose {
+  opacity: 0.95;
+  font-size: 1.2rem;
+  line-height: 1;
+  filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.25));
+}
+.cell .expose[data-type='grand'] {
+  color: #b8860b; /* darkgoldenrod */
+  text-shadow: 0 0 4px rgba(255, 223, 0, 0.7);
+}
+.cell .expose[data-type='consolation'] {
+  color: #0b6db8; /* blue accent */
+  text-shadow: 0 0 4px rgba(0, 123, 255, 0.5);
+}
+
+
 
 .cell:focus-visible {
   outline: 0;
