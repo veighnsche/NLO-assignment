@@ -1,5 +1,5 @@
 import { useGridStore } from '@/frontend/store/grid'
-import { apiAdminReset, apiAdminSetBotDelay } from '@/frontend/api'
+import { apiAdminReset, apiAdminSetBotDelay, apiAdminGetBotDelay } from '@/frontend/api'
 
 export function useAdminControls() {
   const grid = useGridStore()
@@ -25,5 +25,9 @@ export function useAdminControls() {
     grid.startBotPolling(payload.intervalMs)
   }
 
-  return { reset, setBotSpeed }
+  async function getBotDelay(): Promise<{ minMs: number; maxMs: number }> {
+    return apiAdminGetBotDelay()
+  }
+
+  return { reset, setBotSpeed, getBotDelay }
 }

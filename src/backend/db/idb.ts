@@ -21,6 +21,10 @@ export function setBotDelayRange(minMs: number, maxMs: number): void {
   BOT_DELAY_MAX_MS = max
 }
 
+export function getBotDelayRange(): { minMs: number; maxMs: number } {
+  return { minMs: BOT_DELAY_MIN_MS, maxMs: BOT_DELAY_MAX_MS }
+}
+
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }

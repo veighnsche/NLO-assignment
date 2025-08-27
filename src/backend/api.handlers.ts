@@ -8,6 +8,7 @@ import {
   revealCell,
   botStep,
   setBotDelayRange,
+  getBotDelayRange,
 } from '@/backend/db/idb'
 
 export const handlers = [
@@ -76,6 +77,15 @@ export const handlers = [
       }
       setBotDelayRange(body.minMs, body.maxMs)
       return HttpResponse.json({ ok: true })
+    } catch (err) {
+      return HttpResponse.json({ error: String(err) }, { status: 500 })
+    }
+  }),
+
+  http.get('/api/admin/bot-delay', () => {
+    try {
+      const range = getBotDelayRange()
+      return HttpResponse.json(range)
     } catch (err) {
       return HttpResponse.json({ error: String(err) }, { status: 500 })
     }

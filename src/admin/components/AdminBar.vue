@@ -1,39 +1,41 @@
 <template>
   <div class="admin-bar">
-    <div class="section left">
-      <span class="label">Actieve speler:</span>
-      <span class="value">—</span>
-      <Button>Verander van speler</Button>
-    </div>
+    <div class="bar-card">
+      <div class="section left">
+        <span class="label">Actieve speler:</span>
+        <span class="value">—</span>
+        <Button>Verander van speler</Button>
+      </div>
 
-    <div class="section center">
-      <label class="slider">
-        <span class="label">Botsnelheid</span>
-        <input
-          type="range"
-          min="200"
-          max="3000"
-          step="100"
-          v-model.number="botSpeedMs"
-          @input="emitBotSpeed()"
-          aria-label="Stel de botsnelheid in"
-        />
-        <span class="value">{{ botSpeedMs }} ms</span>
-      </label>
-    </div>
+      <div class="section center">
+        <label class="slider">
+          <span class="label">Botsnelheid</span>
+          <input
+            type="range"
+            min="0.3"
+            max="10"
+            step="0.1"
+            v-model.number="botSpeedHz"
+            @input="scheduleSetSpeed()"
+            aria-label="Stel de botsnelheid in (acties per seconde)"
+          />
+          <span class="value">{{ botSpeedHz.toFixed(1) }} /s</span>
+        </label>
+      </div>
 
-    <div class="section right">
-      <Button color="danger" variant="outline" @click="showModal = true">Reset spel…</Button>
-      <Button
-        icon
-        variant="text"
-        size="sm"
-        aria-label="Sluit adminbalk"
-        title="Sluit adminbalk"
-        @click="$emit('toggle')"
-      >
-        ✕
-      </Button>
+      <div class="section right">
+        <Button color="danger" variant="outline" @click="showModal = true">Reset spel…</Button>
+        <Button
+          icon
+          variant="text"
+          size="sm"
+          aria-label="Sluit adminbalk"
+          title="Sluit adminbalk"
+          @click="$emit('toggle')"
+        >
+          ✕
+        </Button>
+      </div>
     </div>
   </div>
 
@@ -54,15 +56,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineEmits } from 'vue'
+import { ref, defineEmits, onMounted } from 'vue'
 import Modal from '@/frontend/components/ui/Modal.vue'
 import Button from '@/frontend/components/ui/Button.vue'
 import { useAdminControls } from '@/admin/useAdminControls'
 
 const showModal = ref(false)
 const seed = ref<number | null>(null)
-const botSpeedMs = ref(1500)
-const { reset: adminReset, setBotSpeed } = useAdminControls()
+// Slider now represents actions per second (Hz). Right = faster
+const botSpeedHz = ref(1.0)
+let speedTimer: number | null = null
+const { reset: adminReset, setBotSpeed, getBotDelay } = useAdminControls()
 
 defineEmits<{ (e: 'toggle'): void }>()
 
@@ -82,13 +86,34 @@ async function confirmReset() {
   showModal.value = false
 }
 
-async function emitBotSpeed() {
-  const interval = Math.max(100, Math.floor(botSpeedMs.value))
-  // Map a single speed control to a backend delay window
-  const minMs = Math.max(0, Math.round(interval * 0.5))
-  const maxMs = Math.max(minMs, Math.round(interval * 1.5))
-  await setBotSpeed({ intervalMs: interval, minMs, maxMs })
+function scheduleSetSpeed() {
+  if (speedTimer != null) window.clearTimeout(speedTimer)
+  speedTimer = window.setTimeout(async () => {
+    const speed = Math.max(0.1, Number(botSpeedHz.value) || 1)
+    // Convert speed (actions/sec) to base interval in ms
+    const interval = Math.max(100, Math.round(1000 / speed))
+    // Map single control to a backend delay window around the interval
+    const minMs = Math.max(0, Math.round(interval * 0.5))
+    const maxMs = Math.max(minMs, Math.round(interval * 1.5))
+    await setBotSpeed({ intervalMs: interval, minMs, maxMs })
+    speedTimer = null
+  }, 250)
 }
+
+onMounted(async () => {
+  try {
+    const { minMs, maxMs } = await getBotDelay()
+    const avg = Math.max(1, Math.round((minMs + maxMs) / 2))
+    // Initialize slider from backend by converting ms -> actions/sec
+    const speed = 1000 / avg
+    // Clamp to slider boundaries
+    botSpeedHz.value = Math.min(10, Math.max(0.3, Number(speed)))
+    // Align frontend polling interval with backend range
+    await setBotSpeed({ intervalMs: avg, minMs, maxMs })
+  } catch {
+    // ignore fetch errors in dev
+  }
+})
 </script>
 
 <style scoped>
@@ -98,7 +123,7 @@ async function emitBotSpeed() {
   right: 0;
   bottom: 0;
   z-index: 1000;
-  height: 80px;
+  height: 100px;
   padding: 0 16px;
   display: flex;
   align-items: center;
@@ -109,6 +134,20 @@ async function emitBotSpeed() {
     linear-gradient(rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0.35)),
     repeating-linear-gradient(30deg, #ffe14d 0 40px, #2b2b2b 40px 80px);
   box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.bar-card {
+  width: 100%;
+  height: 56px;
+  background: #fff;
+  color: #111;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 12px;
 }
 
 .section {

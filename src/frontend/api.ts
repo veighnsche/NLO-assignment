@@ -66,3 +66,7 @@ export async function apiAdminSetBotDelay(minMs: number, maxMs: number) {
     body: JSON.stringify({ minMs, maxMs }),
   })
 }
+
+export async function apiAdminGetBotDelay(): Promise<{ minMs: number; maxMs: number }> {
+  return jsonFetch('/api/admin/bot-delay')
+}
