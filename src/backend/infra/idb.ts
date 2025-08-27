@@ -24,5 +24,13 @@ export async function openDatabase(): Promise<IDBPDatabase> {
       }
     },
   })
+  // Ensure we don't block future upgrades
+  cachedDb.onversionchange = () => {
+    try {
+      cachedDb?.close()
+    } finally {
+      cachedDb = null
+    }
+  }
   return cachedDb
 }

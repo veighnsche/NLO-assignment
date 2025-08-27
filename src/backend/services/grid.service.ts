@@ -15,15 +15,9 @@ import {
 import { bumpVersion } from '../infra/meta'
 import { getBotDelayRange as _getBotDelayRange } from './bot.service'
 import { mixSeedWithString } from '../domain/shared/rng'
+import { sleep, randomInt } from '../infra/util'
 
-function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms))
-}
-
-function randomInt(min: number, max: number): number {
-  // inclusive min, inclusive max
-  return Math.floor(Math.random() * (max - min + 1)) + min
-}
+// sleep/randomInt moved to infra/util
 
 async function persistAll(): Promise<void> {
   const memory = getMemory()

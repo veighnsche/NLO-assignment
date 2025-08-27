@@ -27,6 +27,33 @@ async function safeJson<T>(request: Request, fallback: T): Promise<T> {
   }
 }
 
+function statusForDomainError(err:
+  | 'NOT_FOUND'
+  | 'ALREADY_REVEALED'
+  | 'ALREADY_PLAYED'
+  | 'NOT_YOUR_TURN'
+  | 'NOT_ELIGIBLE'
+  | 'NO_ELIGIBLE'
+  | 'NOT_BOOTED',
+): number {
+  switch (err) {
+    case 'NOT_FOUND':
+      return 404
+    case 'ALREADY_REVEALED':
+    case 'ALREADY_PLAYED':
+      return 409
+    case 'NOT_YOUR_TURN':
+    case 'NOT_ELIGIBLE':
+      return 403
+    case 'NO_ELIGIBLE':
+      return 404
+    case 'NOT_BOOTED':
+      return 503
+    default:
+      return 400
+  }
+}
+
 function parseCookie(header: string): Record<string, string> {
   if (!header) return {}
   return Object.fromEntries(
@@ -77,7 +104,7 @@ export const handlers = [
     try {
       const body = await safeJson<{ id: string; playerId?: string }>(request, { id: '' })
       const res = await revealCell(body.id, body.playerId)
-      if ('error' in res) return HttpResponse.json(res, { status: 400 })
+      if ('error' in res) return HttpResponse.json(res, { status: statusForDomainError(res.error) })
       return HttpResponse.json(res)
     } catch (err) {
       return HttpResponse.json({ error: String(err) }, { status: 500 })
@@ -87,7 +114,7 @@ export const handlers = [
   http.post('/api/bot/step', async () => {
     try {
       const res = await botStep()
-      if ('error' in res) return HttpResponse.json(res, { status: 400 })
+      if ('error' in res) return HttpResponse.json(res, { status: statusForDomainError(res.error) })
       return HttpResponse.json(res)
     } catch (err) {
       return HttpResponse.json({ error: String(err) }, { status: 500 })
@@ -186,7 +213,7 @@ export const handlers = [
     try {
       const body = await safeJson<{ playerId?: string | null }>(request, {})
       const res = await setCurrentPlayer(body.playerId ?? null)
-      if ('error' in res) return HttpResponse.json(res, { status: 400 })
+      if ('error' in res) return HttpResponse.json(res, { status: statusForDomainError(res.error) })
       return HttpResponse.json(res)
     } catch (err) {
       return HttpResponse.json({ error: String(err) }, { status: 500 })
