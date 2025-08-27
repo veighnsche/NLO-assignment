@@ -31,7 +31,6 @@ function statusForDomainError(err:
   | 'NOT_FOUND'
   | 'ALREADY_REVEALED'
   | 'ALREADY_PLAYED'
-  | 'NOT_YOUR_TURN'
   | 'NOT_ELIGIBLE'
   | 'NO_ELIGIBLE'
   | 'NOT_BOOTED',
@@ -42,7 +41,6 @@ function statusForDomainError(err:
     case 'ALREADY_REVEALED':
     case 'ALREADY_PLAYED':
       return 409
-    case 'NOT_YOUR_TURN':
     case 'NOT_ELIGIBLE':
       return 403
     case 'NO_ELIGIBLE':
