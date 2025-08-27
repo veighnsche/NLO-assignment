@@ -1,18 +1,18 @@
 import { computed } from 'vue'
 import { useGridStore } from '@/frontend/features/game/store/grid'
-import { useAdminGameStore } from '@/frontend/features/game/store/admin'
+import { useExposedStore } from '@/frontend/features/shared/exposed'
 import { useStatusStore } from '@/frontend/features/game/store/status'
 import { useAdminUiStore } from '@/frontend/features/admin/store'
 
 export function useGridCells(rows = 100, cols = 100) {
   const grid = useGridStore()
-  const adminGame = useAdminGameStore()
+  const exposed = useExposedStore()
   const status = useStatusStore()
   const adminUi = useAdminUiStore()
 
   const cells = Array.from({ length: rows * cols }, (_, i) => i)
   const revealedSet = computed(() => grid.revealedSet)
-  const exposedSet = computed(() => adminGame.exposedSet)
+  const exposedSet = computed(() => exposed.exposedSet)
   const revealedById = computed(() => grid.revealedById)
   const revealing = computed(() => status.isRevealing)
   const userHasRevealed = computed(() => grid.userHasRevealed())
@@ -44,7 +44,7 @@ export function useGridCells(rows = 100, cols = 100) {
   function exposedPrizeType(i: number): 'grand' | 'consolation' | undefined {
     if (!isExposed(i)) return undefined
     const id = cellIdFromIndex(i)
-    const t = adminGame.exposedTargets.find(
+    const t = exposed.targets.find(
       (x: { id: string; prize?: { type?: 'grand' | 'consolation' } }) => x.id === id,
     )?.prize?.type
     return t === 'grand' || t === 'consolation' ? t : undefined

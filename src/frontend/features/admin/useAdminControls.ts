@@ -1,5 +1,5 @@
 import { useGridStore } from '@/frontend/features/game/store/grid'
-import { useAdminGameStore } from '@/frontend/features/game/store/admin'
+import { useExposedStore } from '@/frontend/features/shared/exposed'
 import { useBotStore } from '@/frontend/features/game/store/bot'
 import { useSessionStore } from '@/frontend/features/game/store/session'
 import {
@@ -13,7 +13,7 @@ import {
 
 export function useAdminControls() {
   const grid = useGridStore()
-  const admin = useAdminGameStore()
+  const exposed = useExposedStore()
   const bot = useBotStore()
   const session = useSessionStore()
 
@@ -26,7 +26,7 @@ export function useAdminControls() {
       // ignore in dev
     }
     // Clear any admin-exposed overlay so it doesn't show stale targets after reseed
-    admin.clearExposedTargets()
+    exposed.clearTargets()
     await grid.refresh()
   }
 

@@ -1,5 +1,7 @@
 import { defineStore } from 'pinia'
-import { useAdminGameStore } from '@/frontend/features/game/store/admin'
+import { useExposedStore } from '@/frontend/features/shared/exposed'
+import { apiAdminGetTargets } from '@/frontend/features/admin/api'
+import { useGridStore } from '@/frontend/features/game/store/grid'
 
 export const useAdminUiStore = defineStore('adminUi', {
   state: () => ({
@@ -13,9 +15,19 @@ export const useAdminUiStore = defineStore('adminUi', {
         this.showExposed = !this.showExposed
       }
       if (this.showExposed) {
-        const adminGame = useAdminGameStore()
-        if (adminGame.exposedTargets.length === 0) {
-          void adminGame.loadExposedTargets()
+        const exposed = useExposedStore()
+        if (exposed.targets.length === 0) {
+          // Lazy-load admin targets via API and populate shared store
+          void (async () => {
+            try {
+              const grid = useGridStore()
+              const etag = grid.meta?.etag ?? null
+              const res = await apiAdminGetTargets()
+              exposed.setTargets(res.targets, etag)
+            } catch {
+              // swallow in dev; admin UI can be tolerant to failures
+            }
+          })()
         }
       }
     },
