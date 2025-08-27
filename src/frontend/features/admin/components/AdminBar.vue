@@ -58,11 +58,11 @@
 
 <script setup lang="ts">
 import { ref, defineEmits, onMounted } from 'vue'
-import Modal from '@/frontend/components/ui/Modal.vue'
-import Button from '@/frontend/components/ui/Button.vue'
-import Slider from '@/frontend/components/ui/Slider.vue'
-import { useAdminControls } from '@/admin/useAdminControls'
-import { useGridStore } from '@/frontend/store/grid'
+import Modal from '@/frontend/shared/ui/Modal.vue'
+import Button from '@/frontend/shared/ui/Button.vue'
+import Slider from '@/frontend/shared/ui/Slider.vue'
+import { useAdminControls } from '@/frontend/features/admin/useAdminControls'
+import { useGridStore } from '@/frontend/features/game/store/grid'
 
 const showModal = ref(false)
 const seed = ref<number | null>(null)

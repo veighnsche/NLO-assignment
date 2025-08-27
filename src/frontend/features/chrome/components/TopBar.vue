@@ -26,8 +26,8 @@
 
 <script setup lang="ts">
 import { withDefaults, defineProps, toRefs, computed } from 'vue'
-import UiButton from './ui/Button.vue'
-import { useGridStore } from '@/frontend/store/grid'
+import UiButton from '@/frontend/shared/ui/Button.vue'
+import { useGridStore } from '@/frontend/features/game/store/grid'
 
 const props = withDefaults(defineProps<{ showAdminBar: boolean; title?: string }>(), {
   title: 'Verrassingskalender',

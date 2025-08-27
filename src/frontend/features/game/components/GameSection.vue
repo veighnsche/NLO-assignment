@@ -1,8 +1,6 @@
 <script setup lang="ts">
-import GameHeader from './GameHeader.vue'
 import GameMetrics from './GameMetrics.vue'
 import CalendarGrid from './CalendarGrid.vue'
-import GameFooter from './GameFooter.vue'
 
 // Derived header metrics (kept for header if needed)
 
@@ -11,10 +9,8 @@ import GameFooter from './GameFooter.vue'
 
 <template>
   <section class="game-section" aria-label="Spel">
-    <GameHeader />
     <GameMetrics />
     <CalendarGrid />
-    <GameFooter />
   </section>
   <!-- RevealModal and Tooltip are now managed internally by CalendarGrid -->
 </template>

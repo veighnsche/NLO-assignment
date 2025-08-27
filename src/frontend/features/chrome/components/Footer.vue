@@ -25,7 +25,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useGridStore } from '@/frontend/store/grid'
+import { useGridStore } from '@/frontend/features/game/store/grid'
 
 const grid = useGridStore()
 const total = computed(() => grid.total)

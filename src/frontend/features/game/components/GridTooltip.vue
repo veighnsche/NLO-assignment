@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Tooltip from '@/frontend/components/ui/Tooltip.vue'
+import Tooltip from '@/frontend/shared/ui/Tooltip.vue'
 
 const props = defineProps<{
   open: boolean

@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { useGridStore } from '@/frontend/store/grid'
-import RevealModal from '@/frontend/components/RevealModal.vue'
-import GridTooltip from '@/frontend/components/GridTooltip.vue'
-import { useTooltip } from '@/frontend/composables/useTooltip'
+import { useGridStore } from '@/frontend/features/game/store/grid'
+import RevealModal from './RevealModal.vue'
+import GridTooltip from './GridTooltip.vue'
+import { useTooltip } from '@/frontend/shared/composables/useTooltip'
 
 // 100x100 grid (10,000 cells)
 const rows = 100
@@ -46,7 +46,9 @@ function cellPrizeType(i: number): 'grand' | 'consolation' | undefined {
 function exposedPrizeType(i: number): 'grand' | 'consolation' | undefined {
   if (!isExposed(i)) return undefined
   const id = cellIdFromIndex(i)
-  const t = grid.exposedTargets.find((x) => x.id === id)?.prize?.type
+  const t = grid.exposedTargets.find(
+    (x: { id: string; prize?: { type?: 'grand' | 'consolation' } }) => x.id === id,
+  )?.prize?.type
   return t === 'grand' || t === 'consolation' ? t : undefined
 }
 
@@ -76,7 +78,12 @@ const pending = ref<{ id: string; row: number; col: number } | null>(null)
 
 async function performReveal(id: string) {
   await grid.reveal(id)
-  const entry = grid.revealed.find((c) => c.id === id)
+  const entry = grid.revealed.find(
+    (c: {
+      id: string
+      prize?: { type?: 'none' | 'consolation' | 'grand'; amount?: number }
+    }) => c.id === id,
+  )
   const t = entry?.prize?.type
   if (t === 'grand') return { type: 'grand' as const, amount: 25000 }
   if (t === 'consolation') return { type: 'consolation' as const, amount: 100 }

@@ -1,5 +1,11 @@
 import { defineStore } from 'pinia'
-import { apiBoot, apiSnapshot, apiReveal, apiBotStep, apiAdminGetTargets } from '@/frontend/api'
+import {
+  apiBoot,
+  apiSnapshot,
+  apiReveal,
+  apiBotStep,
+  apiAdminGetTargets,
+} from '@/frontend/shared/api/client'
 
 export const useGridStore = defineStore('grid', {
   state: () => ({
