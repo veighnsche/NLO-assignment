@@ -1,71 +1,25 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import { useGridStore } from '@/frontend/features/game/store/grid'
+import { ref } from 'vue'
 import RevealModal from './RevealModal.vue'
 import type { GridTooltipApi } from './GridTooltip.vue'
+import { useGridCells } from '@/frontend/features/game/composables/useGridCells'
 
-// 100x100 grid (10,000 cells)
-const rows = 100
-const cols = 100
-const cells = Array.from({ length: rows * cols }, (_, i) => i)
-
-// Store
-const grid = useGridStore()
-const revealedSet = computed(() => grid.revealedSet)
-const exposedSet = computed(() => grid.exposedSet)
-const revealedById = computed(() => grid.revealedById)
-// Cache frequently used store-derived flags to avoid recomputation per cell
-const revealing = computed(() => grid.isRevealing)
-const userHasRevealed = computed(() => grid.userHasRevealed())
-const showExposed = computed(() => grid.showExposed)
-
-// Backend cell ids are like: r{row}-c{col}
-function cellIdFromIndex(i: number): string {
-  return `r${getRow(i)}-c${getCol(i)}`
-}
-
-function isRevealed(i: number): boolean {
-  return revealedSet.value.has(cellIdFromIndex(i))
-}
-
-function isExposed(i: number): boolean {
-  // Only consider exposed when admin toggle is active and the cell is not revealed
-  return showExposed.value && !isRevealed(i) && exposedSet.value.has(cellIdFromIndex(i))
-}
-
-function cellPrize(i: number) {
-  return revealedById.value.get(cellIdFromIndex(i))?.prize
-}
-
-// Prize type helper: 'grand' | 'consolation' | undefined
-function cellPrizeType(i: number): 'grand' | 'consolation' | undefined {
-  return cellPrize(i)?.type as 'grand' | 'consolation' | undefined
-}
-
-function exposedPrizeType(i: number): 'grand' | 'consolation' | undefined {
-  if (!isExposed(i)) return undefined
-  const id = cellIdFromIndex(i)
-  const t = grid.exposedTargets.find(
-    (x: { id: string; prize?: { type?: 'grand' | 'consolation' } }) => x.id === id,
-  )?.prize?.type
-  return t === 'grand' || t === 'consolation' ? t : undefined
-}
-
-// Accessible label helper
-function ariaLabelForCell(i: number): string {
-  if (!isRevealed(i)) {
-    return isCellDisabled(i) ? 'Gesloten vakje (niet speelbaar)' : 'Gesloten vakje (speelbaar)'
-  }
-  const t = cellPrizeType(i)
-  if (t === 'grand') return 'Geopend vakje (Hoofdprijs)'
-  if (t === 'consolation') return 'Geopend vakje (Troostprijs)'
-  return 'Geopend vakje'
-}
-
-// Disabled helper: mirrors :disabled binding in template
-function isCellDisabled(i: number): boolean {
-  return revealing.value || userHasRevealed.value || isRevealed(i)
-}
+// Encapsulated grid logic via composable
+const {
+  cells,
+  grid,
+  revealedById,
+  getRow,
+  getCol,
+  cellIdFromIndex,
+  isRevealed,
+  isExposed,
+  cellPrize,
+  cellPrizeType,
+  exposedPrizeType,
+  isCellDisabled,
+  ariaLabelForCell,
+} = useGridCells(100, 100)
 
 // Props (merged): confirmation flag and tooltip API provided by parent
 const props = withDefaults(
@@ -108,9 +62,6 @@ async function onReveal(i: number) {
   }
   await grid.reveal(cellIdFromIndex(i))
 }
-
-const getRow = (i: number) => Math.floor(i / cols)
-const getCol = (i: number) => i % cols
 
 // Tooltip control comes from parent via prop (available on props.tooltip)
 
