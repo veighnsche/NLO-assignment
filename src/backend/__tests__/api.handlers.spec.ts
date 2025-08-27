@@ -10,6 +10,15 @@ async function post(path: string, body?: unknown, init?: RequestInit) {
   })
 }
 
+// Send intentionally malformed JSON with application/json header
+async function rawPost(path: string, raw: string) {
+  return fetch(path, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: raw,
+  })
+}
+
 async function get(path: string, init?: RequestInit) {
   return fetch(path, { method: 'GET', ...init })
 }
@@ -22,6 +31,13 @@ describe('api.handlers (MSW integration)', () => {
 
   it('POST /api/boot initializes DB (idempotent)', async () => {
     const r = await post('/api/boot', { seed: 1234 })
+    expect(r.status).toBe(200)
+    const j = await r.json()
+    expect(j).toEqual({ ok: true })
+  })
+
+  it('POST /api/boot tolerates invalid JSON body (safeJson fallback)', async () => {
+    const r = await rawPost('/api/boot', '{ not-json')
     expect(r.status).toBe(200)
     const j = await r.json()
     expect(j).toEqual({ ok: true })
@@ -66,6 +82,14 @@ describe('api.handlers (MSW integration)', () => {
     expect(j).toEqual({ error: 'NOT_FOUND' })
   })
 
+  it('POST /api/reveal with invalid JSON uses fallback and returns 404', async () => {
+    await post('/api/boot', { seed: 123 })
+    const r = await rawPost('/api/reveal', '{ bad')
+    expect(r.status).toBe(404)
+    const j = await r.json()
+    expect(j).toEqual({ error: 'NOT_FOUND' })
+  })
+
   it('GET /api/admin/targets returns list of target cells', async () => {
     await post('/api/boot', { seed: 2024 })
     const r = await get('/api/admin/targets')
@@ -92,6 +116,14 @@ describe('api.handlers (MSW integration)', () => {
     expect(j).toHaveProperty('meta')
     expect(j.meta).toHaveProperty('version')
     expect(j.meta).toHaveProperty('etag')
+  })
+
+  it('POST /api/admin/reset tolerates invalid JSON body (defaults mode to hard)', async () => {
+    const r = await rawPost('/api/admin/reset', '{ nope')
+    expect(r.status).toBe(200)
+    const j = await r.json()
+    expect(j).toHaveProperty('ok', true)
+    expect(j).toHaveProperty('meta')
   })
 
   it('POST /api/users/assign issues cookie when missing and is deterministic with explicit clientId', async () => {
@@ -126,6 +158,13 @@ describe('api.handlers (MSW integration)', () => {
     expect(Array.isArray(j.users)).toBe(true)
     const ids = j.users.map((u: { id: string; name: string }) => u.id).sort()
     expect(ids).toEqual([a.userId, b.userId].sort())
+  })
+
+  it('POST /api/users/resolve tolerates invalid JSON body (fallback to empty ids)', async () => {
+    const r = await rawPost('/api/users/resolve', '{ nope')
+    expect(r.status).toBe(200)
+    const j = await r.json()
+    expect(Array.isArray(j.users)).toBe(true)
   })
 
   it('GET/POST /api/admin/current-player round-trips and validates', async () => {
