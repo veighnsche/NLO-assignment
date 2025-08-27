@@ -9,9 +9,9 @@ const props = defineProps<{
 }>()
 
 const grid = useGridStore()
-// Current player id is the backend-assigned user id
-const playerId = computed(() => grid.getAssignedUserId() ?? '')
-const playerName = computed(() => grid.assignedUser?.name ?? grid.userNameById(playerId.value) ?? '')
+// Active player can be admin-selected current player; falls back to assigned user
+const playerId = computed(() => grid.activePlayerId ?? '')
+const playerName = computed(() => grid.activePlayerName)
 
 // Derived state for the status card
 const canOpen = computed(

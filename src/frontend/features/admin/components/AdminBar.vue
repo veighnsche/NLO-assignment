@@ -3,8 +3,8 @@
     <div class="bar-card">
       <div class="section left">
         <span class="label">Actieve speler:</span>
-        <span class="value">{{ currentPlayerName || '—' }}</span>
-        <Button>Verander van speler</Button>
+        <span class="value">{{ grid.activePlayerName || '—' }}</span>
+        <Button @click="pickRandomPlayer">Verander van speler</Button>
       </div>
 
       <div class="section center">
@@ -54,6 +54,7 @@
       <Button color="danger" @click="confirmReset">Resetten</Button>
     </template>
   </Modal>
+
 </template>
 
 <script setup lang="ts">
@@ -63,38 +64,18 @@ import Button from '@/frontend/shared/ui/Button.vue'
 import Slider from '@/frontend/shared/ui/Slider.vue'
 import { useAdminControls } from '@/frontend/features/admin/useAdminControls'
 import { useGridStore } from '@/frontend/features/game/store/grid'
-import { apiAdminGetCurrentPlayer, apiUsersResolve, apiUsersAssign } from '@/frontend/shared/api/client'
+import { apiAdminPickRandomPlayer } from '@/frontend/shared/api/client'
 
 const showModal = ref(false)
 const seed = ref<number | null>(null)
+// No manual change-player modal; backend picks a random eligible player
 // Slider now represents actions per second (Hz). Right = faster
 const botSpeedHz = ref(1.0)
 let speedTimer: number | null = null
 const { reset: adminReset, setBotSpeed, getBotDelay } = useAdminControls()
 const grid = useGridStore()
 
-// Current player display
-const currentPlayerId = ref<string | undefined>(undefined)
-const currentPlayerName = ref<string>('')
-// No client id persisted locally; backend assigns identity via cookie
-
-async function refreshCurrentPlayer() {
-  try {
-    const { currentPlayerId: id } = await apiAdminGetCurrentPlayer()
-    currentPlayerId.value = id
-    if (id) {
-      const res = await apiUsersResolve([id])
-      currentPlayerName.value = res.users[0]?.name ?? ''
-      return
-    }
-    // Fallback: show this browser's assigned user name
-    const assigned = await apiUsersAssign()
-    currentPlayerName.value = assigned.name || ''
-  } catch {
-    // ignore in dev
-    currentPlayerName.value = ''
-  }
-}
+// Current player display is provided by grid store (activePlayerName)
 
 defineEmits<{ (e: 'toggle'): void }>()
 
@@ -107,7 +88,20 @@ async function confirmReset() {
   await adminReset(typeof raw === 'number' && !Number.isNaN(raw) ? raw : undefined)
   showModal.value = false
   // Refresh the current player display after a reset
-  await refreshCurrentPlayer()
+  await grid.refreshCurrentPlayer()
+}
+
+// --- Change active player (admin) ---
+async function pickRandomPlayer() {
+  try {
+    const res = await apiAdminPickRandomPlayer()
+    if ('ok' in res && res.ok) {
+      await grid.refreshCurrentPlayer()
+      return
+    }
+  } catch {
+    // ignore
+  }
 }
 
 function scheduleSetSpeed() {
@@ -159,13 +153,13 @@ onMounted(async () => {
   }
   // Fetch current player name after boot completes (avoid early calls during init)
   if (!grid.isBooting) {
-    await refreshCurrentPlayer()
+    await grid.refreshCurrentPlayer()
   } else {
     const stop = watch(
       () => grid.isBooting,
       async (booting) => {
         if (!booting) {
-          await refreshCurrentPlayer()
+          await grid.refreshCurrentPlayer()
           stop()
         }
       },

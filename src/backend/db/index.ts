@@ -14,4 +14,5 @@ export {
   listEligibleUsers,
   assignUserForClient,
   resolveUsers,
+  pickRandomEligibleUser,
 } from './services/users.service'

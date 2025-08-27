@@ -58,6 +58,9 @@ export const useGridStore = defineStore('grid', {
     assignedUser: null as null | { id: string; name: string },
     // Cache of user id -> name (populated from resolve endpoint and assignments)
     userNames: new Map<string, string>() as Map<string, string>,
+    // Backend-selected current player (admin controlled)
+    currentPlayerId: undefined as string | undefined,
+    currentPlayerName: '' as string,
   }),
 
   getters: {
@@ -78,12 +81,21 @@ export const useGridStore = defineStore('grid', {
         return state.userNames.get(id) ?? null
       }
     },
+    activePlayerId(state): string | null {
+      return state.currentPlayerId ?? state.assignedUser?.id ?? null
+    },
+    activePlayerName(state): string {
+      if (state.currentPlayerName) return state.currentPlayerName
+      const id = state.currentPlayerId ?? state.assignedUser?.id
+      if (!id) return ''
+      return state.userNames.get(id) ?? state.assignedUser?.name ?? ''
+    },
   },
 
   actions: {
-    // No client-side id persistence; use backend-assigned identity
+    // Active player is admin-selected currentPlayer if present; otherwise assigned user
     getPlayerId(): string | null {
-      return this.assignedUser?.id ?? null
+      return this.currentPlayerId ?? this.assignedUser?.id ?? null
     },
     getAssignedUserId(): string | null {
       return this.assignedUser?.id ?? null
@@ -94,6 +106,37 @@ export const useGridStore = defineStore('grid', {
       this.assignedUser = { id: u.userId, name: u.name }
       // Seed names cache with our own assignment
       this.userNames.set(u.userId, u.name)
+    },
+    async refreshCurrentPlayer() {
+      try {
+        const mod = await import('@/frontend/shared/api/client')
+        const { currentPlayerId } = await mod.apiAdminGetCurrentPlayer()
+        this.currentPlayerId = currentPlayerId ?? undefined
+        if (this.currentPlayerId) {
+          const id = this.currentPlayerId
+          // Try cache first
+          const cached = this.userNames.get(id)
+          if (cached) {
+            this.currentPlayerName = cached
+          } else {
+            try {
+              const res = await mod.apiUsersResolve([id])
+              const nm = res.users[0]?.name ?? ''
+              if (nm) this.userNames.set(id, nm)
+              this.currentPlayerName = nm
+            } catch {
+              this.currentPlayerName = ''
+            }
+          }
+        } else {
+          // Fallback to this browser's assigned user
+          await this.ensureAssignedUser()
+          this.currentPlayerName = this.assignedUser?.name ?? ''
+        }
+      } catch {
+        this.currentPlayerId = undefined
+        this.currentPlayerName = ''
+      }
     },
     async boot(seed?: number) {
       this.isBooting = true
@@ -151,7 +194,7 @@ export const useGridStore = defineStore('grid', {
     },
 
     userHasRevealed(): boolean {
-      const pid = this.getAssignedUserId()
+      const pid = this.getPlayerId()
       if (!pid) return false
       return this.revealed.some((c) => c.revealedBy === pid)
     },
@@ -168,7 +211,7 @@ export const useGridStore = defineStore('grid', {
       try {
         // Ensure we have a backend-assigned user id
         await this.ensureAssignedUser()
-        const pid: string | undefined = (playerId ?? this.getAssignedUserId()) ?? undefined
+        const pid: string | undefined = (playerId ?? this.getPlayerId()) ?? undefined
         await apiReveal(id, pid)
         this.networkOk = true
         await this.refresh()

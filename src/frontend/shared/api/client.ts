@@ -162,6 +162,10 @@ export async function apiAdminSetCurrentPlayer(playerId: string | null): Promise
   })
 }
 
+export async function apiAdminPickRandomPlayer(): Promise<{ ok: true; playerId: string } | { error: 'NO_ELIGIBLE' }> {
+  return jsonFetch('/api/admin/pick-random-player', { method: 'POST' })
+}
+
 export async function apiAdminEligibleUsers(
   offset = 0,
   limit = 100,

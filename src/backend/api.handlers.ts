@@ -15,6 +15,7 @@ import {
   listEligibleUsers,
   assignUserForClient,
   resolveUsers,
+  pickRandomEligibleUser,
 } from '@/backend/db'
 
 export const handlers = [
@@ -25,6 +26,16 @@ export const handlers = [
       return HttpResponse.json({ ok: true })
     } catch (err) {
       return HttpResponse.json({ ok: false, error: String(err) }, { status: 500 })
+    }
+  }),
+
+  http.post('/api/admin/pick-random-player', async () => {
+    try {
+      const res = await pickRandomEligibleUser()
+      if ('error' in res) return HttpResponse.json(res, { status: 400 })
+      return HttpResponse.json(res)
+    } catch (err) {
+      return HttpResponse.json({ error: String(err) }, { status: 500 })
     }
   }),
 

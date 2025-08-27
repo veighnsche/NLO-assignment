@@ -11,6 +11,27 @@ function bumpVersion(): void {
   memory.meta.etag = makeEtag(memory.meta.version)
 }
 
+export async function pickRandomEligibleUser(): Promise<
+  { ok: true; playerId: string } | { error: 'NO_ELIGIBLE' }
+> {
+  const memory = getMemory()
+  ensureBooted(memory)
+  const users = getUsersMemory()
+  if (!users) return { error: 'NO_ELIGIBLE' }
+  const pool = Object.values(users).filter((u) => !u.played)
+  if (pool.length === 0) return { error: 'NO_ELIGIBLE' }
+  const baseSeed = (memory.meta.seed ?? 0x9e3779b9) | 0
+  // Mix with changing key so subsequent calls vary
+  const key = `admin-pick-${memory.meta.version}`
+  const rng = mixSeedWithString(baseSeed, key)
+  const idx = rng.nextInt(pool.length)
+  const chosen = pool[idx]
+  memory.meta.currentPlayerId = chosen.id
+  bumpVersion()
+  await persistMeta()
+  return { ok: true, playerId: chosen.id }
+}
+
 async function persistMeta(): Promise<void> {
   const memory = getMemory()
   ensureBooted(memory)
