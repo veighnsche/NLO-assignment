@@ -8,19 +8,16 @@
       </div>
 
       <div class="section center">
-        <label class="slider">
-          <span class="label">Botsnelheid</span>
-          <input
-            type="range"
-            min="0.3"
-            max="10"
-            step="0.1"
-            v-model.number="botSpeedHz"
-            @input="scheduleSetSpeed()"
-            aria-label="Stel de botsnelheid in (acties per seconde)"
-          />
-          <span class="value">{{ botSpeedHz.toFixed(1) }} /s</span>
-        </label>
+        <Slider
+          v-model="botSpeedHz"
+          :min="0.3"
+          :max="10"
+          :step="0.1"
+          label="Botsnelheid"
+          suffix=" /s"
+          :decimals="1"
+          @input="scheduleSetSpeed()"
+        />
       </div>
 
       <div class="section right">
@@ -59,6 +56,7 @@
 import { ref, defineEmits, onMounted } from 'vue'
 import Modal from '@/frontend/components/ui/Modal.vue'
 import Button from '@/frontend/components/ui/Button.vue'
+import Slider from '@/frontend/components/ui/Slider.vue'
 import { useAdminControls } from '@/admin/useAdminControls'
 
 const showModal = ref(false)
