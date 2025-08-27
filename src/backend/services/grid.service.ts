@@ -212,7 +212,10 @@ export async function botStep(): Promise<
   if (!memory) return { error: 'NOT_BOOTED' }
   // Randomized backend-side delay to simulate realistic server/bot timing
   const { minMs, maxMs } = _getBotDelayRange()
-  await sleep(randomInt(minMs, maxMs))
+  // Use deterministic RNG so tests can be reproducible; falls back to Math.random when no seed.
+  const baseSeed = (memory.meta.seed ?? 0x9e3779b9) | 0
+  const delayRng = mixSeedWithString(baseSeed, `bot-delay-${memory.meta.version}`)
+  await sleep(randomInt(minMs, maxMs, delayRng))
   // Ensure reveal order exists
   if (!memory.meta.revealOrder || typeof memory.meta.revealIndex !== 'number') {
     const { state: seeded } = seedGrid(GRID_ROWS, GRID_COLS, memory.meta.seed)
