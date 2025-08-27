@@ -15,7 +15,7 @@ import {
   listEligibleUsers,
   assignUserForClient,
   resolveUsers,
-} from '@/backend/db/idb'
+} from '@/backend/db'
 
 export const handlers = [
   http.post('/api/boot', async ({ request }) => {
