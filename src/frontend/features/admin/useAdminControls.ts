@@ -1,4 +1,7 @@
 import { useGridStore } from '@/frontend/features/game/store/grid'
+import { useAdminGameStore } from '@/frontend/features/game/store/admin'
+import { useBotStore } from '@/frontend/features/game/store/bot'
+import { useSessionStore } from '@/frontend/features/game/store/session'
 import {
   apiAdminReset,
   apiAdminSetBotDelay,
@@ -10,6 +13,9 @@ import {
 
 export function useAdminControls() {
   const grid = useGridStore()
+  const admin = useAdminGameStore()
+  const bot = useBotStore()
+  const session = useSessionStore()
 
   async function reset(seed?: number): Promise<void> {
     await apiAdminReset('hard', seed)
@@ -20,7 +26,7 @@ export function useAdminControls() {
       // ignore in dev
     }
     // Clear any admin-exposed overlay so it doesn't show stale targets after reseed
-    grid.clearExposedTargets(true)
+    admin.clearExposedTargets()
     await grid.refresh()
   }
 
@@ -34,7 +40,7 @@ export function useAdminControls() {
     } catch {
       // ignore in dev
     }
-    grid.setPollingInterval(payload.intervalMs)
+    bot.setPollingInterval(payload.intervalMs)
   }
 
   async function getBotDelay(): Promise<{ minMs: number; maxMs: number }> {
@@ -57,7 +63,7 @@ export function useAdminControls() {
     try {
       const res = await apiAdminPickRandomPlayer()
       if ('ok' in res && res.ok) {
-        await grid.refreshCurrentPlayer()
+        await session.refreshCurrentPlayer()
       }
     } catch {
       // ignore in dev

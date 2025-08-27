@@ -2,8 +2,10 @@
 import { computed } from 'vue'
 import { Icon } from '@iconify/vue'
 import { useGridStore } from '@/frontend/features/game/store/grid'
+import { useStatusStore } from '@/frontend/features/game/store/status'
 
 const grid = useGridStore()
+const status = useStatusStore()
 
 // Derived metrics locally to avoid prop drilling
 const openedCount = computed(() => grid.openedCount)
@@ -22,7 +24,7 @@ const grandOpened = computed(() =>
   ),
 )
 const canOpen = computed(
-  () => !grid.isRevealing && !grid.userHasRevealed() && grid.openedCount < grid.total,
+  () => !status.isRevealing && !grid.userHasRevealed() && grid.openedCount < grid.total,
 )
 </script>
 

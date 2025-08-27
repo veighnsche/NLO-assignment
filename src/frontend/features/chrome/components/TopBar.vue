@@ -27,7 +27,7 @@
 <script setup lang="ts">
 import { toRefs, computed } from 'vue'
 import UiButton from '@/frontend/ui/Button.vue'
-import { useGridStore } from '@/frontend/features/game/store/grid'
+import { useStatusStore } from '@/frontend/features/game/store/status'
 
 const props = withDefaults(defineProps<{ showAdminBar: boolean; title?: string }>(), {
   title: 'Verrassingskalender',
@@ -36,8 +36,8 @@ const { showAdminBar, title } = toRefs(props)
 defineEmits<{ (e: 'toggle'): void }>()
 
 // Connectivity indicator
-const grid = useGridStore()
-const networkOk = computed(() => grid.networkOk)
+const status = useStatusStore()
+const networkOk = computed(() => status.networkOk)
 </script>
 
 <style scoped>

@@ -6,6 +6,8 @@ import type { GridTooltipApi } from '@/frontend/features/game/composables/useGri
 import { useGridCells } from '@/frontend/features/game/composables/useGridCells'
 import type { RevealResult } from '@/frontend/types/api'
 import { useGridHoverTooltip } from '@/frontend/features/game/composables/useGridHoverTooltip'
+import { useStatusStore } from '@/frontend/features/game/store/status'
+import { useSessionStore } from '@/frontend/features/game/store/session'
 
 // Encapsulated grid logic via composable
 const {
@@ -23,6 +25,9 @@ const {
   isCellDisabled,
   ariaLabelForCell,
 } = useGridCells(100, 100)
+
+const status = useStatusStore()
+const session = useSessionStore()
 
 // Props (merged): confirmation flag and tooltip API provided by parent
 const props = withDefaults(
@@ -54,7 +59,7 @@ function onModalClosed() {
 }
 
 async function onReveal(i: number) {
-  if (grid.isRevealing || isRevealed(i) || grid.userHasRevealed()) return
+  if (status.isRevealing || isRevealed(i) || grid.userHasRevealed()) return
   if (props.confirmBeforeReveal) {
     pending.value = { id: cellIdFromIndex(i), row: getRow(i), col: getCol(i) }
     confirmOpen.value = true
@@ -70,7 +75,7 @@ const { onGridMove, onGridLeave } = useGridHoverTooltip({
   getCol,
   cellIdFromIndex,
   revealedById,
-  userNameById: grid.userNameById,
+  userNameById: session.userNameById,
 })
 </script>
 

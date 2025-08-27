@@ -3,6 +3,8 @@ defineOptions({ name: 'AppHeader' })
 import { computed } from 'vue'
 import { Icon } from '@iconify/vue'
 import { useGridStore } from '@/frontend/features/game/store/grid'
+import { useSessionStore } from '@/frontend/features/game/store/session'
+import { useStatusStore } from '@/frontend/features/game/store/status'
 
 const props = defineProps<{
   title?: string
@@ -10,13 +12,15 @@ const props = defineProps<{
 }>()
 
 const grid = useGridStore()
+const session = useSessionStore()
+const status = useStatusStore()
 // Active player can be admin-selected current player; falls back to assigned user
-const playerId = computed(() => grid.activePlayerId ?? '')
-const playerName = computed(() => grid.activePlayerName)
+const playerId = computed(() => session.activePlayerId ?? '')
+const playerName = computed(() => session.activePlayerName)
 
 // Derived state for the status card
 const canOpen = computed(
-  () => !grid.isRevealing && !grid.userHasRevealed() && grid.openedCount < grid.total,
+  () => !status.isRevealing && !grid.userHasRevealed() && grid.openedCount < grid.total,
 )
 
 type PrizeType = 'none' | 'consolation' | 'grand'

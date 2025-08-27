@@ -3,7 +3,7 @@
     <div class="bar-card">
       <div class="section left">
         <span class="label">Actieve speler:</span>
-        <span class="value">{{ grid.activePlayerName || '—' }}</span>
+        <span class="value">{{ session.activePlayerName || '—' }}</span>
         <Button @click="pickRandomPlayer">Verander van speler</Button>
       </div>
 
@@ -20,7 +20,7 @@
         />
         <Button size="sm" variant="outline" @click="resetBotSpeed">Reset snelheid</Button>
         <Button size="sm" variant="outline" @click="toggleExpose">
-          {{ grid.showExposed ? 'Verberg prijzen' : 'Toon prijzen' }}
+          {{ admin.showExposed ? 'Verberg prijzen' : 'Toon prijzen' }}
         </Button>
       </div>
 
@@ -63,7 +63,9 @@ import Modal from '@/frontend/ui/Modal.vue'
 import Button from '@/frontend/ui/Button.vue'
 import Slider from '@/frontend/ui/Slider.vue'
 import { useAdminControls } from '@/frontend/features/admin/useAdminControls'
-import { useGridStore } from '@/frontend/features/game/store/grid'
+import { useAdminUiStore } from '@/frontend/features/admin/store'
+import { useSessionStore } from '@/frontend/features/game/store/session'
+import { useStatusStore } from '@/frontend/features/game/store/status'
 import { hzToIntervalMs, intervalWindow, clampHz, intervalToHz, DEFAULT_MIN_MS, DEFAULT_MAX_MS } from '@/frontend/lib/botSpeed'
 
 const showModal = ref(false)
@@ -73,9 +75,11 @@ const seed = ref<number | null>(null)
 const botSpeedHz = ref(1.0)
 let speedTimer: number | null = null
 const { reset: adminReset, setBotSpeed, getBotDelay, pickRandomPlayer } = useAdminControls()
-const grid = useGridStore()
+const admin = useAdminUiStore()
+const session = useSessionStore()
+const status = useStatusStore()
 
-// Current player display is provided by grid store (activePlayerName)
+// Current player display is provided by session store (activePlayerName)
 
 defineEmits<{ (e: 'toggle'): void }>()
 
@@ -88,7 +92,7 @@ async function confirmReset() {
   await adminReset(typeof raw === 'number' && !Number.isNaN(raw) ? raw : undefined)
   showModal.value = false
   // Refresh the current player display after a reset
-  await grid.refreshCurrentPlayer()
+  await session.refreshCurrentPlayer()
 }
 
 // --- Change active player (admin) ---
@@ -105,7 +109,7 @@ function scheduleSetSpeed() {
 }
 
 function toggleExpose() {
-  grid.toggleExposed()
+  admin.toggleExposed()
 }
 
 async function resetBotSpeed() {
@@ -137,14 +141,14 @@ onMounted(async () => {
     // ignore fetch errors in dev
   }
   // Fetch current player name after boot completes (avoid early calls during init)
-  if (!grid.isBooting) {
-    await grid.refreshCurrentPlayer()
+  if (!status.isBooting) {
+    await session.refreshCurrentPlayer()
   } else {
     const stop = watch(
-      () => grid.isBooting,
+      () => status.isBooting,
       async (booting) => {
         if (!booting) {
-          await grid.refreshCurrentPlayer()
+          await session.refreshCurrentPlayer()
           stop()
         }
       },
