@@ -1,4 +1,5 @@
 import { beforeEach, describe, it, expect } from 'vitest'
+import { getUsersMemory, setMemory } from '@/backend/infra/state'
 
 async function post(path: string, body?: unknown, init?: RequestInit) {
   return fetch(path, {
@@ -49,6 +50,14 @@ describe('api.handlers (MSW integration)', () => {
     expect(j).toEqual({ minMs: 5, maxMs: 7 })
   })
 
+  it('POST/GET /api/admin/bot-delay clamps negative values to [0,0]', async () => {
+    await post('/api/admin/bot-delay', { minMs: -5, maxMs: -1 })
+    const r = await get('/api/admin/bot-delay')
+    expect(r.status).toBe(200)
+    const j = await r.json()
+    expect(j).toEqual({ minMs: 0, maxMs: 0 })
+  })
+
   it('POST /api/reveal maps NOT_FOUND to 404', async () => {
     await post('/api/boot', { seed: 999 })
     const r = await post('/api/reveal', { id: 'does-not-exist' })
@@ -64,6 +73,15 @@ describe('api.handlers (MSW integration)', () => {
     const j = await r.json()
     expect(j).toHaveProperty('targets')
     expect(Array.isArray(j.targets)).toBe(true)
+  })
+
+  it('POST /api/admin/pick-random-player succeeds and sets a current player', async () => {
+    await post('/api/boot', { seed: 2025 })
+    const r = await post('/api/admin/pick-random-player')
+    expect(r.status).toBe(200)
+    const j = await r.json()
+    expect(j).toHaveProperty('ok', true)
+    expect(j).toHaveProperty('playerId')
   })
 
   it('POST /api/admin/reset returns ok and meta', async () => {
@@ -145,5 +163,61 @@ describe('api.handlers (MSW integration)', () => {
       j = await r.json()
       expect(j.total).toBeGreaterThan(0)
     }
+  })
+
+  it('GET /api/admin/eligible-users tolerates invalid offset/limit by defaulting', async () => {
+    const r = await get('/api/admin/eligible-users?offset=not-a-number&limit=nah')
+    expect(r.status).toBe(200)
+    const j = await r.json()
+    expect(j).toHaveProperty('total')
+    expect(Array.isArray(j.users)).toBe(true)
+  })
+
+  it('POST /api/bot/step maps NOT_BOOTED to 503', async () => {
+    // Force backend memory to null so botStep returns NOT_BOOTED
+    setMemory(null)
+    const r = await post('/api/bot/step')
+    expect(r.status).toBe(503)
+    const j = await r.json()
+    expect(j).toEqual({ error: 'NOT_BOOTED' })
+  })
+
+  it('POST /api/bot/step returns ok after boot', async () => {
+    await post('/api/boot', { seed: 4242 })
+    const r = await post('/api/bot/step')
+    expect(r.status).toBe(200)
+    const j = await r.json()
+    expect(j).toHaveProperty('ok', true)
+  })
+
+  it('POST /api/admin/pick-random-player maps NO_ELIGIBLE to 400 when all played', async () => {
+    await post('/api/boot', { seed: 13579 })
+    // Mark all users as played
+    const users = getUsersMemory()!
+    for (const u of Object.values(users)) u.played = true
+    const r = await post('/api/admin/pick-random-player')
+    expect(r.status).toBe(400)
+    const j = await r.json()
+    expect(j).toEqual({ error: 'NO_ELIGIBLE' })
+  })
+
+  it('POST /api/reveal maps ALREADY_REVEALED, NOT_ELIGIBLE and ALREADY_PLAYED to proper statuses', async () => {
+    await post('/api/admin/reset', { mode: 'hard', seed: 4242 })
+    // First reveal a cell (no player attribution), then reveal again => 409
+    let r = await post('/api/reveal', { id: 'r0-c0' })
+    expect(r.status).toBe(200)
+    r = await post('/api/reveal', { id: 'r0-c0' })
+    expect(r.status).toBe(409)
+
+    // NOT_ELIGIBLE: use a non-existent playerId
+    r = await post('/api/reveal', { id: 'r0-c1', playerId: 'does-not-exist' })
+    expect(r.status).toBe(403)
+
+    // ALREADY_PLAYED: get a valid player via users/assign, reveal once, then attempt again
+    const a = await (await post('/api/users/assign', { clientId: 'api-reveal-player' })).json()
+    r = await post('/api/reveal', { id: 'r0-c2', playerId: a.userId })
+    expect(r.status).toBe(200)
+    r = await post('/api/reveal', { id: 'r0-c3', playerId: a.userId })
+    expect(r.status).toBe(409)
   })
 })
