@@ -16,6 +16,8 @@ async function initApp() {
   try {
     // Initialize backend state and hydrate the store
     await grid.boot()
+    // Sync admin-selected current player into the store so UI reflects it immediately
+    await grid.refreshCurrentPlayer()
     // Simulate other users by starting bot polling
     grid.startBotPolling(1500)
   } finally {

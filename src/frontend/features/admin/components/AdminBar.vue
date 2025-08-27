@@ -58,7 +58,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineEmits, onMounted, watch } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import Modal from '@/frontend/shared/ui/Modal.vue'
 import Button from '@/frontend/shared/ui/Button.vue'
 import Slider from '@/frontend/shared/ui/Slider.vue'
