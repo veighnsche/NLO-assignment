@@ -143,11 +143,6 @@ export async function revealCell(
   const bypass = options?.bypassEligibility === true
   // Enforce one reveal per player unless bypassing (used for bot attribution)
   if (!bypass && playerId && playerId !== 'bot') {
-    // Turn gating if currentPlayerId is set
-    const current = memory!.meta.currentPlayerId
-    if (current && playerId !== current) {
-      return { error: 'NOT_YOUR_TURN' }
-    }
     // Ensure users are loaded
     const usersMemory = getUsersMemory()
     if (!usersMemory) {

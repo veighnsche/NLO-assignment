@@ -65,7 +65,7 @@ describe('services/grid.service', () => {
       expect(r2).toEqual({ error: 'ALREADY_REVEALED' })
     })
 
-    it('enforces NOT_YOUR_TURN when currentPlayerId is set to someone else', async () => {
+    it('allows reveal even when currentPlayerId is set to someone else (no turn-gating)', async () => {
       const users = getUsersMemory()!
       const ids = Object.keys(users)
       const current = ids[0]
@@ -75,7 +75,7 @@ describe('services/grid.service', () => {
 
       const id = cellId(0, 2)
       const res = await revealCell(id, other)
-      expect(res).toEqual({ error: 'NOT_YOUR_TURN' })
+      expect('ok' in res && res.ok).toBe(true)
     })
 
     it('returns NOT_ELIGIBLE when user does not exist', async () => {
