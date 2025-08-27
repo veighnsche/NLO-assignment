@@ -10,7 +10,7 @@ const props = defineProps<{
 <template>
   <div class="game-header">
     <h2 v-if="props.title">{{ props.title }}</h2>
-    <div class="greeting" aria-live="polite">-</div>
+    <div class="greeting" aria-live="polite">Hello, -</div>
   </div>
 </template>
 

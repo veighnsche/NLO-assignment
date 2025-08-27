@@ -1,6 +1,9 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useGridStore } from '@/frontend/store/grid'
+import RevealModal from '@/frontend/components/RevealModal.vue'
+import GridTooltip from '@/frontend/components/GridTooltip.vue'
+import { useTooltip } from '@/frontend/composables/useTooltip'
 
 // 100x100 grid (10,000 cells)
 const rows = 100
@@ -63,17 +66,32 @@ function isCellDisabled(i: number): boolean {
   return grid.isRevealing || grid.userHasRevealed() || isRevealed(i)
 }
 
-const props = defineProps<{ confirmBeforeReveal?: boolean }>()
+const props = withDefaults(defineProps<{ confirmBeforeReveal?: boolean }>(), {
+  confirmBeforeReveal: true,
+})
+
+// Internal confirm + modal state
+const confirmOpen = ref(false)
+const pending = ref<{ id: string; row: number; col: number } | null>(null)
+
+async function performReveal(id: string) {
+  await grid.reveal(id)
+  const entry = grid.revealed.find((c) => c.id === id)
+  const t = entry?.prize?.type
+  if (t === 'grand') return { type: 'grand' as const, amount: 25000 }
+  if (t === 'consolation') return { type: 'consolation' as const, amount: 100 }
+  return { type: 'none' as const, amount: 0 }
+}
+
+function onModalClosed() {
+  pending.value = null
+}
 
 async function onReveal(i: number) {
   if (grid.isRevealing || isRevealed(i) || grid.userHasRevealed()) return
   if (props.confirmBeforeReveal) {
-    emit('request-reveal', {
-      id: cellIdFromIndex(i),
-      index: i,
-      row: getRow(i),
-      col: getCol(i),
-    })
+    pending.value = { id: cellIdFromIndex(i), row: getRow(i), col: getCol(i) }
+    confirmOpen.value = true
     return
   }
   await grid.reveal(cellIdFromIndex(i))
@@ -82,44 +100,44 @@ async function onReveal(i: number) {
 const getRow = (i: number) => Math.floor(i / cols)
 const getCol = (i: number) => i % cols
 
-const emit = defineEmits<{
-  (
-    e: 'hover',
-    payload: {
-      text: string
-      x: number
-      y: number
-      opener: string | null
-      revealed: boolean
-      prizeType?: 'none' | 'consolation' | 'grand'
-      prizeAmount?: 0 | 100 | 25000
-      revealedAt?: string | null
-    },
-  ): void
-  (e: 'leave'): void
-  (e: 'request-reveal', payload: { id: string; index: number; row: number; col: number }): void
-}>()
+// Tooltip composable
+const {
+  open,
+  x,
+  y,
+  text,
+  opener,
+  revealed,
+  prizeLabel,
+  prizeEmoji,
+  prizeAmountText,
+  prizeClass,
+  statusClass,
+  whenText,
+  onHover,
+  onLeave,
+} = useTooltip()
 
 function onGridMove(e: MouseEvent) {
   const target = (e.target as HTMLElement).closest('button.cell') as HTMLElement | null
   if (!target) {
-    emit('leave')
+    onLeave()
     return
   }
   const idxAttr = target.getAttribute('data-index')
   if (idxAttr == null) {
-    emit('leave')
+    onLeave()
     return
   }
   const idx = Number(idxAttr)
   if (Number.isNaN(idx)) {
-    emit('leave')
+    onLeave()
     return
   }
   const text = `Rij ${getRow(idx)}, Kolom ${getCol(idx)}`
   const id = cellIdFromIndex(idx)
   const cell = revealedMap.value.get(id)
-  emit('hover', {
+  onHover({
     text,
     x: e.clientX,
     y: e.clientY,
@@ -132,7 +150,7 @@ function onGridMove(e: MouseEvent) {
 }
 
 function onGridLeave() {
-  emit('leave')
+  onLeave()
 }
 </script>
 
@@ -177,6 +195,28 @@ function onGridLeave() {
       </span>
     </button>
   </div>
+  <!-- Tooltip rendered via dedicated component -->
+  <GridTooltip
+    :open="open"
+    :x="x"
+    :y="y"
+    :text="text"
+    :opener="opener"
+    :revealed="revealed"
+    :when-text="whenText"
+    :prize-label="prizeLabel"
+    :prize-emoji="prizeEmoji"
+    :prize-amount-text="prizeAmountText"
+    :prize-class="prizeClass"
+    :status-class="statusClass"
+  />
+  <!-- Internal two-step RevealModal -->
+  <RevealModal
+    v-model="confirmOpen"
+    :pending="pending"
+    :performReveal="performReveal"
+    @closed="onModalClosed"
+  />
 </template>
 
 <style scoped>
@@ -299,4 +339,5 @@ function onGridLeave() {
     inset 0 0 0 2px var(--color-accent-gold),
     inset 0 0 0 4px color-mix(in srgb, var(--color-primary-green) 30%, transparent);
 }
+
 </style>
