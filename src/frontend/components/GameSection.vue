@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 import Tooltip from './ui/Tooltip.vue'
 import GameHeader from './GameHeader.vue'
 import CalendarGrid from './CalendarGrid.vue'
+import GameFooter from './GameFooter.vue'
 import Modal from '@/frontend/components/ui/Modal.vue'
 import Button from '@/frontend/components/ui/Button.vue'
 import { useGridStore } from '@/frontend/store/grid'
@@ -136,6 +137,7 @@ const canOpen = computed(
       @hover="onHover"
       @leave="onLeave"
     />
+    <GameFooter />
   </section>
 
   <!-- Global tooltip following cursor -->
