@@ -1,20 +1,11 @@
-import type { IDBPDatabase } from 'idb'
 import type { GridState } from '../domain/grid/schema'
 import type { Targets } from '../domain/grid/seed'
 import type { User } from '../domain/users/model'
 
 // Centralized in-memory singletons with typed accessors
-let dbRef: IDBPDatabase | null = null
 let memoryRef: GridState | null = null
 let targetsRef: Targets = {}
 let usersRef: Record<string, User> | null = null
-
-export function getDbRef(): IDBPDatabase | null {
-  return dbRef
-}
-export function setDbRef(db: IDBPDatabase | null): void {
-  dbRef = db
-}
 
 export function getMemory(): GridState | null {
   return memoryRef
