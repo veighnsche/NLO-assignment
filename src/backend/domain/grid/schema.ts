@@ -24,6 +24,10 @@ export interface GridMeta {
   etag: string
   seed?: number
   /**
+   * Count of revealed cells. Maintained incrementally to avoid O(n) scans.
+   */
+  openedCount?: number
+  /**
    * Deterministic reveal sequence for simulated players.
    * Created at seed time via a Fisher–Yates shuffle over all cell ids.
    */

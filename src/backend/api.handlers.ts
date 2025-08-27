@@ -18,10 +18,35 @@ import {
   pickRandomEligibleUser,
 } from '@/backend'
 
+// --- Small helpers ---
+async function safeJson<T>(request: Request, fallback: T): Promise<T> {
+  try {
+    return (await request.json()) as T
+  } catch {
+    return fallback
+  }
+}
+
+function parseCookie(header: string): Record<string, string> {
+  if (!header) return {}
+  return Object.fromEntries(
+    header
+      .split(';')
+      .map((p) => p.trim())
+      .filter(Boolean)
+      .map((p) => {
+        const idx = p.indexOf('=')
+        const k = idx >= 0 ? p.slice(0, idx) : p
+        const v = idx >= 0 ? decodeURIComponent(p.slice(idx + 1)) : ''
+        return [k, v] as const
+      }),
+  ) as Record<string, string>
+}
+
 export const handlers = [
   http.post('/api/boot', async ({ request }) => {
     try {
-      const body = (await request.json().catch(() => ({}))) as { seed?: number }
+      const body = await safeJson<{ seed?: number }>(request, {})
       await bootDatabase(typeof body?.seed === 'number' ? body.seed : undefined)
       return HttpResponse.json({ ok: true })
     } catch (err) {
@@ -50,7 +75,7 @@ export const handlers = [
 
   http.post('/api/reveal', async ({ request }) => {
     try {
-      const body = (await request.json()) as { id: string; playerId?: string }
+      const body = await safeJson<{ id: string; playerId?: string }>(request, { id: '' })
       const res = await revealCell(body.id, body.playerId)
       if ('error' in res) return HttpResponse.json(res, { status: 400 })
       return HttpResponse.json(res)
@@ -71,10 +96,7 @@ export const handlers = [
 
   http.post('/api/admin/reset', async ({ request }) => {
     try {
-      const body = (await request.json().catch(() => ({}))) as {
-        mode?: 'soft' | 'hard'
-        seed?: number
-      }
+      const body = await safeJson<{ mode?: 'soft' | 'hard'; seed?: number }>(request, {})
       const mode = body.mode ?? 'hard'
       const res = await adminReset(mode, typeof body?.seed === 'number' ? body.seed : undefined)
       return HttpResponse.json(res)
@@ -85,10 +107,7 @@ export const handlers = [
 
   http.post('/api/admin/bot-delay', async ({ request }) => {
     try {
-      const body = (await request.json().catch(() => ({}))) as {
-        minMs?: number
-        maxMs?: number
-      }
+      const body = await safeJson<{ minMs?: number; maxMs?: number }>(request, {})
       if (typeof body.minMs !== 'number' || typeof body.maxMs !== 'number') {
         return HttpResponse.json({ error: 'minMs and maxMs required' }, { status: 400 })
       }
@@ -121,24 +140,13 @@ export const handlers = [
   // --- Users & Admin: Players ---
   http.post('/api/users/assign', async ({ request }) => {
     try {
-      const body = (await request.json().catch(() => ({}))) as { clientId?: string }
+      const body = await safeJson<{ clientId?: string }>(request, {})
       // Prefer explicit clientId from body; otherwise fall back to cookie-based id
       let cid = body.clientId
       let setCookieHeader: string | undefined
       if (!cid) {
         const cookieHeader = request.headers.get('cookie') || ''
-        const cookies = Object.fromEntries(
-          cookieHeader
-            .split(';')
-            .map((p) => p.trim())
-            .filter(Boolean)
-            .map((p) => {
-              const idx = p.indexOf('=')
-              const k = idx >= 0 ? p.slice(0, idx) : p
-              const v = idx >= 0 ? decodeURIComponent(p.slice(idx + 1)) : ''
-              return [k, v] as const
-            }),
-        ) as Record<string, string>
+        const cookies = parseCookie(cookieHeader)
         cid = cookies['nlo-client-id']
         if (!cid) {
           // Generate a simple random id; persistence via cookie
@@ -157,7 +165,7 @@ export const handlers = [
 
   http.post('/api/users/resolve', async ({ request }) => {
     try {
-      const body = (await request.json().catch(() => ({}))) as { ids?: string[] }
+      const body = await safeJson<{ ids?: string[] }>(request, {})
       const ids = Array.isArray(body.ids) ? body.ids : []
       const users = resolveUsers(ids)
       return HttpResponse.json({ users })
@@ -176,7 +184,7 @@ export const handlers = [
 
   http.post('/api/admin/current-player', async ({ request }) => {
     try {
-      const body = (await request.json().catch(() => ({}))) as { playerId?: string | null }
+      const body = await safeJson<{ playerId?: string | null }>(request, {})
       const res = await setCurrentPlayer(body.playerId ?? null)
       if ('error' in res) return HttpResponse.json(res, { status: 400 })
       return HttpResponse.json(res)

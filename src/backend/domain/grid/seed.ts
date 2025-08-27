@@ -100,6 +100,7 @@ export function seedGrid(rows = GRID_ROWS, cols = GRID_COLS, seed?: number): See
     version: 1,
     etag: makeEtag(1),
     seed, // store the input seed (may be undefined) for traceability
+    openedCount: 0,
     revealOrder,
     revealIndex: 0,
   }

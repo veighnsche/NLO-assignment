@@ -1,15 +1,9 @@
-import { openDatabase, STORE_META } from '../infra/idb'
 import { getMemory, getUsersMemory, ensureBooted } from '../infra/state'
 import { mixSeedWithString } from '../domain/shared/rng'
 import type { User } from '../domain/users/model'
-import { makeEtag } from '../domain/grid/schema'
+import { bumpVersion, persistMeta } from '../infra/meta'
 
-function bumpVersion(): void {
-  const memory = getMemory()
-  ensureBooted(memory)
-  memory.meta.version += 1
-  memory.meta.etag = makeEtag(memory.meta.version)
-}
+// bumpVersion provided by infra/meta.ts
 
 export async function pickRandomEligibleUser(): Promise<
   { ok: true; playerId: string } | { error: 'NO_ELIGIBLE' }
@@ -32,14 +26,7 @@ export async function pickRandomEligibleUser(): Promise<
   return { ok: true, playerId: chosen.id }
 }
 
-async function persistMeta(): Promise<void> {
-  const memory = getMemory()
-  ensureBooted(memory)
-  const db = await openDatabase()
-  const tx = db.transaction([STORE_META], 'readwrite')
-  await tx.objectStore(STORE_META).put(memory.meta, 'meta')
-  await tx.done
-}
+// persistMeta provided by infra/meta.ts
 
 export function getCurrentPlayer(): { currentPlayerId?: string } {
   const memory = getMemory()

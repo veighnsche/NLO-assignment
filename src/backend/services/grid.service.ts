@@ -1,5 +1,5 @@
 import type { Cell, CellId, GridMeta, Prize } from '../domain/grid/schema'
-import { GRID_COLS, GRID_ROWS, GRID_TOTAL, PrizeNone, makeEtag } from '../domain/grid/schema'
+import { GRID_COLS, GRID_ROWS, GRID_TOTAL, PrizeNone } from '../domain/grid/schema'
 import { seedGrid, getNextBotReveal } from '../domain/grid/seed'
 import { generateDutchUsers, indexUsers } from '../domain/users/generator'
 import { openDatabase, STORE_GRID, STORE_META, STORE_USERS } from '../infra/idb'
@@ -12,6 +12,7 @@ import {
   setUsersMemory,
   ensureBooted,
 } from '../infra/state'
+import { bumpVersion } from '../infra/meta'
 import { getBotDelayRange as _getBotDelayRange } from './bot.service'
 import { mixSeedWithString } from '../domain/shared/rng'
 
@@ -38,12 +39,7 @@ async function persistAll(): Promise<void> {
   await tx.done
 }
 
-function bumpVersion(): void {
-  const memory = getMemory()
-  ensureBooted(memory)
-  memory.meta.version += 1
-  memory.meta.etag = makeEtag(memory.meta.version)
-}
+// version bumping centralized in infra/meta.ts
 
 function reseedTargetsFromSeed(seed?: number): void {
   // Use seedGrid only to derive targets deterministically; discard the generated state
@@ -116,13 +112,11 @@ export function getSnapshotForClient(): {
 } {
   const memory = getMemory()
   ensureBooted(memory)
-  const revealed = Object.values(memory.cells).filter(
-    (c): c is Cell => (c as Cell).revealed === true,
-  )
+  const revealed = Object.values(memory.cells).filter((c): c is Cell => (c as Cell).revealed === true)
   return {
     meta: { version: memory.meta.version, etag: memory.meta.etag },
     revealed,
-    openedCount: revealed.length,
+    openedCount: typeof memory.meta.openedCount === 'number' ? memory.meta.openedCount : revealed.length,
     total: GRID_TOTAL,
   }
 }
@@ -168,10 +162,6 @@ export async function revealCell(
     const user = usersMemory[playerId]
     if (!user) return { error: 'NOT_ELIGIBLE' }
     if (user.played) return { error: 'ALREADY_PLAYED' }
-    const already = Object.values(memory!.cells).some((c) => c.revealedBy === playerId)
-    if (already) {
-      return { error: 'ALREADY_PLAYED' }
-    }
   }
   const cell = memory!.cells[id]
   if (!cell) return { error: 'NOT_FOUND' }
@@ -187,6 +177,8 @@ export async function revealCell(
   const revealedBy = options?.overrideRevealedBy ?? playerId
   if (revealedBy) cell.revealedBy = revealedBy
   cell.revealedAt = new Date().toISOString()
+  // Increment openedCount meta
+  memory!.meta.openedCount = (memory!.meta.openedCount ?? 0) + 1
 
   // Mark user as played when applicable
   const usersMemory2 = getUsersMemory()
