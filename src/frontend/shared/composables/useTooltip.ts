@@ -65,7 +65,9 @@ export function useTooltip() {
 
   const statusClass = computed(() => (revealed.value ? 'status--open' : 'status--closed'))
 
-  const whenText = computed(() => (revealedAt.value ? dfDateTime.format(new Date(revealedAt.value)) : null))
+  const whenText = computed(() =>
+    revealedAt.value ? dfDateTime.format(new Date(revealedAt.value)) : null,
+  )
 
   // Event handlers
   function onHover(payload: TooltipPayload) {

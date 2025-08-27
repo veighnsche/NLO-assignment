@@ -18,7 +18,14 @@ const props = defineProps<{
 </script>
 
 <template>
-  <Tooltip :open="props.open" :x="props.x" :y="props.y" placement="top" :offset="12" :max-width="'340px'">
+  <Tooltip
+    :open="props.open"
+    :x="props.x"
+    :y="props.y"
+    placement="top"
+    :offset="12"
+    :max-width="'340px'"
+  >
     <div class="tt-card">
       <div class="tt-row">
         <span class="tt-emoji" aria-hidden="true">📍</span>
@@ -26,15 +33,21 @@ const props = defineProps<{
       </div>
       <div class="tt-row">
         <span class="tt-emoji" aria-hidden="true">👤</span>
-        <span>Geopend door: <strong>{{ props.opener ?? '—' }}</strong></span>
+        <span
+          >Geopend door: <strong>{{ props.opener ?? '—' }}</strong></span
+        >
       </div>
       <div class="tt-row" :class="props.statusClass">
         <span class="tt-emoji" aria-hidden="true">🎯</span>
-        <span>Status: <strong>{{ props.revealed ? 'Geopend' : 'Gesloten' }}</strong></span>
+        <span
+          >Status: <strong>{{ props.revealed ? 'Geopend' : 'Gesloten' }}</strong></span
+        >
       </div>
       <div v-if="props.whenText" class="tt-row">
         <span class="tt-emoji" aria-hidden="true">⏰</span>
-        <span>Geopend op: <strong>{{ props.whenText }}</strong></span>
+        <span
+          >Geopend op: <strong>{{ props.whenText }}</strong></span
+        >
       </div>
       <div class="tt-row" :class="props.prizeClass">
         <span class="tt-emoji" aria-hidden="true">🏆</span>

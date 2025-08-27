@@ -79,10 +79,8 @@ const pending = ref<{ id: string; row: number; col: number } | null>(null)
 async function performReveal(id: string) {
   await grid.reveal(id)
   const entry = grid.revealed.find(
-    (c: {
-      id: string
-      prize?: { type?: 'none' | 'consolation' | 'grand'; amount?: number }
-    }) => c.id === id,
+    (c: { id: string; prize?: { type?: 'none' | 'consolation' | 'grand'; amount?: number } }) =>
+      c.id === id,
   )
   const t = entry?.prize?.type
   if (t === 'grand') return { type: 'grand' as const, amount: 25000 }
@@ -346,5 +344,4 @@ function onGridLeave() {
     inset 0 0 0 2px var(--color-accent-gold),
     inset 0 0 0 4px color-mix(in srgb, var(--color-primary-green) 30%, transparent);
 }
-
 </style>
