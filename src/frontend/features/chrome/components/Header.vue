@@ -1,6 +1,7 @@
 <script setup lang="ts">
 defineOptions({ name: 'AppHeader' })
 import { computed } from 'vue'
+import { Icon } from '@iconify/vue'
 import { useGridStore } from '@/frontend/features/game/store/grid'
 
 const props = defineProps<{
@@ -47,19 +48,19 @@ const cardState = computed(() => {
       :aria-live="cardState === 'won-grand' ? 'polite' : 'off'"
     >
       <template v-if="cardState === 'can-open'">
-        <span class="icon" aria-hidden="true">🔓</span>
+        <Icon class="icon" icon="mdi:lock-open-variant" aria-hidden="true" />
         <span class="text">Je kunt 1 vakje openen</span>
       </template>
       <template v-else-if="cardState === 'lost'">
-        <span class="icon" aria-hidden="true">🙁</span>
+        <Icon class="icon" icon="mdi:emoticon-sad-outline" aria-hidden="true" />
         <span class="text">Je hebt niets gewonnen</span>
       </template>
       <template v-else-if="cardState === 'won-consolation'">
-        <span class="icon" aria-hidden="true">🎁</span>
+        <Icon class="icon" icon="mdi:gift" aria-hidden="true" />
         <span class="text">Je hebt de troostprijs gewonnen</span>
       </template>
       <template v-else>
-        <span class="icon" aria-hidden="true">💎</span>
+        <Icon class="icon" icon="mdi:diamond-stone" aria-hidden="true" />
         <span class="text">Je hebt de hoofdprijs gewonnen</span>
         <span class="burst" aria-hidden="true"></span>
       </template>

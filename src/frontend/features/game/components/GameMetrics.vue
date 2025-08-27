@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { Icon } from '@iconify/vue'
 import { useGridStore } from '@/frontend/features/game/store/grid'
 
 const grid = useGridStore()
@@ -29,13 +30,13 @@ const canOpen = computed(
   <div class="metrics-sticky">
     <div class="meta-row" role="group" aria-label="Spelstatistieken">
       <div class="metric opened" aria-label="Aantal geopende vakjes">
-        <span class="emoji" aria-hidden="true">📦</span>
+        <Icon class="emoji" icon="mdi:archive-outline" aria-hidden="true" />
         <span class="label">Geopend:</span>
         <span class="value">{{ openedCount }} / {{ total }}</span>
       </div>
 
       <div class="metric consolation" aria-label="Aantal geopende troostprijzen">
-        <span class="emoji" aria-hidden="true">🎁</span>
+        <Icon class="emoji" icon="mdi:gift" aria-hidden="true" />
         <span class="label">Troostprijzen:</span>
         <span class="value">{{ consolationOpenedCount }} / {{ consolationTotal }}</span>
       </div>
@@ -46,7 +47,7 @@ const canOpen = computed(
         :aria-live="grandOpened ? 'polite' : undefined"
         aria-label="Status hoofdprijs"
       >
-        <span class="emoji" aria-hidden="true">💎</span>
+        <Icon class="emoji" icon="mdi:diamond-stone" aria-hidden="true" />
         <span class="label">Hoofdprijs:</span>
         <span class="value">{{ grandOpened ? 'Geopend' : 'Nog verborgen' }}</span>
         <span v-if="grandOpened" class="burst" aria-hidden="true"></span>
@@ -57,7 +58,7 @@ const canOpen = computed(
         :class="{ closed: !canOpen }"
         aria-label="Kan gebruiker nog een vakje openen?"
       >
-        <span class="emoji" aria-hidden="true">{{ canOpen ? '🔓' : '🔒' }}</span>
+        <Icon class="emoji" :icon="canOpen ? 'mdi:lock-open-variant' : 'mdi:lock-outline'" aria-hidden="true" />
         <span class="label">Kan openen:</span>
         <span class="value">{{ canOpen ? 'Ja' : 'Nee' }}</span>
       </div>

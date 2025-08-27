@@ -26,7 +26,8 @@
           Fantastisch! Je hebt de <strong>Hoofdprijs</strong> gewonnen
           <template v-if="result.amount"
             >van <strong>{{ nfCurrency.format(result.amount) }}</strong></template
-          >! 🎉
+          >!
+          <Icon icon="mdi:party-popper" aria-hidden="true" />
         </p>
       </div>
     </div>
@@ -49,6 +50,7 @@
 
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
+import { Icon } from '@iconify/vue'
 import Modal from '@/frontend/ui/Modal.vue'
 import Button from '@/frontend/ui/Button.vue'
 import { nfCurrency } from '@/frontend/lib/format'

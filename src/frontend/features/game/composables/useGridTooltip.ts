@@ -44,12 +44,6 @@ export function useGridTooltip() {
     return 'Onbekend'
   })
 
-  const prizeEmoji = computed(() => {
-    if (prizeType.value === 'grand') return '💎'
-    if (prizeType.value === 'consolation') return '🎁'
-    return '—'
-  })
-
   const prizeAmountText = computed(() =>
     prizeAmount.value != null ? nfCurrency.format(prizeAmount.value) : '',
   )
@@ -102,7 +96,6 @@ export function useGridTooltip() {
     revealedAt,
     // derived
     prizeLabel,
-    prizeEmoji,
     prizeAmountText,
     prizeClass,
     statusClass,

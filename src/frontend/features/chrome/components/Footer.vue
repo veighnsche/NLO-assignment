@@ -24,6 +24,7 @@
 </template>
 
 <script setup lang="ts">
+defineOptions({ name: 'AppFooter' })
 import { computed } from 'vue'
 import { useGridStore } from '@/frontend/features/game/store/grid'
 

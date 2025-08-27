@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { Icon } from '@iconify/vue'
 import RevealModal from './RevealModal.vue'
 import type { GridTooltipApi } from '@/frontend/features/game/composables/useGridTooltip'
 import { useGridCells } from '@/frontend/features/game/composables/useGridCells'
@@ -108,16 +109,25 @@ const { onGridMove, onGridLeave } = useGridHoverTooltip({
       @click="onReveal(id)"
     >
       <span v-if="isRevealed(id)" class="reveal">
-        {{
-          cellPrize(id)?.type === 'grand'
-            ? '💎'
-            : cellPrize(id)?.type === 'consolation'
-              ? '🎁'
-              : '•'
-        }}
+        <Icon
+          v-if="cellPrize(id)?.type === 'grand'"
+          icon="mdi:diamond-stone"
+          aria-hidden="true"
+        />
+        <Icon
+          v-else-if="cellPrize(id)?.type === 'consolation'"
+          icon="mdi:gift"
+          aria-hidden="true"
+        />
+        <Icon v-else icon="mdi:circle-small" aria-hidden="true" />
       </span>
       <span v-else-if="isExposed(id)" class="expose" :data-type="exposedPrizeType(id)">
-        {{ exposedPrizeType(id) === 'grand' ? '★' : '●' }}
+        <Icon
+          v-if="exposedPrizeType(id) === 'grand'"
+          icon="mdi:star"
+          aria-hidden="true"
+        />
+        <Icon v-else icon="mdi:checkbox-blank-circle" aria-hidden="true" />
       </span>
     </button>
   </div>

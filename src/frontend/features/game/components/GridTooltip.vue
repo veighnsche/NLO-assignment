@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Tooltip from '@/frontend/ui/Tooltip.vue'
+import { Icon } from '@iconify/vue'
 import { useGridTooltip } from '@/frontend/features/game/composables/useGridTooltip'
 
 const {
@@ -12,7 +13,6 @@ const {
   revealed,
   // derived
   prizeLabel,
-  prizeEmoji,
   prizeAmountText,
   prizeClass,
   statusClass,
@@ -41,31 +41,33 @@ defineExpose({ hover, move, leave })
   <Tooltip :open="open" :x="x" :y="y" placement="top" :offset="12" :max-width="'340px'">
     <div class="tt-card">
       <div class="tt-row">
-        <span class="tt-emoji" aria-hidden="true">📍</span>
+        <Icon class="tt-emoji" icon="mdi:map-marker" aria-hidden="true" />
         <span>{{ text }}</span>
       </div>
       <div class="tt-row">
-        <span class="tt-emoji" aria-hidden="true">👤</span>
+        <Icon class="tt-emoji" icon="mdi:account" aria-hidden="true" />
         <span
           >Geopend door: <strong>{{ opener ?? '—' }}</strong></span
         >
       </div>
       <div class="tt-row" :class="statusClass">
-        <span class="tt-emoji" aria-hidden="true">🎯</span>
+        <Icon class="tt-emoji" icon="mdi:target" aria-hidden="true" />
         <span
           >Status: <strong>{{ revealed ? 'Geopend' : 'Gesloten' }}</strong></span
         >
       </div>
       <div v-if="whenText" class="tt-row">
-        <span class="tt-emoji" aria-hidden="true">⏰</span>
+        <Icon class="tt-emoji" icon="mdi:clock-time-four-outline" aria-hidden="true" />
         <span
           >Geopend op: <strong>{{ whenText }}</strong></span
         >
       </div>
       <div class="tt-row" :class="prizeClass">
-        <span class="tt-emoji" aria-hidden="true">🏆</span>
+        <Icon class="tt-emoji" icon="mdi:trophy" aria-hidden="true" />
         <span>
-          Prijs: <strong>{{ prizeEmoji }} {{ prizeLabel }}</strong>
+          Prijs: <Icon class="tt-emoji" icon="mdi:gift" v-if="prizeLabel === 'Troostprijs'" aria-hidden="true" />
+          <Icon class="tt-emoji" icon="mdi:diamond-stone" v-else-if="prizeLabel === 'Hoofdprijs'" aria-hidden="true" />
+          <strong>{{ prizeLabel }}</strong>
           <template v-if="prizeAmountText">
             <span class="tt-amount">— {{ prizeAmountText }}</span>
           </template>

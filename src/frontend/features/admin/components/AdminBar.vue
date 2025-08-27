@@ -34,7 +34,7 @@
           title="Sluit adminbalk"
           @click="$emit('toggle')"
         >
-          ✕
+          <Icon icon="mdi:close" aria-hidden="true" />
         </Button>
       </div>
     </div>
@@ -58,6 +58,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
+import { Icon } from '@iconify/vue'
 import Modal from '@/frontend/ui/Modal.vue'
 import Button from '@/frontend/ui/Button.vue'
 import Slider from '@/frontend/ui/Slider.vue'
