@@ -4,6 +4,7 @@ import {
   apiAdminSetBotDelay,
   apiAdminGetBotDelay,
   apiAdminGetTargets,
+  apiAdminSetCurrentPlayer,
 } from '@/frontend/shared/api/client'
 
 export function useAdminControls() {
@@ -11,8 +12,12 @@ export function useAdminControls() {
 
   async function reset(seed?: number): Promise<void> {
     await apiAdminReset('hard', seed)
-    // Allow the current browser to reveal again after a reset
-    localStorage.removeItem('nlo-user-revealed')
+    // Explicitly clear any active player on the server
+    try {
+      await apiAdminSetCurrentPlayer(null)
+    } catch {
+      // ignore in dev
+    }
     // Clear any admin-exposed overlay so it doesn't show stale targets after reseed
     grid.clearExposedTargets(true)
     await grid.refresh()

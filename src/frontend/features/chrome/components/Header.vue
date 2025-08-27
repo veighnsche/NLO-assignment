@@ -1,6 +1,6 @@
 <script setup lang="ts">
 defineOptions({ name: 'AppHeader' })
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import { useGridStore } from '@/frontend/features/game/store/grid'
 
 const props = defineProps<{
@@ -8,25 +8,9 @@ const props = defineProps<{
   // Header no longer handles metrics; keep optional title only
 }>()
 
-// Identify the current user for outcome tracking
-const playerId = ref<string>('')
-const storageKey = 'nlo-player-id'
-try {
-  const existing = localStorage.getItem(storageKey)
-  if (existing) {
-    playerId.value = existing
-  } else {
-    // lightweight random id
-    const rnd = crypto.getRandomValues(new Uint32Array(4))
-    playerId.value = Array.from(rnd).map((n) => n.toString(16).padStart(8, '0')).join('')
-    localStorage.setItem(storageKey, playerId.value)
-  }
-} catch {
-  // localStorage/crypto may be unavailable in SSR; fall back
-  playerId.value = `anon-${Math.random().toString(36).slice(2)}`
-}
-
 const grid = useGridStore()
+// Current player id is the backend-assigned user id
+const playerId = computed(() => grid.getAssignedUserId() ?? '')
 
 // Derived state for the status card
 const canOpen = computed(

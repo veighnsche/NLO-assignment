@@ -1,7 +1,7 @@
 import type { Cell, CellId, GridMeta, Prize } from '../schema'
 import { GRID_COLS, GRID_ROWS, GRID_TOTAL, PrizeNone, makeEtag } from '../schema'
 import { seedGrid, getNextBotReveal } from '../seed'
-import { generateUsers, indexUsers } from '../users'
+import { generateDutchUsers, indexUsers } from '../users'
 import { openDatabase, STORE_GRID, STORE_META, STORE_USERS } from '../core/storage'
 import {
   getMemory,
@@ -71,7 +71,7 @@ export async function bootDatabase(seed?: number): Promise<void> {
       setUsersMemory(storedUsers)
     } else {
       const s = typeof storedMeta.seed === 'number' ? storedMeta.seed : 0x9e3779b9
-      const users = generateUsers(GRID_TOTAL, s)
+      const users = generateDutchUsers(GRID_TOTAL, s)
       const usersMemory = indexUsers(users)
       setUsersMemory(usersMemory)
       const txw = database.transaction([STORE_USERS], 'readwrite')
@@ -95,7 +95,7 @@ export async function bootDatabase(seed?: number): Promise<void> {
   setTargetsRef(t)
   // Generate users deterministically from the same seed
   const s = typeof seed === 'number' ? seed : 0x9e3779b9
-  const users = generateUsers(GRID_TOTAL, s)
+  const users = generateDutchUsers(GRID_TOTAL, s)
   const usersMemory = indexUsers(users)
   setUsersMemory(usersMemory)
   const txw = database.transaction([STORE_GRID, STORE_META, STORE_USERS], 'readwrite')
@@ -203,7 +203,7 @@ export async function adminReset(
   setTargetsRef(t)
   // Regenerate users deterministically on reset
   const s = typeof seed === 'number' ? seed : 0x9e3779b9
-  const users = generateUsers(GRID_TOTAL, s)
+  const users = generateDutchUsers(GRID_TOTAL, s)
   const usersMemory = indexUsers(users)
   setUsersMemory(usersMemory)
   await persistAll()

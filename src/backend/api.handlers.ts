@@ -111,9 +111,34 @@ export const handlers = [
   http.post('/api/users/assign', async ({ request }) => {
     try {
       const body = (await request.json().catch(() => ({}))) as { clientId?: string }
-      if (!body.clientId) return HttpResponse.json({ error: 'clientId required' }, { status: 400 })
-      const u = assignUserForClient(body.clientId)
-      return HttpResponse.json({ userId: u.id, name: u.name })
+      // Prefer explicit clientId from body; otherwise fall back to cookie-based id
+      let cid = body.clientId
+      let setCookieHeader: string | undefined
+      if (!cid) {
+        const cookieHeader = request.headers.get('cookie') || ''
+        const cookies = Object.fromEntries(
+          cookieHeader
+            .split(';')
+            .map((p) => p.trim())
+            .filter(Boolean)
+            .map((p) => {
+              const idx = p.indexOf('=')
+              const k = idx >= 0 ? p.slice(0, idx) : p
+              const v = idx >= 0 ? decodeURIComponent(p.slice(idx + 1)) : ''
+              return [k, v] as const
+            }),
+        ) as Record<string, string>
+        cid = cookies['nlo-client-id']
+        if (!cid) {
+          // Generate a simple random id; persistence via cookie
+          const rand = Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2)
+          cid = `cid-${rand}`
+          setCookieHeader = `nlo-client-id=${encodeURIComponent(cid)}; Path=/; Max-Age=31536000; SameSite=Lax`
+        }
+      }
+      const u = assignUserForClient(cid)
+      const init = setCookieHeader ? { headers: { 'Set-Cookie': setCookieHeader } } : undefined
+      return HttpResponse.json({ userId: u.id, name: u.name }, init)
     } catch (err) {
       return HttpResponse.json({ error: String(err) }, { status: 500 })
     }

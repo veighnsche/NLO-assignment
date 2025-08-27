@@ -117,10 +117,11 @@ export async function apiAdminGetTargets(): Promise<{
 
 // --- Users & Admin: Players ---
 
-export async function apiUsersAssign(clientId: string): Promise<{ userId: string; name: string }> {
+export async function apiUsersAssign(clientId?: string): Promise<{ userId: string; name: string }> {
+  const body = clientId ? JSON.stringify({ clientId }) : JSON.stringify({})
   return jsonFetch<{ userId: string; name: string }>('/api/users/assign', {
     method: 'POST',
-    body: JSON.stringify({ clientId }),
+    body,
   })
 }
 

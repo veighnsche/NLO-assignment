@@ -72,43 +72,17 @@ export const useGridStore = defineStore('grid', {
   },
 
   actions: {
-    getPlayerId(): string {
-      // Stable client id used only for attribution; backend enforces one-open rule
-      const key = 'nlo-player-id'
-      try {
-        const existing = localStorage.getItem(key)
-        if (existing) return existing
-        const rnd = crypto.getRandomValues(new Uint32Array(4))
-        const pid = Array.from(rnd)
-          .map((n) => n.toString(16).padStart(8, '0'))
-          .join('')
-        localStorage.setItem(key, pid)
-        return pid
-      } catch {
-        return `anon-${Math.random().toString(36).slice(2)}`
-      }
+    // No client-side id persistence; use backend-assigned identity
+    getPlayerId(): string | null {
+      return this.assignedUser?.id ?? null
     },
     getAssignedUserId(): string | null {
       return this.assignedUser?.id ?? null
     },
     async ensureAssignedUser() {
       if (this.assignedUser) return
-      // Cache in localStorage by clientId to avoid extra calls
-      const clientId = this.getPlayerId()
-      const cacheKey = `nlo-assigned-user-${clientId}`
-      try {
-        const cached = localStorage.getItem(cacheKey)
-        if (cached) {
-          const parsed = JSON.parse(cached) as { id: string; name: string }
-          this.assignedUser = { id: parsed.id, name: parsed.name }
-          return
-        }
-      } catch {}
-      const u = await apiUsersAssign(clientId)
+      const u = await apiUsersAssign()
       this.assignedUser = { id: u.userId, name: u.name }
-      try {
-        localStorage.setItem(cacheKey, JSON.stringify({ id: u.userId, name: u.name }))
-      } catch {}
     },
     async boot(seed?: number) {
       this.isBooting = true
@@ -155,7 +129,8 @@ export const useGridStore = defineStore('grid', {
     },
 
     userHasRevealed(): boolean {
-      const pid = this.getAssignedUserId() || this.getPlayerId()
+      const pid = this.getAssignedUserId()
+      if (!pid) return false
       return this.revealed.some((c) => c.revealedBy === pid)
     },
 
@@ -171,7 +146,7 @@ export const useGridStore = defineStore('grid', {
       try {
         // Ensure we have a backend-assigned user id
         await this.ensureAssignedUser()
-        const pid = playerId || this.getAssignedUserId() || this.getPlayerId()
+        const pid: string | undefined = (playerId ?? this.getAssignedUserId()) ?? undefined
         await apiReveal(id, pid)
         this.networkOk = true
         await this.refresh()
