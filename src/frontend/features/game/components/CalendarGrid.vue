@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import RevealModal from './RevealModal.vue'
-import type { GridTooltipApi } from './GridTooltip.vue'
+import type { GridTooltipApi } from '@/frontend/features/game/composables/useGridTooltip'
 import { useGridCells } from '@/frontend/features/game/composables/useGridCells'
 
 // Encapsulated grid logic via composable

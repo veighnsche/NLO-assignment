@@ -51,6 +51,7 @@
 import { computed, ref, watch } from 'vue'
 import Modal from '@/frontend/ui/Modal.vue'
 import Button from '@/frontend/ui/Button.vue'
+import { nfCurrency } from '@/frontend/lib/format'
 
 export type RevealResult = {
   type: 'none' | 'consolation' | 'grand'
@@ -78,11 +79,6 @@ const result = ref<RevealResult>({ type: 'none', amount: 0 })
 const busy = ref(false)
 const errorMsg = ref<string | null>(null)
 
-const nfCurrency = new Intl.NumberFormat('nl-NL', {
-  style: 'currency',
-  currency: 'EUR',
-  maximumFractionDigits: 0,
-})
 
 watch(
   () => props.modelValue,
