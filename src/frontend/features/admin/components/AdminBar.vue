@@ -63,6 +63,7 @@ import Button from '@/frontend/ui/Button.vue'
 import Slider from '@/frontend/ui/Slider.vue'
 import { useAdminControls } from '@/frontend/features/admin/useAdminControls'
 import { useGridStore } from '@/frontend/features/game/store/grid'
+import { hzToIntervalMs, intervalWindow, clampHz, intervalToHz, DEFAULT_MIN_MS, DEFAULT_MAX_MS } from '@/frontend/lib/botSpeed'
 
 const showModal = ref(false)
 const seed = ref<number | null>(null)
@@ -94,12 +95,9 @@ async function confirmReset() {
 function scheduleSetSpeed() {
   if (speedTimer != null) window.clearTimeout(speedTimer)
   speedTimer = window.setTimeout(async () => {
-    const speed = Math.max(0.1, Number(botSpeedHz.value) || 1)
-    // Convert speed (actions/sec) to base interval in ms
-    const interval = Math.max(100, Math.round(1000 / speed))
-    // Map single control to a backend delay window around the interval
-    const minMs = Math.max(0, Math.round(interval * 0.5))
-    const maxMs = Math.max(minMs, Math.round(interval * 1.5))
+    const speed = clampHz(Number(botSpeedHz.value) || 1)
+    const interval = hzToIntervalMs(speed)
+    const { minMs, maxMs } = intervalWindow(interval)
     await setBotSpeed({ intervalMs: interval, minMs, maxMs })
     speedTimer = null
   }, 250)
@@ -111,8 +109,8 @@ function toggleExpose() {
 
 async function resetBotSpeed() {
   // Restore backend defaults and sync UI
-  const defaultMin = 300
-  const defaultMax = 1500
+  const defaultMin = DEFAULT_MIN_MS
+  const defaultMax = DEFAULT_MAX_MS
   const avg = Math.round((defaultMin + defaultMax) / 2)
   // Clear pending debounce to avoid extra network call
   if (speedTimer != null) {
@@ -120,8 +118,8 @@ async function resetBotSpeed() {
     speedTimer = null
   }
   // Update slider (Hz) from ms
-  const speed = 1000 / Math.max(1, avg)
-  botSpeedHz.value = Math.min(10, Math.max(0.3, Number(speed)))
+  const speed = intervalToHz(avg)
+  botSpeedHz.value = clampHz(speed)
   await setBotSpeed({ intervalMs: avg, minMs: defaultMin, maxMs: defaultMax })
 }
 
@@ -130,11 +128,10 @@ onMounted(async () => {
     const { minMs, maxMs } = await getBotDelay()
     const avg = Math.max(1, Math.round((minMs + maxMs) / 2))
     // Initialize slider from backend by converting ms -> actions/sec
-    const speed = 1000 / avg
-    // Clamp to slider boundaries
-    botSpeedHz.value = Math.min(10, Math.max(0.3, Number(speed)))
+    const speed = clampHz(intervalToHz(avg))
+    botSpeedHz.value = speed
     // Align frontend polling interval with backend range
-    await setBotSpeed({ intervalMs: avg, minMs, maxMs })
+    await setBotSpeed({ intervalMs: hzToIntervalMs(speed), minMs, maxMs })
   } catch {
     // ignore fetch errors in dev
   }

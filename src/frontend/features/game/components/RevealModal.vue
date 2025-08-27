@@ -52,11 +52,7 @@ import { computed, ref, watch } from 'vue'
 import Modal from '@/frontend/ui/Modal.vue'
 import Button from '@/frontend/ui/Button.vue'
 import { nfCurrency } from '@/frontend/lib/format'
-
-export type RevealResult = {
-  type: 'none' | 'consolation' | 'grand'
-  amount: number
-}
+import type { RevealResult } from '@/frontend/types/api'
 
 const props = defineProps<{
   modelValue: boolean

@@ -34,8 +34,7 @@ export function useAdminControls() {
     } catch {
       // ignore in dev
     }
-    grid.stopBotPolling()
-    grid.startBotPolling(payload.intervalMs)
+    grid.setPollingInterval(payload.intervalMs)
   }
 
   async function getBotDelay(): Promise<{ minMs: number; maxMs: number }> {

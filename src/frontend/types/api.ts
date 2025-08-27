@@ -52,3 +52,9 @@ export interface AdminResetResponse {
   ok: true
   meta: GridMeta
 }
+
+// Centralized reveal result type used by UI components
+export type RevealResult = {
+  type: PrizeType
+  amount: Prize['amount']
+}

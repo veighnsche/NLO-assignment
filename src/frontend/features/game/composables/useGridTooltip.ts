@@ -1,8 +1,6 @@
 import { computed, ref } from 'vue'
 import { nfCurrency } from '@/frontend/lib/format'
-
-export type PrizeType = 'none' | 'consolation' | 'grand' | undefined
-export type PrizeAmount = 0 | 100 | 25000 | undefined
+import type { PrizeType, Prize } from '@/frontend/types/api'
 
 export interface TooltipPayload {
   text: string
@@ -10,8 +8,8 @@ export interface TooltipPayload {
   y: number
   opener: string | null
   revealed: boolean
-  prizeType?: 'none' | 'consolation' | 'grand'
-  prizeAmount?: 0 | 100 | 25000
+  prizeType?: PrizeType
+  prizeAmount?: Prize['amount']
   revealedAt?: string | null
 }
 
@@ -34,8 +32,8 @@ export function useGridTooltip() {
   const text = ref('')
   const opener = ref<string | null>(null)
   const revealed = ref(false)
-  const prizeType = ref<PrizeType>(undefined)
-  const prizeAmount = ref<PrizeAmount>(undefined)
+  const prizeType = ref<PrizeType | undefined>(undefined)
+  const prizeAmount = ref<Prize['amount'] | undefined>(undefined)
   const revealedAt = ref<string | null>(null)
 
   // Derived values

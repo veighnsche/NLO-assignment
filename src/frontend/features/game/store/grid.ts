@@ -1,17 +1,10 @@
 import { defineStore } from 'pinia'
 import { apiBoot, apiSnapshot, apiReveal, apiBotStep, apiUsersAssign, apiUsersResolve } from '@/frontend/features/game/api'
 import { apiAdminGetTargets, apiAdminGetCurrentPlayer } from '@/frontend/features/admin/api'
+import type { Cell } from '@/frontend/types/api'
 
-// Strong type for revealed cell entries
-export interface RevealedCellEntry {
-  id: string
-  row: number
-  col: number
-  revealed: boolean
-  prize?: { type: 'none' | 'consolation' | 'grand'; amount: 0 | 100 | 25000 }
-  revealedBy?: string
-  revealedAt?: string
-}
+// Strong type for revealed cell entries (reuse API Cell shape)
+export type RevealedCellEntry = Cell
 
 export const useGridStore = defineStore('grid', {
   state: () => ({
@@ -39,7 +32,7 @@ export const useGridStore = defineStore('grid', {
       col: number
       prize: { type: 'consolation' | 'grand'; amount: 100 | 25000 }
     }>,
-    // Stable id Sets to avoid recomputing per render
+    // Stable structures kept as plain collections (mutated in place)
     revealedIds: new Set<string>() as Set<string>,
     exposedIds: new Set<string>() as Set<string>,
     // Stable Map for id -> revealed entry
@@ -231,6 +224,14 @@ export const useGridStore = defineStore('grid', {
       if (this.botTimerId != null) {
         clearInterval(this.botTimerId)
         this.botTimerId = null
+      }
+    },
+
+    setPollingInterval(intervalMs: number) {
+      // If polling is active, restart with the new interval; otherwise do nothing.
+      if (this.botTimerId != null) {
+        this.stopBotPolling()
+        this.startBotPolling(intervalMs)
       }
     },
 

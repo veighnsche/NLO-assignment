@@ -1,5 +1,6 @@
 import { jsonFetch } from '@/frontend/lib/http'
 import type { Snapshot, RevealResponse, BotStepResponse } from '@/frontend/types/api'
+import { getStableClientId } from '@/frontend/lib/clientId'
 
 export async function apiBoot(seed?: number): Promise<void> {
   await jsonFetch<{ ok: true }>('/api/boot', {
@@ -25,21 +26,6 @@ export async function apiBotStep(): Promise<BotStepResponse> {
 
 // Users-related APIs (part of game feature)
 export async function apiUsersAssign(clientId?: string): Promise<{ userId: string; name: string }> {
-  function getStableClientId(): string {
-    try {
-      const key = 'nlo-client-id'
-      let cid = localStorage.getItem(key)
-      if (!cid) {
-        const rand = Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2)
-        cid = `cid-${rand}`
-        localStorage.setItem(key, cid)
-      }
-      return cid
-    } catch {
-      return `cid-${Math.random().toString(36).slice(2)}${Math.random().toString(36).slice(2)}`
-    }
-  }
-
   const effectiveClientId = clientId || getStableClientId()
   const body = JSON.stringify({ clientId: effectiveClientId })
   return jsonFetch<{ userId: string; name: string }>('/api/users/assign', {

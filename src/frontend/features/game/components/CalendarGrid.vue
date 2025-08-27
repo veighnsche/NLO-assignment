@@ -3,6 +3,8 @@ import { ref } from 'vue'
 import RevealModal from './RevealModal.vue'
 import type { GridTooltipApi } from '@/frontend/features/game/composables/useGridTooltip'
 import { useGridCells } from '@/frontend/features/game/composables/useGridCells'
+import type { RevealResult } from '@/frontend/types/api'
+import { useGridHoverTooltip } from '@/frontend/features/game/composables/useGridHoverTooltip'
 
 // Encapsulated grid logic via composable
 const {
@@ -37,12 +39,9 @@ const props = withDefaults(
 const confirmOpen = ref(false)
 const pending = ref<{ id: string; row: number; col: number } | null>(null)
 
-async function performReveal(id: string) {
+async function performReveal(id: string): Promise<RevealResult> {
   await grid.reveal(id)
-  const entry = grid.revealed.find(
-    (c: { id: string; prize?: { type?: 'none' | 'consolation' | 'grand'; amount?: number } }) =>
-      c.id === id,
-  )
+  const entry = grid.revealed.find((c) => c.id === id)
   const t = entry?.prize?.type
   if (t === 'grand') return { type: 'grand' as const, amount: 25000 }
   if (t === 'consolation') return { type: 'consolation' as const, amount: 100 }
@@ -64,65 +63,14 @@ async function onReveal(i: number) {
 }
 
 // Tooltip control comes from parent via prop (available on props.tooltip)
-
-// --- Performance: throttle mousemove updates to one per animation frame ---
-const rafId = ref<number | null>(null)
-const lastIdx = ref<number | null>(null)
-function schedule(fn: () => void) {
-  if (rafId.value != null) return
-  rafId.value = requestAnimationFrame(() => {
-    rafId.value = null
-    fn()
-  })
-}
-
-function onGridMove(e: MouseEvent) {
-  schedule(() => {
-    const target = (e.target as HTMLElement).closest('button.cell') as HTMLElement | null
-    if (!target) {
-      props.tooltip?.leave()
-      lastIdx.value = null
-      return
-    }
-    const idxAttr = target.getAttribute('data-index')
-    if (idxAttr == null) {
-      props.tooltip?.leave()
-      lastIdx.value = null
-      return
-    }
-    const idx = Number(idxAttr)
-    if (Number.isNaN(idx)) {
-      props.tooltip?.leave()
-      lastIdx.value = null
-      return
-    }
-    // If we're still on the same cell, only update position to reduce reactive work
-    if (lastIdx.value === idx) {
-      props.tooltip?.move(e.clientX, e.clientY)
-      return
-    }
-    lastIdx.value = idx
-    const text = `Rij ${getRow(idx)}, Kolom ${getCol(idx)}`
-    const id = cellIdFromIndex(idx)
-    const cell = revealedById.value.get(id)
-    const openerName = grid.userNameById(cell?.revealedBy) || cell?.revealedBy || null
-    props.tooltip?.hover({
-      text,
-      x: e.clientX,
-      y: e.clientY,
-      opener: openerName,
-      revealed: !!cell?.revealed,
-      prizeType: cell?.prize?.type,
-      prizeAmount: cell?.prize?.amount,
-      revealedAt: cell?.revealedAt ?? null,
-    })
-  })
-}
-
-function onGridLeave() {
-  props.tooltip?.leave()
-  lastIdx.value = null
-}
+const { onGridMove, onGridLeave } = useGridHoverTooltip({
+  tooltip: props.tooltip ?? null,
+  getRow,
+  getCol,
+  cellIdFromIndex,
+  revealedById,
+  userNameById: grid.userNameById,
+})
 </script>
 
 <template>
