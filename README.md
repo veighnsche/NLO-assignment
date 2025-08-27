@@ -1,6 +1,6 @@
 # NLO
 
-This template should help get you started developing with Vue 3 in Vite.
+A Vue 3 + Vite project implementing a 100x100 surprise calendar with a mocked backend, deterministic seeding, IndexedDB persistence, and MSW-driven API.
 
 ## Recommended IDE Setup
 
@@ -36,6 +36,12 @@ pnpm build
 
 ```sh
 pnpm test:unit
+```
+
+Run once (no watch):
+
+```sh
+pnpm test:unit:run
 ```
 
 ### Lint with [ESLint](https://eslint.org/)
@@ -100,10 +106,17 @@ pnpm dev
 Directories of interest:
 
 * __`src/backend/`__
-  * `api.handlers.ts` — HTTP endpoints (boot, snapshot, reveal, bot step, admin reset). These are the single source of truth for API routes.
-  * `db/` — In-memory + IndexedDB-backed data access. Key file: `db/idb.ts`.
-  * `msw/browser.ts` — MSW worker setup for the browser (dev only).
-  * `msw/server.ts` — MSW server setup for tests (Node/Vitest).
+  * `api.handlers.ts` — HTTP endpoints (boot, snapshot, reveal, bot step, admin reset). Single source of truth for API routes.
+  * `db/domain/` — Domain models and logic
+    * `grid/` — `schema.ts` (types, helpers), `seed.ts` (grid seed + bot reveal order)
+    * `users/` — `model.ts` (User), `generator.ts` (deterministic user generation)
+    * `shared/` — `rng.ts` (deterministic PRNG utilities)
+  * `db/infra/` — Infrastructure
+    * `idb.ts` — IndexedDB config and open helper
+    * `state.ts` — In-memory state singletons and accessors
+  * `db/services/` — Application services orchestrating domain + infra
+  * `msw/browser.ts` — MSW worker setup for the browser (dev only)
+  * `msw/server.ts` — MSW server setup for tests (Node/Vitest)
 
 * __`src/frontend/`__
   * `api.ts` — Thin HTTP client for `/api/*` endpoints.
@@ -145,7 +158,7 @@ Client functions in `src/frontend/api.ts` map 1:1 to these endpoints.
   * Cleared on Admin reset to ease demoing.
 
 * __Persistence__
-  * `src/backend/db/idb.ts` persists grid + meta to IndexedDB.
+  * `src/backend/db/infra/idb.ts` persists grid + meta to IndexedDB.
   * On boot, state is loaded; frontend hydrates via `snapshot`.
 
 * __Simulated multi-user__
