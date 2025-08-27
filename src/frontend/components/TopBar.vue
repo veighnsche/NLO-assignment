@@ -6,6 +6,10 @@
       </div>
       <div class="topbar-spacer"></div>
       <div class="topbar-right">
+        <div class="net-indicator" :class="networkOk ? 'ok' : 'down'" :aria-live="'polite'">
+          <span class="dot" aria-hidden="true"></span>
+          <span class="label">{{ networkOk ? 'Verbonden' : 'Offline' }}</span>
+        </div>
         <UiButton
           color="primary"
           variant="outline"
@@ -21,14 +25,19 @@
 </template>
 
 <script setup lang="ts">
-import { withDefaults, defineProps, toRefs } from 'vue'
+import { withDefaults, defineProps, toRefs, computed } from 'vue'
 import UiButton from './ui/Button.vue'
+import { useGridStore } from '@/frontend/store/grid'
 
 const props = withDefaults(defineProps<{ showAdminBar: boolean; title?: string }>(), {
   title: 'Verrassingskalender',
 })
 const { showAdminBar, title } = toRefs(props)
 defineEmits<{ (e: 'toggle'): void }>()
+
+// Connectivity indicator
+const grid = useGridStore()
+const networkOk = computed(() => grid.networkOk)
 </script>
 
 <style scoped>
@@ -65,5 +74,29 @@ defineEmits<{ (e: 'toggle'): void }>()
   margin: 0;
   font-size: 1.125rem;
   line-height: 1;
+}
+
+/* Network indicator */
+.net-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-right: 8px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--border-subtle);
+  background: var(--surface);
+  font-size: 0.85rem;
+}
+.net-indicator .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px rgba(0,0,0,0.04) inset;
+}
+.net-indicator.ok .dot { background: #2ecc71; }
+.net-indicator.down .dot { background: #e74c3c; }
+.net-indicator .label {
+  color: var(--text-muted, #777);
 }
 </style>

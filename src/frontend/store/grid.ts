@@ -24,6 +24,8 @@ export const useGridStore = defineStore('grid', {
     isRefreshing: false,
     isRevealing: false,
     botTimerId: null as number | null,
+    // Network/Backend status
+    networkOk: true,
     // Admin-only exposure of hidden target cells
     showExposed: false,
     targetsEtag: null as string | null,
@@ -49,6 +51,7 @@ export const useGridStore = defineStore('grid', {
       this.isBooting = true
       try {
         await apiBoot(seed)
+        this.networkOk = true
         await this.refresh()
       } finally {
         this.isBooting = false
@@ -59,6 +62,7 @@ export const useGridStore = defineStore('grid', {
       this.isRefreshing = true
       try {
         const snap = await apiSnapshot()
+        this.networkOk = true
         const prevEtag = this.lastEtag
         this.meta = snap.meta
         this.revealed = snap.revealed
@@ -68,6 +72,8 @@ export const useGridStore = defineStore('grid', {
         if (prevEtag !== snap.meta.etag) {
           this.lastEtag = snap.meta.etag
         }
+      } catch {
+        this.networkOk = false
       } finally {
         this.isRefreshing = false
       }
@@ -87,8 +93,12 @@ export const useGridStore = defineStore('grid', {
       this.isRevealing = true
       try {
         await apiReveal(id, playerId)
+        this.networkOk = true
         this.markUserRevealed()
         await this.refresh()
+      } catch (err) {
+        this.networkOk = false
+        throw err
       } finally {
         this.isRevealing = false
       }
@@ -99,8 +109,10 @@ export const useGridStore = defineStore('grid', {
       const handle = window.setInterval(async () => {
         try {
           await apiBotStep()
+          this.networkOk = true
           await this.refresh()
         } catch {
+          this.networkOk = false
           // ignore in dev
         }
       }, intervalMs)
@@ -125,7 +137,9 @@ export const useGridStore = defineStore('grid', {
         const res = await apiAdminGetTargets()
         this.exposedTargets = res.targets
         this.targetsEtag = currentEtag
+        this.networkOk = true
       } catch {
+        this.networkOk = false
         // ignore in dev
       }
     },

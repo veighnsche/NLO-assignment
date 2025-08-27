@@ -4,8 +4,7 @@ import Tooltip from './ui/Tooltip.vue'
 import GameHeader from './GameHeader.vue'
 import CalendarGrid from './CalendarGrid.vue'
 import GameFooter from './GameFooter.vue'
-import Modal from '@/frontend/components/ui/Modal.vue'
-import Button from '@/frontend/components/ui/Button.vue'
+import RevealModal from './RevealModal.vue'
 import { useGridStore } from '@/frontend/store/grid'
 
 // Store (for header counts)
@@ -94,7 +93,7 @@ function onLeave() {
   tipOpen.value = false
 }
 
-// Confirm before reveal state
+// Modal state owned here, UI handled by RevealModal
 const confirmOpen = ref(false)
 const pending = ref<{ id: string; row: number; col: number } | null>(null)
 
@@ -103,15 +102,18 @@ function onRequestReveal(payload: { id: string; index: number; row: number; col:
   confirmOpen.value = true
 }
 
-async function confirmReveal() {
-  if (!pending.value) return
-  await grid.reveal(pending.value.id)
-  confirmOpen.value = false
-  pending.value = null
+async function performReveal(id: string) {
+  await grid.reveal(id)
+  const entry = grid.revealed.find((c) => c.id === id)
+  const t = entry?.prize?.type
+  if (t === 'grand') return { type: 'grand' as const, amount: 25000 }
+  if (t === 'consolation') return { type: 'consolation' as const, amount: 100 }
+  return { type: 'none' as const, amount: 0 }
 }
 
-function cancelReveal() {
-  confirmOpen.value = false
+// no-op cancel handled inside RevealModal; keep state resets via onModalClosed
+
+function onModalClosed() {
   pending.value = null
 }
 
@@ -177,19 +179,13 @@ const canOpen = computed(
     </div>
   </Tooltip>
 
-  <!-- Confirm reveal modal -->
-  <Modal v-model="confirmOpen" :ariaLabelledby="'confirm-title'">
-    <h2 id="confirm-title">Vakje openen bevestigen</h2>
-    <p class="confirm-text">
-      Weet je zeker dat je vakje
-      <strong>Rij {{ pending?.row }}, Kolom {{ pending?.col }}</strong>
-      wilt openen?
-    </p>
-    <template #footer>
-      <Button @click="cancelReveal">Annuleren</Button>
-      <Button color="danger" @click="confirmReveal">Openen</Button>
-    </template>
-  </Modal>
+  <!-- Dedicated two-step RevealModal component -->
+  <RevealModal
+    v-model="confirmOpen"
+    :pending="pending"
+    :performReveal="performReveal"
+    @closed="onModalClosed"
+  />
 </template>
 
 <style scoped>
