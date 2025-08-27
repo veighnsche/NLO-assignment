@@ -120,42 +120,66 @@ const {
   statusClass,
   whenText,
   onHover,
+  onMove,
   onLeave,
 } = useTooltip()
 
+// --- Performance: throttle mousemove updates to one per animation frame ---
+const rafId = ref<number | null>(null)
+const lastIdx = ref<number | null>(null)
+function schedule(fn: () => void) {
+  if (rafId.value != null) return
+  rafId.value = requestAnimationFrame(() => {
+    rafId.value = null
+    fn()
+  })
+}
+
 function onGridMove(e: MouseEvent) {
-  const target = (e.target as HTMLElement).closest('button.cell') as HTMLElement | null
-  if (!target) {
-    onLeave()
-    return
-  }
-  const idxAttr = target.getAttribute('data-index')
-  if (idxAttr == null) {
-    onLeave()
-    return
-  }
-  const idx = Number(idxAttr)
-  if (Number.isNaN(idx)) {
-    onLeave()
-    return
-  }
-  const text = `Rij ${getRow(idx)}, Kolom ${getCol(idx)}`
-  const id = cellIdFromIndex(idx)
-  const cell = revealedMap.value.get(id)
-  onHover({
-    text,
-    x: e.clientX,
-    y: e.clientY,
-    opener: cell?.revealedBy ?? null,
-    revealed: !!cell?.revealed,
-    prizeType: cell?.prize?.type,
-    prizeAmount: cell?.prize?.amount,
-    revealedAt: cell?.revealedAt ?? null,
+  schedule(() => {
+    const target = (e.target as HTMLElement).closest('button.cell') as HTMLElement | null
+    if (!target) {
+      onLeave()
+      lastIdx.value = null
+      return
+    }
+    const idxAttr = target.getAttribute('data-index')
+    if (idxAttr == null) {
+      onLeave()
+      lastIdx.value = null
+      return
+    }
+    const idx = Number(idxAttr)
+    if (Number.isNaN(idx)) {
+      onLeave()
+      lastIdx.value = null
+      return
+    }
+    // If we're still on the same cell, only update position to reduce reactive work
+    if (lastIdx.value === idx) {
+      onMove(e.clientX, e.clientY)
+      return
+    }
+    lastIdx.value = idx
+    const text = `Rij ${getRow(idx)}, Kolom ${getCol(idx)}`
+    const id = cellIdFromIndex(idx)
+    const cell = revealedMap.value.get(id)
+    onHover({
+      text,
+      x: e.clientX,
+      y: e.clientY,
+      opener: cell?.revealedBy ?? null,
+      revealed: !!cell?.revealed,
+      prizeType: cell?.prize?.type,
+      prizeAmount: cell?.prize?.amount,
+      revealedAt: cell?.revealedAt ?? null,
+    })
   })
 }
 
 function onGridLeave() {
   onLeave()
+  lastIdx.value = null
 }
 </script>
 
@@ -165,6 +189,7 @@ function onGridLeave() {
     aria-label="Speelraster"
     @mousemove="onGridMove"
     @mouseleave="onGridLeave"
+    v-memo="[grid.lastEtag, grid.showExposed, grid.exposedTargets.length]"
   >
     <button
       v-for="id in cells"

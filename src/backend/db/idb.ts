@@ -150,8 +150,18 @@ export function getAdminTargets(): Array<{ id: CellId; row: number; col: number;
 export async function revealCell(
   id: CellId,
   playerId?: string,
-): Promise<{ ok: true; cell: Cell; meta: GridMeta } | { error: 'NOT_FOUND' | 'ALREADY_REVEALED' }> {
+): Promise<
+  | { ok: true; cell: Cell; meta: GridMeta }
+  | { error: 'NOT_FOUND' | 'ALREADY_REVEALED' | 'ALREADY_PLAYED' }
+> {
   ensureBooted(memory)
+  // Enforce one reveal per player
+  if (playerId) {
+    const already = Object.values(memory!.cells).some((c) => c.revealedBy === playerId)
+    if (already) {
+      return { error: 'ALREADY_PLAYED' }
+    }
+  }
   const cell = memory!.cells[id]
   if (!cell) return { error: 'NOT_FOUND' }
   if (cell.revealed) return { error: 'ALREADY_REVEALED' }

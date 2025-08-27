@@ -53,6 +53,22 @@ export const useGridStore = defineStore('grid', {
   },
 
   actions: {
+    getPlayerId(): string {
+      // Stable client id used only for attribution; backend enforces one-open rule
+      const key = 'nlo-player-id'
+      try {
+        const existing = localStorage.getItem(key)
+        if (existing) return existing
+        const rnd = crypto.getRandomValues(new Uint32Array(4))
+        const pid = Array.from(rnd)
+          .map((n) => n.toString(16).padStart(8, '0'))
+          .join('')
+        localStorage.setItem(key, pid)
+        return pid
+      } catch {
+        return `anon-${Math.random().toString(36).slice(2)}`
+      }
+    },
     async boot(seed?: number) {
       this.isBooting = true
       try {
@@ -86,11 +102,13 @@ export const useGridStore = defineStore('grid', {
     },
 
     userHasRevealed(): boolean {
-      return localStorage.getItem('nlo-user-revealed') === '1'
+      const pid = this.getPlayerId()
+      return this.revealed.some((c) => c.revealedBy === pid)
     },
 
+    // Kept for compatibility; no longer used to set truth
     markUserRevealed() {
-      localStorage.setItem('nlo-user-revealed', '1')
+      /* no-op: backend/state is source of truth */
     },
 
     async reveal(id: string, playerId?: string) {
@@ -99,29 +117,9 @@ export const useGridStore = defineStore('grid', {
       this.isRevealing = true
       try {
         // Ensure a stable playerId is used for attribution
-        let pid = playerId
-        try {
-          const key = 'nlo-player-id'
-          if (!pid) {
-            const existing = localStorage.getItem(key)
-            if (existing) {
-              pid = existing
-            } else {
-              const rnd = crypto.getRandomValues(new Uint32Array(4))
-              pid = Array.from(rnd)
-                .map((n) => n.toString(16).padStart(8, '0'))
-                .join('')
-              localStorage.setItem(key, pid)
-            }
-          }
-        } catch {
-          // Fallback when localStorage/crypto unavailable
-          pid = pid || `anon-${Math.random().toString(36).slice(2)}`
-        }
-
+        const pid = playerId || this.getPlayerId()
         await apiReveal(id, pid)
         this.networkOk = true
-        this.markUserRevealed()
         await this.refresh()
       } catch (err) {
         this.networkOk = false

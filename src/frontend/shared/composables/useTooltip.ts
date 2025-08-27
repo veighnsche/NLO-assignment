@@ -86,6 +86,13 @@ export function useTooltip() {
     open.value = false
   }
 
+  // Lightweight position-only update to reduce reactive churn on mousemove
+  function onMove(nx: number, ny: number) {
+    if (!open.value) return
+    x.value = nx
+    y.value = ny
+  }
+
   return {
     // State
     open,
@@ -106,6 +113,7 @@ export function useTooltip() {
     whenText,
     // Handlers
     onHover,
+    onMove,
     onLeave,
   }
 }
