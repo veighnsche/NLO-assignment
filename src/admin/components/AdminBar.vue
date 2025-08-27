@@ -18,6 +18,7 @@
           :decimals="1"
           @input="scheduleSetSpeed()"
         />
+        <Button size="sm" variant="outline" @click="resetBotSpeed">Reset snelheid</Button>
       </div>
 
       <div class="section right">
@@ -96,6 +97,22 @@ function scheduleSetSpeed() {
     await setBotSpeed({ intervalMs: interval, minMs, maxMs })
     speedTimer = null
   }, 250)
+}
+
+async function resetBotSpeed() {
+  // Restore backend defaults and sync UI
+  const defaultMin = 300
+  const defaultMax = 1500
+  const avg = Math.round((defaultMin + defaultMax) / 2)
+  // Clear pending debounce to avoid extra network call
+  if (speedTimer != null) {
+    window.clearTimeout(speedTimer)
+    speedTimer = null
+  }
+  // Update slider (Hz) from ms
+  const speed = 1000 / Math.max(1, avg)
+  botSpeedHz.value = Math.min(10, Math.max(0.3, Number(speed)))
+  await setBotSpeed({ intervalMs: avg, minMs: defaultMin, maxMs: defaultMax })
 }
 
 onMounted(async () => {
