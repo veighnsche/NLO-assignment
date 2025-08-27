@@ -1,13 +1,13 @@
 <script setup lang="ts">
-// Basic init screen. Customize as needed via slots.
+// Eenvoudig opstartscherm. Pas desgewenst aan via slots.
 </script>
 
 <template>
   <section class="init-screen" role="status" aria-live="polite" aria-busy="true">
     <div class="card">
       <div class="spinner" aria-hidden="true" />
-      <h2>Preparing your experience…</h2>
-      <p>Loading data and setting things up. This should only take a moment.</p>
+      <h2>Je ervaring wordt voorbereid…</h2>
+      <p>Gegevens laden en alles klaarzetten. Dit duurt maar een ogenblik.</p>
       <slot />
     </div>
   </section>
