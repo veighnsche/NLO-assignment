@@ -189,7 +189,7 @@ function onGridLeave() {
         isCellDisabled(id),
         cellPrizeType(id),
         isExposed(id),
-        exposedPrizeType(id)
+        exposedPrizeType(id),
       ]"
       :aria-label="ariaLabelForCell(id)"
       :class="{
