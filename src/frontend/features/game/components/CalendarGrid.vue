@@ -3,7 +3,7 @@ import { computed, ref } from 'vue'
 import { useGridStore } from '@/frontend/features/game/store/grid'
 import RevealModal from './RevealModal.vue'
 import GridTooltip from './GridTooltip.vue'
-import { useTooltip } from '@/frontend/shared/composables/useTooltip'
+import type { GridTooltipApi } from './GridTooltip.vue'
 
 // 100x100 grid (10,000 cells)
 const rows = 100
@@ -105,24 +105,8 @@ async function onReveal(i: number) {
 const getRow = (i: number) => Math.floor(i / cols)
 const getCol = (i: number) => i % cols
 
-// Tooltip composable
-const {
-  open,
-  x,
-  y,
-  text,
-  opener,
-  revealed,
-  prizeLabel,
-  prizeEmoji,
-  prizeAmountText,
-  prizeClass,
-  statusClass,
-  whenText,
-  onHover,
-  onMove,
-  onLeave,
-} = useTooltip()
+// Tooltip control via child component API
+const tooltipRef = ref<GridTooltipApi | null>(null)
 
 // --- Performance: throttle mousemove updates to one per animation frame ---
 const rafId = ref<number | null>(null)
@@ -139,32 +123,32 @@ function onGridMove(e: MouseEvent) {
   schedule(() => {
     const target = (e.target as HTMLElement).closest('button.cell') as HTMLElement | null
     if (!target) {
-      onLeave()
+      tooltipRef.value?.leave()
       lastIdx.value = null
       return
     }
     const idxAttr = target.getAttribute('data-index')
     if (idxAttr == null) {
-      onLeave()
+      tooltipRef.value?.leave()
       lastIdx.value = null
       return
     }
     const idx = Number(idxAttr)
     if (Number.isNaN(idx)) {
-      onLeave()
+      tooltipRef.value?.leave()
       lastIdx.value = null
       return
     }
     // If we're still on the same cell, only update position to reduce reactive work
     if (lastIdx.value === idx) {
-      onMove(e.clientX, e.clientY)
+      tooltipRef.value?.move(e.clientX, e.clientY)
       return
     }
     lastIdx.value = idx
     const text = `Rij ${getRow(idx)}, Kolom ${getCol(idx)}`
     const id = cellIdFromIndex(idx)
     const cell = revealedMap.value.get(id)
-    onHover({
+    tooltipRef.value?.hover({
       text,
       x: e.clientX,
       y: e.clientY,
@@ -178,7 +162,7 @@ function onGridMove(e: MouseEvent) {
 }
 
 function onGridLeave() {
-  onLeave()
+  tooltipRef.value?.leave()
   lastIdx.value = null
 }
 </script>
@@ -224,21 +208,8 @@ function onGridLeave() {
       </span>
     </button>
   </div>
-  <!-- Tooltip rendered via dedicated component -->
-  <GridTooltip
-    :open="open"
-    :x="x"
-    :y="y"
-    :text="text"
-    :opener="opener"
-    :revealed="revealed"
-    :when-text="whenText"
-    :prize-label="prizeLabel"
-    :prize-emoji="prizeEmoji"
-    :prize-amount-text="prizeAmountText"
-    :prize-class="prizeClass"
-    :status-class="statusClass"
-  />
+  <!-- Tooltip rendered via dedicated component, driven imperatively -->
+  <GridTooltip ref="tooltipRef" />
   <!-- Internal two-step RevealModal -->
   <RevealModal
     v-model="confirmOpen"

@@ -1,60 +1,71 @@
 <script setup lang="ts">
 import Tooltip from '@/frontend/shared/ui/Tooltip.vue'
+import { useTooltip, type TooltipPayload } from '@/frontend/shared/composables/useTooltip'
 
-const props = defineProps<{
-  open: boolean
-  x: number
-  y: number
-  text: string
-  opener: string | null
-  revealed: boolean
-  whenText?: string | null
-  prizeLabel: string
-  prizeEmoji: string
-  prizeAmountText?: string | null
-  prizeClass: string
-  statusClass: string
-}>()
+// Own tooltip state here to avoid forcing parent (10k grid) re-renders on mouse move
+const {
+  open,
+  x,
+  y,
+  text,
+  opener,
+  revealed,
+  prizeLabel,
+  prizeEmoji,
+  prizeAmountText,
+  prizeClass,
+  statusClass,
+  whenText,
+  onHover,
+  onMove,
+  onLeave,
+} = useTooltip()
+
+// Expose imperative API so parent can drive tooltip without prop updates
+export interface GridTooltipApi {
+  hover(payload: TooltipPayload): void
+  move(x: number, y: number): void
+  leave(): void
+}
+
+function hover(payload: TooltipPayload) {
+  onHover(payload)
+}
+function move(nx: number, ny: number) {
+  onMove(nx, ny)
+}
+function leave() {
+  onLeave()
+}
+
+defineExpose<GridTooltipApi>({ hover, move, leave })
 </script>
 
 <template>
-  <Tooltip
-    :open="props.open"
-    :x="props.x"
-    :y="props.y"
-    placement="top"
-    :offset="12"
-    :max-width="'340px'"
-  >
+  <Tooltip :open="open" :x="x" :y="y" placement="top" :offset="12" :max-width="'340px'">
     <div class="tt-card">
       <div class="tt-row">
         <span class="tt-emoji" aria-hidden="true">📍</span>
-        <span>{{ props.text }}</span>
+        <span>{{ text }}</span>
       </div>
       <div class="tt-row">
         <span class="tt-emoji" aria-hidden="true">👤</span>
-        <span
-          >Geopend door: <strong>{{ props.opener ?? '—' }}</strong></span
-        >
+        <span>Geopend door: <strong>{{ opener ?? '—' }}</strong></span>
       </div>
-      <div class="tt-row" :class="props.statusClass">
+      <div class="tt-row" :class="statusClass">
         <span class="tt-emoji" aria-hidden="true">🎯</span>
-        <span
-          >Status: <strong>{{ props.revealed ? 'Geopend' : 'Gesloten' }}</strong></span
-        >
+        <span>Status: <strong>{{ revealed ? 'Geopend' : 'Gesloten' }}</strong></span>
       </div>
-      <div v-if="props.whenText" class="tt-row">
+      <div v-if="whenText" class="tt-row">
         <span class="tt-emoji" aria-hidden="true">⏰</span>
-        <span
-          >Geopend op: <strong>{{ props.whenText }}</strong></span
-        >
+        <span>Geopend op: <strong>{{ whenText }}</strong></span>
       </div>
-      <div class="tt-row" :class="props.prizeClass">
+      <div class="tt-row" :class="prizeClass">
         <span class="tt-emoji" aria-hidden="true">🏆</span>
         <span>
-          Prijs: <strong>{{ props.prizeEmoji }} {{ props.prizeLabel }}</strong>
-          <template v-if="props.prizeAmountText">
-            <span class="tt-amount">— {{ props.prizeAmountText }}</span>
+          Prijs: <strong>{{ prizeEmoji }} {{ prizeLabel }}</strong>
+          <template v-if="prizeAmountText">
+            <span class="tt-amount">— {{ prizeAmountText }}</span>
           </template>
         </span>
       </div>

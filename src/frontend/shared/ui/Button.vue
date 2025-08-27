@@ -32,19 +32,16 @@ interface Props {
   type?: 'button' | 'submit' | 'reset'
 }
 
-const { color, variant, size, block, icon, disabled, loading, type } = withDefaults(
-  defineProps<Props>(),
-  {
-    color: 'default',
-    variant: 'filled',
-    size: 'md',
-    block: false,
-    icon: false,
-    disabled: false,
-    loading: false,
-    type: 'button',
-  },
-)
+const {
+  color = 'default',
+  variant = 'filled',
+  size = 'md',
+  block = false,
+  icon = false,
+  disabled = false,
+  loading = false,
+  type = 'button',
+} = defineProps<Props>()
 </script>
 
 <style scoped>

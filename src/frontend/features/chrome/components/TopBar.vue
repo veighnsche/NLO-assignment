@@ -25,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-import { withDefaults, defineProps, toRefs, computed } from 'vue'
+import { toRefs, computed } from 'vue'
 import UiButton from '@/frontend/shared/ui/Button.vue'
 import { useGridStore } from '@/frontend/features/game/store/grid'
 

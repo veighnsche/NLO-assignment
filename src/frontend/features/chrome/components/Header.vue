@@ -1,6 +1,6 @@
 <script setup lang="ts">
 defineOptions({ name: 'AppHeader' })
-import { defineProps, computed, ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useGridStore } from '@/frontend/features/game/store/grid'
 
 const props = defineProps<{
