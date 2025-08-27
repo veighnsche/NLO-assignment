@@ -155,8 +155,8 @@ export async function revealCell(
   | { error: 'NOT_FOUND' | 'ALREADY_REVEALED' | 'ALREADY_PLAYED' }
 > {
   ensureBooted(memory)
-  // Enforce one reveal per player
-  if (playerId) {
+  // Enforce one reveal per player (except for the deterministic bot)
+  if (playerId && playerId !== 'bot') {
     const already = Object.values(memory!.cells).some((c) => c.revealedBy === playerId)
     if (already) {
       return { error: 'ALREADY_PLAYED' }

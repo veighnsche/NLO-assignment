@@ -189,7 +189,6 @@ function onGridLeave() {
     aria-label="Speelraster"
     @mousemove="onGridMove"
     @mouseleave="onGridLeave"
-    v-memo="[grid.lastEtag, grid.showExposed, grid.exposedTargets.length]"
   >
     <button
       v-for="id in cells"
