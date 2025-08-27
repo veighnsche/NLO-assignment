@@ -1,13 +1,6 @@
 import { defineStore } from 'pinia'
-import {
-  apiBoot,
-  apiSnapshot,
-  apiReveal,
-  apiBotStep,
-  apiAdminGetTargets,
-  apiUsersAssign,
-  apiUsersResolve,
-} from '@/frontend/api/client'
+import { apiBoot, apiSnapshot, apiReveal, apiBotStep, apiUsersAssign, apiUsersResolve } from '@/frontend/features/game/api'
+import { apiAdminGetTargets, apiAdminGetCurrentPlayer } from '@/frontend/features/admin/api'
 
 // Strong type for revealed cell entries
 export interface RevealedCellEntry {
@@ -106,8 +99,7 @@ export const useGridStore = defineStore('grid', {
     },
     async refreshCurrentPlayer() {
       try {
-        const mod = await import('@/frontend/api/client')
-        const { currentPlayerId } = await mod.apiAdminGetCurrentPlayer()
+        const { currentPlayerId } = await apiAdminGetCurrentPlayer()
         this.currentPlayerId = currentPlayerId ?? undefined
         if (this.currentPlayerId) {
           const id = this.currentPlayerId
@@ -117,7 +109,7 @@ export const useGridStore = defineStore('grid', {
             this.currentPlayerName = cached
           } else {
             try {
-              const res = await mod.apiUsersResolve([id])
+              const res = await apiUsersResolve([id])
               const nm = res.users[0]?.name ?? ''
               if (nm) this.userNames.set(id, nm)
               this.currentPlayerName = nm

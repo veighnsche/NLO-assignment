@@ -5,7 +5,7 @@ import {
   apiAdminGetBotDelay,
   apiAdminGetTargets,
   apiAdminSetCurrentPlayer,
-} from '@/frontend/api/client'
+} from '@/frontend/features/admin/api'
 
 export function useAdminControls() {
   const grid = useGridStore()

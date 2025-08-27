@@ -63,7 +63,7 @@ import Button from '@/frontend/ui/Button.vue'
 import Slider from '@/frontend/ui/Slider.vue'
 import { useAdminControls } from '@/frontend/features/admin/useAdminControls'
 import { useGridStore } from '@/frontend/features/game/store/grid'
-import { apiAdminPickRandomPlayer } from '@/frontend/api/client'
+import { apiAdminPickRandomPlayer } from '@/frontend/features/admin/api'
 
 const showModal = ref(false)
 const seed = ref<number | null>(null)
