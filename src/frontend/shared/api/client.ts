@@ -118,7 +118,26 @@ export async function apiAdminGetTargets(): Promise<{
 // --- Users & Admin: Players ---
 
 export async function apiUsersAssign(clientId?: string): Promise<{ userId: string; name: string }> {
-  const body = clientId ? JSON.stringify({ clientId }) : JSON.stringify({})
+  // Ensure a stable client id across sessions without relying on cookies.
+  // This avoids variability when the Service Worker (MSW) or fetch layer doesn't persist cookies.
+  function getStableClientId(): string {
+    try {
+      const key = 'nlo-client-id'
+      let cid = localStorage.getItem(key)
+      if (!cid) {
+        const rand = Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2)
+        cid = `cid-${rand}`
+        localStorage.setItem(key, cid)
+      }
+      return cid
+    } catch {
+      // Fallback: ephemeral id if localStorage is unavailable (e.g., SSR/tests)
+      return `cid-${Math.random().toString(36).slice(2)}${Math.random().toString(36).slice(2)}`
+    }
+  }
+
+  const effectiveClientId = clientId || getStableClientId()
+  const body = JSON.stringify({ clientId: effectiveClientId })
   return jsonFetch<{ userId: string; name: string }>('/api/users/assign', {
     method: 'POST',
     body,
