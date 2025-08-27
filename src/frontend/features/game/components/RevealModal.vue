@@ -49,8 +49,8 @@
 
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import Modal from '@/frontend/shared/ui/Modal.vue'
-import Button from '@/frontend/shared/ui/Button.vue'
+import Modal from '@/frontend/ui/Modal.vue'
+import Button from '@/frontend/ui/Button.vue'
 
 export type RevealResult = {
   type: 'none' | 'consolation' | 'grand'

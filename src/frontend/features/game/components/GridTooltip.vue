@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import Tooltip from '@/frontend/shared/ui/Tooltip.vue'
+import Tooltip from '@/frontend/ui/Tooltip.vue'
 
 // Types (previously from composable)
 type PrizeType = 'none' | 'consolation' | 'grand' | undefined

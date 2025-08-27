@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
-import AdminBar from './frontend/features/admin/components/AdminBar.vue'
+import AdminBar from '@/frontend/features/admin/components/AdminBar.vue'
 import TopBar from '@/frontend/features/chrome/components/TopBar.vue'
 import Header from '@/frontend/features/chrome/components/Header.vue'
 import Footer from '@/frontend/features/chrome/components/Footer.vue'

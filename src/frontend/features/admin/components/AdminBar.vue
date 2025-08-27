@@ -54,17 +54,16 @@
       <Button color="danger" @click="confirmReset">Resetten</Button>
     </template>
   </Modal>
-
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
-import Modal from '@/frontend/shared/ui/Modal.vue'
-import Button from '@/frontend/shared/ui/Button.vue'
-import Slider from '@/frontend/shared/ui/Slider.vue'
+import Modal from '@/frontend/ui/Modal.vue'
+import Button from '@/frontend/ui/Button.vue'
+import Slider from '@/frontend/ui/Slider.vue'
 import { useAdminControls } from '@/frontend/features/admin/useAdminControls'
 import { useGridStore } from '@/frontend/features/game/store/grid'
-import { apiAdminPickRandomPlayer } from '@/frontend/shared/api/client'
+import { apiAdminPickRandomPlayer } from '@/frontend/api/client'
 
 const showModal = ref(false)
 const seed = ref<number | null>(null)

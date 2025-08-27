@@ -7,7 +7,7 @@ import {
   apiAdminGetTargets,
   apiUsersAssign,
   apiUsersResolve,
-} from '@/frontend/shared/api/client'
+} from '@/frontend/api/client'
 
 // Strong type for revealed cell entries
 export interface RevealedCellEntry {
@@ -50,10 +50,7 @@ export const useGridStore = defineStore('grid', {
     revealedIds: new Set<string>() as Set<string>,
     exposedIds: new Set<string>() as Set<string>,
     // Stable Map for id -> revealed entry
-    revealedByIdMap: new Map<string, RevealedCellEntry>() as Map<
-      string,
-      RevealedCellEntry
-    >,
+    revealedByIdMap: new Map<string, RevealedCellEntry>() as Map<string, RevealedCellEntry>,
     // Assigned backend user identity
     assignedUser: null as null | { id: string; name: string },
     // Cache of user id -> name (populated from resolve endpoint and assignments)
@@ -109,7 +106,7 @@ export const useGridStore = defineStore('grid', {
     },
     async refreshCurrentPlayer() {
       try {
-        const mod = await import('@/frontend/shared/api/client')
+        const mod = await import('@/frontend/api/client')
         const { currentPlayerId } = await mod.apiAdminGetCurrentPlayer()
         this.currentPlayerId = currentPlayerId ?? undefined
         if (this.currentPlayerId) {
@@ -211,7 +208,7 @@ export const useGridStore = defineStore('grid', {
       try {
         // Ensure we have a backend-assigned user id
         await this.ensureAssignedUser()
-        const pid: string | undefined = (playerId ?? this.getPlayerId()) ?? undefined
+        const pid: string | undefined = playerId ?? this.getPlayerId() ?? undefined
         await apiReveal(id, pid)
         this.networkOk = true
         await this.refresh()
