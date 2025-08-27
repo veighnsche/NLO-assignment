@@ -10,8 +10,16 @@ const STORE_GRID = 'grid'
 const STORE_META = 'meta'
 
 // Simulated backend delay for bot actions (in milliseconds)
-const BOT_DELAY_MIN_MS = 300
-const BOT_DELAY_MAX_MS = 1500
+let BOT_DELAY_MIN_MS = 300
+let BOT_DELAY_MAX_MS = 1500
+
+export function setBotDelayRange(minMs: number, maxMs: number): void {
+  // Ensure sane values and ordering
+  const min = Math.max(0, Math.floor(minMs))
+  const max = Math.max(min, Math.floor(maxMs))
+  BOT_DELAY_MIN_MS = min
+  BOT_DELAY_MAX_MS = max
+}
 
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms))

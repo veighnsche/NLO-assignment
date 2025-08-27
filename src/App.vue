@@ -4,7 +4,6 @@ import AdminBar from './admin/components/AdminBar.vue'
 import TopBar from './frontend/components/TopBar.vue'
 import GameSection from './frontend/components/GameSection.vue'
 import InitScreen from './frontend/components/InitScreen.vue'
-import { apiAdminReset } from '@/frontend/api'
 import { useGridStore } from '@/frontend/store/grid'
 
 const showAdminBar = ref(true)
@@ -29,23 +28,7 @@ async function initApp() {
   }
 }
 
-async function onReset(seed?: number) {
-  // Show InitScreen while resetting backend state
-  isInitializing.value = true
-  try {
-    if (typeof seed === 'number') {
-      localStorage.setItem('nlo-seed', String(seed))
-    } else {
-      localStorage.removeItem('nlo-seed')
-    }
-    await apiAdminReset('hard', seed)
-    // Allow the current browser to reveal again after a reset
-    localStorage.removeItem('nlo-user-revealed')
-    await grid.refresh()
-  } finally {
-    isInitializing.value = false
-  }
-}
+// Admin actions (reset, bot speed) are handled inside AdminBar.vue now
 
 onMounted(() => {
   void initApp()
@@ -59,7 +42,7 @@ onUnmounted(() => {
   <TopBar :showAdminBar="showAdminBar" @toggle="showAdminBar = !showAdminBar" />
   <InitScreen v-if="isInitializing" />
   <GameSection v-else />
-  <AdminBar v-if="showAdminBar" @reset="onReset" @toggle="showAdminBar = false" />
+  <AdminBar v-if="showAdminBar" @toggle="showAdminBar = false" />
 </template>
 
 <style scoped></style>

@@ -6,6 +6,22 @@
       <Button>Verander van speler</Button>
     </div>
 
+    <div class="section center">
+      <label class="slider">
+        <span class="label">Botsnelheid</span>
+        <input
+          type="range"
+          min="200"
+          max="3000"
+          step="100"
+          v-model.number="botSpeedMs"
+          @input="emitBotSpeed()"
+          aria-label="Stel de botsnelheid in"
+        />
+        <span class="value">{{ botSpeedMs }} ms</span>
+      </label>
+    </div>
+
     <div class="section right">
       <Button color="danger" variant="outline" @click="showModal = true">Reset spel…</Button>
       <Button
@@ -41,25 +57,37 @@
 import { ref, defineEmits } from 'vue'
 import Modal from '@/frontend/components/ui/Modal.vue'
 import Button from '@/frontend/components/ui/Button.vue'
+import { useAdminControls } from '@/admin/useAdminControls'
 
 const showModal = ref(false)
 const seed = ref<number | null>(null)
+const botSpeedMs = ref(1500)
+const { reset: adminReset, setBotSpeed } = useAdminControls()
 
-const emit = defineEmits<{
-  (e: 'reset', seed?: number): void
-  (e: 'toggle'): void
-}>()
+defineEmits<{ (e: 'toggle'): void }>()
 
 function closeModal() {
   showModal.value = false
 }
 
-function confirmReset() {
-  // Parse the seed to a number if valid; otherwise undefined
+async function confirmReset() {
+  // Persist chosen seed locally like before (used on next boot)
   const raw = seed.value
-  const parsed = typeof raw === 'number' && !Number.isNaN(raw) ? raw : undefined
-  emit('reset', parsed)
+  if (typeof raw === 'number' && !Number.isNaN(raw)) {
+    localStorage.setItem('nlo-seed', String(raw))
+  } else {
+    localStorage.removeItem('nlo-seed')
+  }
+  await adminReset(typeof raw === 'number' && !Number.isNaN(raw) ? raw : undefined)
   showModal.value = false
+}
+
+async function emitBotSpeed() {
+  const interval = Math.max(100, Math.floor(botSpeedMs.value))
+  // Map a single speed control to a backend delay window
+  const minMs = Math.max(0, Math.round(interval * 0.5))
+  const maxMs = Math.max(minMs, Math.round(interval * 1.5))
+  await setBotSpeed({ intervalMs: interval, minMs, maxMs })
 }
 </script>
 
@@ -95,6 +123,16 @@ function confirmReset() {
 
 .section.right {
   justify-content: flex-end;
+}
+
+.slider {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.slider input[type='range'] {
+  width: 220px;
 }
 
 .label {

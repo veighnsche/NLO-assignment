@@ -7,6 +7,7 @@ import {
   adminReset,
   revealCell,
   botStep,
+  setBotDelayRange,
 } from '@/backend/db/idb'
 
 export const handlers = [
@@ -59,6 +60,22 @@ export const handlers = [
       const mode = body.mode ?? 'hard'
       const res = await adminReset(mode, typeof body?.seed === 'number' ? body.seed : undefined)
       return HttpResponse.json(res)
+    } catch (err) {
+      return HttpResponse.json({ error: String(err) }, { status: 500 })
+    }
+  }),
+
+  http.post('/api/admin/bot-delay', async ({ request }) => {
+    try {
+      const body = (await request.json().catch(() => ({}))) as {
+        minMs?: number
+        maxMs?: number
+      }
+      if (typeof body.minMs !== 'number' || typeof body.maxMs !== 'number') {
+        return HttpResponse.json({ error: 'minMs and maxMs required' }, { status: 400 })
+      }
+      setBotDelayRange(body.minMs, body.maxMs)
+      return HttpResponse.json({ ok: true })
     } catch (err) {
       return HttpResponse.json({ error: String(err) }, { status: 500 })
     }

@@ -59,3 +59,10 @@ export async function apiAdminReset(mode: 'soft' | 'hard', seed?: number) {
     body: JSON.stringify({ mode, seed }),
   })
 }
+
+export async function apiAdminSetBotDelay(minMs: number, maxMs: number) {
+  return jsonFetch('/api/admin/bot-delay', {
+    method: 'POST',
+    body: JSON.stringify({ minMs, maxMs }),
+  })
+}
