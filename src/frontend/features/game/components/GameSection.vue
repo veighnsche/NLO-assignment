@@ -1,6 +1,12 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import GameMetrics from './GameMetrics.vue'
 import CalendarGrid from './CalendarGrid.vue'
+import GridTooltip from './GridTooltip.vue'
+import type { GridTooltipApi } from './GridTooltip.vue'
+
+// Tooltip instance owned here and passed down to grid as an imperative API
+const tooltipRef = ref<GridTooltipApi | null>(null)
 
 // Derived header metrics (kept for header if needed)
 
@@ -10,9 +16,10 @@ import CalendarGrid from './CalendarGrid.vue'
 <template>
   <section class="game-section" aria-label="Spel">
     <GameMetrics />
-    <CalendarGrid />
+    <CalendarGrid :tooltip="tooltipRef" />
   </section>
-  <!-- RevealModal and Tooltip are now managed internally by CalendarGrid -->
+  <!-- Tooltip instance is hoisted here to avoid any coupling to the 10k grid subtree -->
+  <GridTooltip ref="tooltipRef" />
 </template>
 
 <style scoped>

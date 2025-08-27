@@ -7,6 +7,17 @@ import {
   apiAdminGetTargets,
 } from '@/frontend/shared/api/client'
 
+// Strong type for revealed cell entries
+export interface RevealedCellEntry {
+  id: string
+  row: number
+  col: number
+  revealed: boolean
+  prize?: { type: 'none' | 'consolation' | 'grand'; amount: 0 | 100 | 25000 }
+  revealedBy?: string
+  revealedAt?: string
+}
+
 export const useGridStore = defineStore('grid', {
   state: () => ({
     meta: null as null | {
@@ -14,15 +25,7 @@ export const useGridStore = defineStore('grid', {
       etag: string
     },
     lastEtag: null as string | null,
-    revealed: [] as Array<{
-      id: string
-      row: number
-      col: number
-      revealed: boolean
-      prize?: { type: 'none' | 'consolation' | 'grand'; amount: 0 | 100 | 25000 }
-      revealedBy?: string
-      revealedAt?: string
-    }>,
+    revealed: [] as Array<RevealedCellEntry>,
     openedCount: 0,
     total: 0,
     consolationTotal: 100,
@@ -41,14 +44,27 @@ export const useGridStore = defineStore('grid', {
       col: number
       prize: { type: 'consolation' | 'grand'; amount: 100 | 25000 }
     }>,
+    // Stable id Sets to avoid recomputing per render
+    revealedIds: new Set<string>() as Set<string>,
+    exposedIds: new Set<string>() as Set<string>,
+    // Stable Map for id -> revealed entry
+    revealedByIdMap: new Map<string, RevealedCellEntry>() as Map<
+      string,
+      RevealedCellEntry
+    >,
   }),
 
   getters: {
     revealedSet(state): Set<string> {
-      return new Set(state.revealed.map((c) => c.id))
+      // Return stable Set to avoid re-allocation per access
+      return state.revealedIds
     },
     exposedSet(state): Set<string> {
-      return new Set(state.exposedTargets.map((t) => t.id))
+      return state.exposedIds
+    },
+    revealedById(state): Map<string, RevealedCellEntry> {
+      // Return stable Map
+      return state.revealedByIdMap as Map<string, RevealedCellEntry>
     },
   },
 
@@ -86,14 +102,25 @@ export const useGridStore = defineStore('grid', {
         const snap = await apiSnapshot()
         this.networkOk = true
         const prevEtag = this.lastEtag
+        // If nothing changed on the backend, avoid touching reactive state to prevent giant rerenders
+        if (prevEtag === snap.meta.etag) {
+          // Keep meta in sync for consumers that read it, but do not assign arrays
+          this.meta = snap.meta
+          return
+        }
+        // Apply updated snapshot only when etag changes
         this.meta = snap.meta
         this.revealed = snap.revealed
+        // Mutate stable revealedIds Set and revealedByIdMap in place
+        this.revealedIds.clear()
+        this.revealedByIdMap.clear()
+        for (const c of snap.revealed) {
+          this.revealedIds.add(c.id)
+          this.revealedByIdMap.set(c.id, c)
+        }
         this.openedCount = snap.openedCount
         this.total = snap.total
-        // Only record etag; do not clear exposed targets here to avoid flicker on bot reveals.
-        if (prevEtag !== snap.meta.etag) {
-          this.lastEtag = snap.meta.etag
-        }
+        this.lastEtag = snap.meta.etag
       } catch {
         this.networkOk = false
       } finally {
@@ -161,6 +188,9 @@ export const useGridStore = defineStore('grid', {
         }
         const res = await apiAdminGetTargets()
         this.exposedTargets = res.targets
+        // Update exposedIds Set in place for stability
+        this.exposedIds.clear()
+        for (const t of res.targets) this.exposedIds.add(t.id)
         this.targetsEtag = currentEtag
         this.networkOk = true
       } catch {
@@ -183,6 +213,7 @@ export const useGridStore = defineStore('grid', {
     clearExposedTargets(hide = true) {
       this.exposedTargets = []
       this.targetsEtag = null
+      this.exposedIds.clear()
       if (hide) this.showExposed = false
     },
   },

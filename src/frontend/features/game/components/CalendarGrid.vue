@@ -2,7 +2,6 @@
 import { computed, ref } from 'vue'
 import { useGridStore } from '@/frontend/features/game/store/grid'
 import RevealModal from './RevealModal.vue'
-import GridTooltip from './GridTooltip.vue'
 import type { GridTooltipApi } from './GridTooltip.vue'
 
 // 100x100 grid (10,000 cells)
@@ -14,11 +13,11 @@ const cells = Array.from({ length: rows * cols }, (_, i) => i)
 const grid = useGridStore()
 const revealedSet = computed(() => grid.revealedSet)
 const exposedSet = computed(() => grid.exposedSet)
-const revealedMap = computed(() => {
-  const m = new Map<string, (typeof grid.revealed)[number]>()
-  for (const c of grid.revealed) m.set(c.id, c)
-  return m
-})
+const revealedById = computed(() => grid.revealedById)
+// Cache frequently used store-derived flags to avoid recomputation per cell
+const revealing = computed(() => grid.isRevealing)
+const userHasRevealed = computed(() => grid.userHasRevealed())
+const showExposed = computed(() => grid.showExposed)
 
 // Backend cell ids are like: r{row}-c{col}
 function cellIdFromIndex(i: number): string {
@@ -31,11 +30,11 @@ function isRevealed(i: number): boolean {
 
 function isExposed(i: number): boolean {
   // Only consider exposed when admin toggle is active and the cell is not revealed
-  return grid.showExposed && !isRevealed(i) && exposedSet.value.has(cellIdFromIndex(i))
+  return showExposed.value && !isRevealed(i) && exposedSet.value.has(cellIdFromIndex(i))
 }
 
 function cellPrize(i: number) {
-  return revealedMap.value.get(cellIdFromIndex(i))?.prize
+  return revealedById.value.get(cellIdFromIndex(i))?.prize
 }
 
 // Prize type helper: 'grand' | 'consolation' | undefined
@@ -65,12 +64,20 @@ function ariaLabelForCell(i: number): string {
 
 // Disabled helper: mirrors :disabled binding in template
 function isCellDisabled(i: number): boolean {
-  return grid.isRevealing || grid.userHasRevealed() || isRevealed(i)
+  return revealing.value || userHasRevealed.value || isRevealed(i)
 }
 
-const props = withDefaults(defineProps<{ confirmBeforeReveal?: boolean }>(), {
-  confirmBeforeReveal: true,
-})
+// Props (merged): confirmation flag and tooltip API provided by parent
+const props = withDefaults(
+  defineProps<{
+    confirmBeforeReveal?: boolean
+    tooltip?: GridTooltipApi | null
+  }>(),
+  {
+    confirmBeforeReveal: true,
+    tooltip: null,
+  },
+)
 
 // Internal confirm + modal state
 const confirmOpen = ref(false)
@@ -105,8 +112,7 @@ async function onReveal(i: number) {
 const getRow = (i: number) => Math.floor(i / cols)
 const getCol = (i: number) => i % cols
 
-// Tooltip control via child component API
-const tooltipRef = ref<GridTooltipApi | null>(null)
+// Tooltip control comes from parent via prop (available on props.tooltip)
 
 // --- Performance: throttle mousemove updates to one per animation frame ---
 const rafId = ref<number | null>(null)
@@ -123,32 +129,32 @@ function onGridMove(e: MouseEvent) {
   schedule(() => {
     const target = (e.target as HTMLElement).closest('button.cell') as HTMLElement | null
     if (!target) {
-      tooltipRef.value?.leave()
+      props.tooltip?.leave()
       lastIdx.value = null
       return
     }
     const idxAttr = target.getAttribute('data-index')
     if (idxAttr == null) {
-      tooltipRef.value?.leave()
+      props.tooltip?.leave()
       lastIdx.value = null
       return
     }
     const idx = Number(idxAttr)
     if (Number.isNaN(idx)) {
-      tooltipRef.value?.leave()
+      props.tooltip?.leave()
       lastIdx.value = null
       return
     }
     // If we're still on the same cell, only update position to reduce reactive work
     if (lastIdx.value === idx) {
-      tooltipRef.value?.move(e.clientX, e.clientY)
+      props.tooltip?.move(e.clientX, e.clientY)
       return
     }
     lastIdx.value = idx
     const text = `Rij ${getRow(idx)}, Kolom ${getCol(idx)}`
     const id = cellIdFromIndex(idx)
-    const cell = revealedMap.value.get(id)
-    tooltipRef.value?.hover({
+    const cell = revealedById.value.get(id)
+    props.tooltip?.hover({
       text,
       x: e.clientX,
       y: e.clientY,
@@ -162,7 +168,7 @@ function onGridMove(e: MouseEvent) {
 }
 
 function onGridLeave() {
-  tooltipRef.value?.leave()
+  props.tooltip?.leave()
   lastIdx.value = null
 }
 </script>
@@ -178,6 +184,13 @@ function onGridLeave() {
       v-for="id in cells"
       :key="id"
       class="cell"
+      v-memo="[
+        isRevealed(id),
+        isCellDisabled(id),
+        cellPrizeType(id),
+        isExposed(id),
+        exposedPrizeType(id)
+      ]"
       :aria-label="ariaLabelForCell(id)"
       :class="{
         revealed: isRevealed(id),
@@ -208,8 +221,6 @@ function onGridLeave() {
       </span>
     </button>
   </div>
-  <!-- Tooltip rendered via dedicated component, driven imperatively -->
-  <GridTooltip ref="tooltipRef" />
   <!-- Internal two-step RevealModal -->
   <RevealModal
     v-model="confirmOpen"

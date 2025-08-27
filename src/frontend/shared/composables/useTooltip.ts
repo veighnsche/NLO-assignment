@@ -14,6 +14,17 @@ export interface TooltipPayload {
   revealedAt?: string | null
 }
 
+// Hoisted formatters to avoid per-instance allocations
+const nfCurrency = new Intl.NumberFormat('nl-NL', {
+  style: 'currency',
+  currency: 'EUR',
+  maximumFractionDigits: 0,
+})
+const dfDateTime = new Intl.DateTimeFormat('nl-NL', {
+  dateStyle: 'medium',
+  timeStyle: 'short',
+})
+
 export function useTooltip() {
   // Core state
   const open = ref(false)
@@ -26,16 +37,7 @@ export function useTooltip() {
   const prizeAmount = ref<PrizeAmount>(undefined)
   const revealedAt = ref<string | null>(null)
 
-  // Localization helpers
-  const nfCurrency = new Intl.NumberFormat('nl-NL', {
-    style: 'currency',
-    currency: 'EUR',
-    maximumFractionDigits: 0,
-  })
-  const dfDateTime = new Intl.DateTimeFormat('nl-NL', {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  })
+  // Localization helpers (hoisted above)
 
   // Derived display values
   const prizeLabel = computed(() => {
