@@ -1,14 +1,20 @@
 <script setup lang="ts">
-import { defineProps } from 'vue'
+import { computed } from 'vue'
+import { useGridStore } from '@/frontend/store/grid'
 
-const props = defineProps<{
-  openedCount: number
-  total: number
-  consolationOpenedCount: number
-  grandOpened: boolean
-  consolationTotal: number
-  canOpen: boolean
-}>()
+const grid = useGridStore()
+
+// Derived metrics locally to avoid prop drilling
+const openedCount = computed(() => grid.openedCount)
+const total = computed(() => grid.total)
+const consolationTotal = computed(() => grid.consolationTotal)
+const consolationOpenedCount = computed(
+  () => grid.revealed.filter((c) => c.prize?.type === 'consolation').length,
+)
+const grandOpened = computed(() => grid.revealed.some((c) => c.prize?.type === 'grand'))
+const canOpen = computed(
+  () => !grid.isRevealing && !grid.userHasRevealed() && grid.openedCount < grid.total,
+)
 </script>
 
 <template>
@@ -17,35 +23,35 @@ const props = defineProps<{
       <div class="metric opened" aria-label="Aantal geopende vakjes">
         <span class="emoji" aria-hidden="true">📦</span>
         <span class="label">Geopend:</span>
-        <span class="value">{{ props.openedCount }} / {{ props.total }}</span>
+        <span class="value">{{ openedCount }} / {{ total }}</span>
       </div>
 
       <div class="metric consolation" aria-label="Aantal geopende troostprijzen">
         <span class="emoji" aria-hidden="true">🎁</span>
         <span class="label">Troostprijzen:</span>
-        <span class="value">{{ props.consolationOpenedCount }} / {{ props.consolationTotal }}</span>
+        <span class="value">{{ consolationOpenedCount }} / {{ consolationTotal }}</span>
       </div>
 
     <div
       class="metric grand"
-      :class="{ active: props.grandOpened }"
-      :aria-live="props.grandOpened ? 'polite' : undefined"
+      :class="{ active: grandOpened }"
+      :aria-live="grandOpened ? 'polite' : undefined"
       aria-label="Status hoofdprijs"
     >
       <span class="emoji" aria-hidden="true">💎</span>
       <span class="label">Hoofdprijs:</span>
-      <span class="value">{{ props.grandOpened ? 'Geopend' : 'Nog verborgen' }}</span>
-      <span v-if="props.grandOpened" class="burst" aria-hidden="true"></span>
+      <span class="value">{{ grandOpened ? 'Geopend' : 'Nog verborgen' }}</span>
+      <span v-if="grandOpened" class="burst" aria-hidden="true"></span>
     </div>
 
     <div
       class="metric can-open"
-      :class="{ closed: !props.canOpen }"
+      :class="{ closed: !canOpen }"
       aria-label="Kan gebruiker nog een vakje openen?"
     >
-      <span class="emoji" aria-hidden="true">{{ props.canOpen ? '🔓' : '🔒' }}</span>
+      <span class="emoji" aria-hidden="true">{{ canOpen ? '🔓' : '🔒' }}</span>
       <span class="label">Kan openen:</span>
-      <span class="value">{{ props.canOpen ? 'Ja' : 'Nee' }}</span>
+      <span class="value">{{ canOpen ? 'Ja' : 'Nee' }}</span>
     </div>
     </div>
   </div>

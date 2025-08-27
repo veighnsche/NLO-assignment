@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import Tooltip from './ui/Tooltip.vue'
 import GameHeader from './GameHeader.vue'
 import GameMetrics from './GameMetrics.vue'
@@ -7,92 +7,30 @@ import CalendarGrid from './CalendarGrid.vue'
 import GameFooter from './GameFooter.vue'
 import RevealModal from './RevealModal.vue'
 import { useGridStore } from '@/frontend/store/grid'
+import { useTooltip } from '@/frontend/composables/useTooltip'
 
 // Store (for header counts)
 const grid = useGridStore()
 
-// Derived header metrics
-const consolationOpenedCount = computed(
-  () => grid.revealed.filter((c) => c.prize?.type === 'consolation').length,
-)
-const grandOpened = computed(() => grid.revealed.some((c) => c.prize?.type === 'grand'))
+// Derived header metrics (kept for header if needed)
 
-// Tooltip state managed by parent; grid emits hover/leave
-const tipOpen = ref(false)
-const tipX = ref(0)
-const tipY = ref(0)
-const tipText = ref('')
-const tipOpener = ref<string | null>(null)
-const tipRevealed = ref(false)
-const tipPrizeType = ref<'none' | 'consolation' | 'grand' | undefined>(undefined)
-const tipPrizeAmount = ref<0 | 100 | 25000 | undefined>(undefined)
-const tipRevealedAt = ref<string | null>(null)
-
-// Localization helpers
-const nfCurrency = new Intl.NumberFormat('nl-NL', {
-  style: 'currency',
-  currency: 'EUR',
-  maximumFractionDigits: 0,
-})
-const dfDateTime = new Intl.DateTimeFormat('nl-NL', {
-  dateStyle: 'medium',
-  timeStyle: 'short',
-})
-
-const prizeLabel = computed(() => {
-  if (tipPrizeType.value === 'grand') return 'Hoofdprijs'
-  if (tipPrizeType.value === 'consolation') return 'Troostprijs'
-  if (tipPrizeType.value === 'none') return 'Geen prijs'
-  return 'Onbekend'
-})
-
-const prizeEmoji = computed(() => {
-  if (tipPrizeType.value === 'grand') return '💎'
-  if (tipPrizeType.value === 'consolation') return '🎁'
-  return '—'
-})
-
-const prizeAmountText = computed(() =>
-  tipPrizeAmount.value != null ? nfCurrency.format(tipPrizeAmount.value) : '',
-)
-
-const prizeClass = computed(() => {
-  return tipPrizeType.value === 'grand'
-    ? 'prize--grand'
-    : tipPrizeType.value === 'consolation'
-      ? 'prize--consolation'
-      : 'prize--none'
-})
-
-const statusClass = computed(() => (tipRevealed.value ? 'status--open' : 'status--closed'))
-const whenText = computed(() =>
-  tipRevealedAt.value ? dfDateTime.format(new Date(tipRevealedAt.value)) : null,
-)
-
-function onHover(payload: {
-  text: string
-  x: number
-  y: number
-  opener: string | null
-  revealed: boolean
-  prizeType?: 'none' | 'consolation' | 'grand'
-  prizeAmount?: 0 | 100 | 25000
-  revealedAt?: string | null
-}) {
-  tipText.value = payload.text
-  tipX.value = payload.x
-  tipY.value = payload.y
-  tipOpener.value = payload.opener ?? null
-  tipRevealed.value = payload.revealed
-  tipPrizeType.value = payload.prizeType
-  tipPrizeAmount.value = payload.prizeAmount
-  tipRevealedAt.value = payload.revealedAt ?? null
-  tipOpen.value = true
-}
-
-function onLeave() {
-  tipOpen.value = false
-}
+// Tooltip via composable
+const {
+  open,
+  x,
+  y,
+  text,
+  opener,
+  revealed,
+  prizeLabel,
+  prizeEmoji,
+  prizeAmountText,
+  prizeClass,
+  statusClass,
+  whenText,
+  onHover,
+  onLeave,
+} = useTooltip()
 
 // Modal state owned here, UI handled by RevealModal
 const confirmOpen = ref(false)
@@ -118,23 +56,13 @@ function onModalClosed() {
   pending.value = null
 }
 
-// Whether the user can open a cell now
-const canOpen = computed(
-  () => !grid.isRevealing && !grid.userHasRevealed() && grid.openedCount < grid.total,
-)
+// Whether the user can open a cell now (moved into GameMetrics, not needed here)
 </script>
 
 <template>
   <section class="game-section" aria-label="Spel">
     <GameHeader />
-    <GameMetrics
-      :opened-count="grid.openedCount"
-      :total="grid.total"
-      :consolation-opened-count="consolationOpenedCount"
-      :grand-opened="grandOpened"
-      :consolation-total="grid.consolationTotal"
-      :can-open="canOpen"
-    />
+    <GameMetrics />
     <CalendarGrid
       :confirmBeforeReveal="true"
       @request-reveal="onRequestReveal"
@@ -145,29 +73,23 @@ const canOpen = computed(
   </section>
 
   <!-- Global tooltip following cursor -->
-  <Tooltip :open="tipOpen" :x="tipX" :y="tipY" placement="top" :offset="12" :max-width="'340px'">
+  <Tooltip :open="open" :x="x" :y="y" placement="top" :offset="12" :max-width="'340px'">
     <div class="tt-card">
       <div class="tt-row">
         <span class="tt-emoji" aria-hidden="true">📍</span>
-        <span>{{ tipText }}</span>
+        <span>{{ text }}</span>
       </div>
       <div class="tt-row">
         <span class="tt-emoji" aria-hidden="true">👤</span>
-        <span
-          >Geopend door: <strong>{{ tipOpener ?? '—' }}</strong></span
-        >
+        <span>Geopend door: <strong>{{ opener ?? '—' }}</strong></span>
       </div>
       <div class="tt-row" :class="statusClass">
         <span class="tt-emoji" aria-hidden="true">🎯</span>
-        <span
-          >Status: <strong>{{ tipRevealed ? 'Geopend' : 'Gesloten' }}</strong></span
-        >
+        <span>Status: <strong>{{ revealed ? 'Geopend' : 'Gesloten' }}</strong></span>
       </div>
       <div v-if="whenText" class="tt-row">
         <span class="tt-emoji" aria-hidden="true">⏰</span>
-        <span
-          >Geopend op: <strong>{{ whenText }}</strong></span
-        >
+        <span>Geopend op: <strong>{{ whenText }}</strong></span>
       </div>
       <div class="tt-row" :class="prizeClass">
         <span class="tt-emoji" aria-hidden="true">🏆</span>
