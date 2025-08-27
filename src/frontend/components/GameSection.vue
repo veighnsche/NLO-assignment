@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue'
 import Tooltip from './ui/Tooltip.vue'
 import GameHeader from './GameHeader.vue'
+import GameMetrics from './GameMetrics.vue'
 import CalendarGrid from './CalendarGrid.vue'
 import GameFooter from './GameFooter.vue'
 import RevealModal from './RevealModal.vue'
@@ -125,7 +126,8 @@ const canOpen = computed(
 
 <template>
   <section class="game-section" aria-label="Spel">
-    <GameHeader
+    <GameHeader />
+    <GameMetrics
       :opened-count="grid.openedCount"
       :total="grid.total"
       :consolation-opened-count="consolationOpenedCount"
