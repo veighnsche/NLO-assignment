@@ -1,19 +1,49 @@
+// Shared client-side representations (mirroring backend schema)
+export type PrizeType = 'none' | 'consolation' | 'grand'
+
+export interface Prize {
+  type: PrizeType
+  amount: 0 | 100 | 25000
+}
+
+export interface Cell {
+  id: string
+  row: number
+  col: number
+  revealed: boolean
+  prize?: Prize
+  revealedBy?: string
+  revealedAt?: string
+}
+
+export interface GridMeta {
+  version: number
+  etag: string
+  seed?: number
+}
+
 export interface Snapshot {
   meta: {
     version: number
     etag: string
   }
-  revealed: Array<{
-    id: string
-    row: number
-    col: number
-    revealed: boolean
-    prize?: { type: 'none' | 'consolation' | 'grand'; amount: 0 | 100 | 25000 }
-    revealedBy?: string
-    revealedAt?: string
-  }>
+  revealed: Cell[]
   openedCount: number
   total: number
+}
+
+// Response types mirroring backend contracts
+export type RevealResponse =
+  | { ok: true; cell: Cell; meta: GridMeta }
+  | { error: 'NOT_FOUND' | 'ALREADY_REVEALED' | 'ALREADY_PLAYED' }
+
+export type BotStepResponse =
+  | { ok: true; revealed?: Cell; meta: GridMeta; done: boolean }
+  | { error: 'NOT_BOOTED' }
+
+export interface AdminResetResponse {
+  ok: true
+  meta: GridMeta
 }
 
 async function jsonFetch<T>(input: RequestInfo, init?: RequestInit): Promise<T> {
@@ -42,26 +72,29 @@ export async function apiSnapshot(): Promise<Snapshot> {
   return jsonFetch<Snapshot>('/api/snapshot')
 }
 
-export async function apiReveal(id: string, playerId?: string) {
-  return jsonFetch('/api/reveal', {
+export async function apiReveal(id: string, playerId?: string): Promise<RevealResponse> {
+  return jsonFetch<RevealResponse>('/api/reveal', {
     method: 'POST',
     body: JSON.stringify({ id, playerId }),
   })
 }
 
-export async function apiBotStep() {
-  return jsonFetch('/api/bot/step', { method: 'POST' })
+export async function apiBotStep(): Promise<BotStepResponse> {
+  return jsonFetch<BotStepResponse>('/api/bot/step', { method: 'POST' })
 }
 
-export async function apiAdminReset(mode: 'soft' | 'hard', seed?: number) {
-  return jsonFetch('/api/admin/reset', {
+export async function apiAdminReset(
+  mode: 'soft' | 'hard',
+  seed?: number,
+): Promise<AdminResetResponse> {
+  return jsonFetch<AdminResetResponse>('/api/admin/reset', {
     method: 'POST',
     body: JSON.stringify({ mode, seed }),
   })
 }
 
-export async function apiAdminSetBotDelay(minMs: number, maxMs: number) {
-  return jsonFetch('/api/admin/bot-delay', {
+export async function apiAdminSetBotDelay(minMs: number, maxMs: number): Promise<{ ok: true }> {
+  return jsonFetch<{ ok: true }>('/api/admin/bot-delay', {
     method: 'POST',
     body: JSON.stringify({ minMs, maxMs }),
   })

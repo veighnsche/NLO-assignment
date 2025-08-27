@@ -12,5 +12,5 @@
 - [ ] TopBar refinement
   - Improve `TopBar.vue` layout, actions, and accessibility. Consider sticky behavior and visual polish.
 
-- [ ] Opening cell sequence
+- [X] Opening cell sequence
   - Define a reveal sequence animation (stagger, highlight path, or celebration). Ensure a11y and performance at 10k grid scale.
