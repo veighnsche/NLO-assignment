@@ -8,7 +8,8 @@ import {
   botStep,
 } from '@/backend/services/grid.service'
 import { setCurrentPlayer } from '@/backend/services/users.service'
-import { getUsersMemory, setMemory } from '@/backend/infra/state'
+import { getMemory, getUsersMemory, setMemory, setUsersMemory } from '@/backend/infra/state'
+import { openDatabase, STORE_META, STORE_USERS } from '@/backend/infra/idb'
 import { cellId } from '@/backend/domain/grid/schema'
 
 const SEED = 24680
@@ -55,6 +56,14 @@ describe('services/grid.service', () => {
     it('returns NOT_FOUND for unknown id', async () => {
       const res = await revealCell('nope')
       expect(res).toEqual({ error: 'NOT_FOUND' })
+    })
+
+    it('throws when users memory missing but playerId provided', async () => {
+      // Ensure booted and then clear users memory to trigger throw path
+      expect(getUsersMemory()).toBeTruthy()
+      setUsersMemory(null)
+      const id = cellId(0, 6)
+      await expect(revealCell(id, 'any-user')).rejects.toThrowError('Users not initialized')
     })
 
     it('returns ALREADY_REVEALED when revealing twice', async () => {
@@ -109,5 +118,82 @@ describe('services/grid.service', () => {
     expect(res).toEqual({ error: 'NOT_BOOTED' })
     // Reboot for isolation
     await bootDatabase(SEED)
+  })
+
+  it('bootDatabase backfills users when grid/meta exist but users missing in DB', async () => {
+    // Ensure DB has grid/meta from reset
+    await adminReset('hard', SEED)
+    // Remove users from IDB to simulate older DB
+    const db = await openDatabase()
+    const tx = db.transaction([STORE_USERS], 'readwrite')
+    await tx.objectStore(STORE_USERS).delete('users')
+    await tx.done
+    // Clear memory and boot -> should regenerate and persist users
+    setMemory(null)
+    await bootDatabase(SEED)
+    expect(getUsersMemory()).toBeTruthy()
+    const tx2 = (await openDatabase()).transaction([STORE_USERS], 'readonly')
+    const persisted = await tx2.objectStore(STORE_USERS).get('users')
+    await tx2.done
+    expect(persisted).toBeTruthy()
+  })
+
+  it('bootDatabase backfills revealOrder/revealIndex when missing in stored meta', async () => {
+    await adminReset('hard', SEED)
+    const mem = getMemory()!
+    const legacyMeta: Record<string, unknown> = { ...(mem.meta as unknown as Record<string, unknown>) }
+    delete (legacyMeta as Record<string, unknown>).revealOrder
+    delete (legacyMeta as Record<string, unknown>).revealIndex
+    // Overwrite META store with legacyMeta
+    const db = await openDatabase()
+    const tx = db.transaction([STORE_META], 'readwrite')
+    await tx.objectStore(STORE_META).put(legacyMeta, 'meta')
+    await tx.done
+    // Clear memory and boot -> should backfill fields
+    setMemory(null)
+    await bootDatabase(SEED)
+    const after = getMemory()!
+    expect(Array.isArray(after.meta.revealOrder)).toBe(true)
+    expect(typeof after.meta.revealIndex).toBe('number')
+  })
+
+  it('botStep reseeds revealOrder when missing in memory', async () => {
+    await adminReset('hard', SEED)
+    const mem = getMemory()!
+    // Simulate missing fields in-memory
+    delete (mem.meta as unknown as Record<string, unknown>).revealOrder
+    delete (mem.meta as unknown as Record<string, unknown>).revealIndex
+    const res = await botStep()
+    if ('error' in res) throw new Error('expected ok')
+    const m = getMemory()!
+    expect(Array.isArray(m.meta.revealOrder)).toBe(true)
+    expect(typeof m.meta.revealIndex).toBe('number')
+  })
+
+  it('botStep returns done=true when no id left to reveal', async () => {
+    await adminReset('hard', SEED)
+    const mem = getMemory()!
+    const order = mem.meta.revealOrder!
+    mem.meta.revealIndex = order.length
+    const res = await botStep()
+    if ('error' in res) throw new Error('expected ok')
+    expect(res.done).toBe(true)
+    expect(res.revealed).toBeUndefined()
+  })
+
+  it('botStep skips already-revealed cells and continues', async () => {
+    await adminReset('hard', SEED)
+    const mem = getMemory()!
+    const order2 = mem.meta.revealOrder!
+    const targetId = order2[0]
+    const r1 = await revealCell(targetId, undefined, { bypassEligibility: true })
+    if ('error' in r1) throw new Error('expected ok')
+    mem.meta.revealIndex = 0
+    const res = await botStep()
+    if ('error' in res) throw new Error('expected ok')
+    expect(res.done).toBe(false)
+    expect(res.revealed).toBeTruthy()
+    // Should not reveal the already revealed first id
+    expect(res.revealed!.id).not.toBe(targetId)
   })
 })
