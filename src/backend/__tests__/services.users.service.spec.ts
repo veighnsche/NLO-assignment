@@ -8,7 +8,7 @@ import {
   assignUserForClient,
   resolveUsers,
 } from '@/backend/services/users.service'
-import { getUsersMemory } from '@/backend/infra/state'
+import { getUsersMemory, setUsersMemory, getMemory } from '@/backend/infra/state'
 
 const SEED = 12345
 
@@ -87,5 +87,67 @@ describe('services/users.service', () => {
     const known = ids.slice(0, 3)
     const res = resolveUsers([...known, 'nope'])
     expect(res.map((u) => u.id).sort()).toEqual(known.sort())
+  })
+
+  it('pickRandomEligibleUser returns NO_ELIGIBLE when users missing', async () => {
+    // Ensure boot state exists, then clear users map
+    expect(getUsersMemory()).toBeTruthy()
+    setUsersMemory(null)
+    const res = await pickRandomEligibleUser()
+    expect(res).toEqual({ error: 'NO_ELIGIBLE' })
+  })
+
+  it('listEligibleUsers returns empty when users missing', () => {
+    setUsersMemory(null)
+    const res = listEligibleUsers(0, 10)
+    expect(res).toEqual({ total: 0, users: [] })
+  })
+
+  it('assignUserForClient throws when users missing', () => {
+    setUsersMemory(null)
+    expect(() => assignUserForClient('any')).toThrowError('Users not initialized')
+  })
+
+  it('resolveUsers returns [] when users missing', () => {
+    setUsersMemory(null)
+    const res = resolveUsers(['a', 'b'])
+    expect(res).toEqual([])
+  })
+
+  it('pickRandomEligibleUser works with undefined meta.seed (fallback seed path)', async () => {
+    // Ensure booted and users present
+    expect(getUsersMemory()).toBeTruthy()
+    const mem = getMemory()!
+    // Simulate older meta without explicit seed
+    mem.meta.seed = undefined
+    const res = await pickRandomEligibleUser()
+    expect('ok' in res && res.ok).toBe(true)
+    expect(getCurrentPlayer().currentPlayerId).toBeTypeOf('string')
+  })
+
+  it('assignUserForClient works with undefined meta.seed (fallback seed path)', () => {
+    const mem = getMemory()!
+    mem.meta.seed = undefined
+    const a = assignUserForClient('client-fallback')
+    const b = assignUserForClient('client-fallback')
+    expect(a).toEqual(b)
+  })
+
+  it('pickRandomEligibleUser works with present meta.seed (primary seed path)', async () => {
+    // Ensure users exist
+    expect(getUsersMemory()).toBeTruthy()
+    const mem = getMemory()!
+    mem.meta.seed = 2025
+    const res = await pickRandomEligibleUser()
+    expect('ok' in res && res.ok).toBe(true)
+    expect(getCurrentPlayer().currentPlayerId).toBeTypeOf('string')
+  })
+
+  it('assignUserForClient works with present meta.seed (primary seed path)', () => {
+    const mem = getMemory()!
+    mem.meta.seed = 2025
+    const a = assignUserForClient('client-present')
+    const b = assignUserForClient('client-present')
+    expect(a).toEqual(b)
   })
 })
