@@ -98,7 +98,28 @@ export const useGridStore = defineStore('grid', {
       if (this.userHasRevealed()) return
       this.isRevealing = true
       try {
-        await apiReveal(id, playerId)
+        // Ensure a stable playerId is used for attribution
+        let pid = playerId
+        try {
+          const key = 'nlo-player-id'
+          if (!pid) {
+            const existing = localStorage.getItem(key)
+            if (existing) {
+              pid = existing
+            } else {
+              const rnd = crypto.getRandomValues(new Uint32Array(4))
+              pid = Array.from(rnd)
+                .map((n) => n.toString(16).padStart(8, '0'))
+                .join('')
+              localStorage.setItem(key, pid)
+            }
+          }
+        } catch {
+          // Fallback when localStorage/crypto unavailable
+          pid = pid || `anon-${Math.random().toString(36).slice(2)}`
+        }
+
+        await apiReveal(id, pid)
         this.networkOk = true
         this.markUserRevealed()
         await this.refresh()
