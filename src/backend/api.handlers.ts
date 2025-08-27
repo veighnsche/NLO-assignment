@@ -16,7 +16,7 @@ import {
   assignUserForClient,
   resolveUsers,
   pickRandomEligibleUser,
-} from '@/backend/db'
+} from '@/backend'
 
 export const handlers = [
   http.post('/api/boot', async ({ request }) => {

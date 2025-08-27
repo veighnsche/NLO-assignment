@@ -107,14 +107,14 @@ Directories of interest:
 
 * __`src/backend/`__
   * `api.handlers.ts` — HTTP endpoints (boot, snapshot, reveal, bot step, admin reset). Single source of truth for API routes.
-  * `db/domain/` — Domain models and logic
+  * `domain/` — Domain models and logic
     * `grid/` — `schema.ts` (types, helpers), `seed.ts` (grid seed + bot reveal order)
     * `users/` — `model.ts` (User), `generator.ts` (deterministic user generation)
     * `shared/` — `rng.ts` (deterministic PRNG utilities)
-  * `db/infra/` — Infrastructure
+  * `infra/` — Infrastructure
     * `idb.ts` — IndexedDB config and open helper
     * `state.ts` — In-memory state singletons and accessors
-  * `db/services/` — Application services orchestrating domain + infra
+  * `services/` — Application services orchestrating domain + infra
   * `msw/browser.ts` — MSW worker setup for the browser (dev only)
   * `msw/server.ts` — MSW server setup for tests (Node/Vitest)
 
@@ -158,7 +158,7 @@ Client functions in `src/frontend/api.ts` map 1:1 to these endpoints.
   * Cleared on Admin reset to ease demoing.
 
 * __Persistence__
-  * `src/backend/db/infra/idb.ts` persists grid + meta to IndexedDB.
+  * `src/backend/infra/idb.ts` persists grid + meta to IndexedDB.
   * On boot, state is loaded; frontend hydrates via `snapshot`.
 
 * __Simulated multi-user__

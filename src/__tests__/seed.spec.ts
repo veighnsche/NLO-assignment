@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
-import { seedGrid, getNextBotReveal } from '@/backend/db/domain/grid/seed'
-import { GRID_TOTAL, PrizeConsolation, PrizeGrand } from '@/backend/db/domain/grid/schema'
-import type { Targets } from '@/backend/db/domain/grid/seed'
+import { seedGrid, getNextBotReveal } from '@/backend/domain/grid/seed'
+import { GRID_TOTAL, PrizeConsolation, PrizeGrand } from '@/backend/domain/grid/schema'
+import type { Targets } from '@/backend/domain/grid/seed'
 
 function countPrizes(targets: Targets) {
   let grand = 0
