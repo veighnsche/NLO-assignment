@@ -65,8 +65,19 @@ defineExpose({ hover, move, leave })
       <div class="tt-row" :class="prizeClass">
         <Icon class="tt-emoji" icon="mdi:trophy" aria-hidden="true" />
         <span>
-          Prijs: <Icon class="tt-emoji" icon="mdi:gift" v-if="prizeLabel === 'Troostprijs'" aria-hidden="true" />
-          <Icon class="tt-emoji" icon="mdi:diamond-stone" v-else-if="prizeLabel === 'Hoofdprijs'" aria-hidden="true" />
+          Prijs:
+          <Icon
+            class="tt-emoji"
+            icon="mdi:gift"
+            v-if="prizeLabel === 'Troostprijs'"
+            aria-hidden="true"
+          />
+          <Icon
+            class="tt-emoji"
+            icon="mdi:diamond-stone"
+            v-else-if="prizeLabel === 'Hoofdprijs'"
+            aria-hidden="true"
+          />
           <strong>{{ prizeLabel }}</strong>
           <template v-if="prizeAmountText">
             <span class="tt-amount">— {{ prizeAmountText }}</span>

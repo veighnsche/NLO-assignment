@@ -7,9 +7,9 @@ export class HttpError extends Error {
     super(`HTTP ${status}: ${bodyText || statusText}`)
     this.name = 'HttpError'
   }
- }
+}
 
- export async function jsonFetch<T>(input: RequestInfo, init?: RequestInit): Promise<T> {
+export async function jsonFetch<T>(input: RequestInfo, init?: RequestInit): Promise<T> {
   const res = await fetch(input, {
     headers: { 'Content-Type': 'application/json', ...(init?.headers || {}) },
     ...init,
@@ -37,4 +37,4 @@ export class HttpError extends Error {
     return txt as unknown as T
   }
   return (await res.json()) as T
- }
+}

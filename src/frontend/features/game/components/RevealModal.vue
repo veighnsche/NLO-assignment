@@ -77,7 +77,6 @@ const result = ref<RevealResult>({ type: 'none', amount: 0 })
 const busy = ref(false)
 const errorMsg = ref<string | null>(null)
 
-
 watch(
   () => props.modelValue,
   (opened) => {

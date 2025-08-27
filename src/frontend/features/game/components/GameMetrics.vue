@@ -60,7 +60,11 @@ const canOpen = computed(
         :class="{ closed: !canOpen }"
         aria-label="Kan gebruiker nog een vakje openen?"
       >
-        <Icon class="emoji" :icon="canOpen ? 'mdi:lock-open-variant' : 'mdi:lock-outline'" aria-hidden="true" />
+        <Icon
+          class="emoji"
+          :icon="canOpen ? 'mdi:lock-open-variant' : 'mdi:lock-outline'"
+          aria-hidden="true"
+        />
         <span class="label">Kan openen:</span>
         <span class="value">{{ canOpen ? 'Ja' : 'Nee' }}</span>
       </div>

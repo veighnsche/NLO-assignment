@@ -58,7 +58,9 @@ export function useGridTooltip() {
 
   const statusClass = computed(() => (revealed.value ? 'status--open' : 'status--closed'))
 
-  const whenText = computed(() => (revealedAt.value ? dfDateTime.format(new Date(revealedAt.value)) : null))
+  const whenText = computed(() =>
+    revealedAt.value ? dfDateTime.format(new Date(revealedAt.value)) : null,
+  )
 
   // Handlers
   function onHover(payload: TooltipPayload) {

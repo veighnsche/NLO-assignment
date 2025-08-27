@@ -66,7 +66,14 @@ import { useAdminControls } from '@/frontend/features/admin/useAdminControls'
 import { useAdminUiStore } from '@/frontend/features/admin/store'
 import { useSessionStore } from '@/frontend/features/game/store/session'
 import { useStatusStore } from '@/frontend/features/game/store/status'
-import { hzToIntervalMs, intervalWindow, clampHz, intervalToHz, DEFAULT_MIN_MS, DEFAULT_MAX_MS } from '@/frontend/lib/botSpeed'
+import {
+  hzToIntervalMs,
+  intervalWindow,
+  clampHz,
+  intervalToHz,
+  DEFAULT_MIN_MS,
+  DEFAULT_MAX_MS,
+} from '@/frontend/lib/botSpeed'
 
 const showModal = ref(false)
 const seed = ref<number | null>(null)
