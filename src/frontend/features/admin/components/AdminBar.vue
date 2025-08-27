@@ -63,7 +63,7 @@ import Modal from '@/frontend/ui/Modal.vue'
 import Button from '@/frontend/ui/Button.vue'
 import Slider from '@/frontend/ui/Slider.vue'
 import { useAdminControls } from '@/frontend/features/admin/useAdminControls'
-import { useAdminUiStore } from '@/frontend/features/admin/store'
+import { useAdminUiStore } from '@/frontend/features/admin/store/adminUI'
 import { useSessionStore } from '@/frontend/features/game/store/session'
 import { useStatusStore } from '@/frontend/features/game/store/status'
 import {

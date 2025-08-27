@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { useExposedStore } from '@/frontend/features/shared/exposed'
+import { useExposedStore } from '@/frontend/features/admin/store/exposed'
 import { apiAdminGetTargets } from '@/frontend/features/admin/api'
 import { useGridStore } from '@/frontend/features/game/store/grid'
 

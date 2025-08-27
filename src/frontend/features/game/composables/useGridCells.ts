@@ -1,8 +1,8 @@
 import { computed } from 'vue'
 import { useGridStore } from '@/frontend/features/game/store/grid'
-import { useExposedStore } from '@/frontend/features/shared/exposed'
+import { useExposedStore } from '@/frontend/features/admin/store/exposed'
 import { useStatusStore } from '@/frontend/features/game/store/status'
-import { useAdminUiStore } from '@/frontend/features/admin/store'
+import { useAdminUiStore } from '@/frontend/features/admin/store/adminUI'
 
 export function useGridCells(rows = 100, cols = 100) {
   const grid = useGridStore()

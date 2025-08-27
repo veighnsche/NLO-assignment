@@ -1,5 +1,5 @@
 import { useGridStore } from '@/frontend/features/game/store/grid'
-import { useExposedStore } from '@/frontend/features/shared/exposed'
+import { useExposedStore } from '@/frontend/features/admin/store/exposed'
 import { useBotStore } from '@/frontend/features/game/store/bot'
 import { useSessionStore } from '@/frontend/features/game/store/session'
 import {
