@@ -3,7 +3,7 @@
     <div class="bar-card">
       <div class="section left">
         <span class="label">Actieve speler:</span>
-        <span class="value">—</span>
+        <span class="value">{{ currentPlayerName || '—' }}</span>
         <Button>Verander van speler</Button>
       </div>
 
@@ -57,12 +57,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineEmits, onMounted } from 'vue'
+import { ref, defineEmits, onMounted, watch } from 'vue'
 import Modal from '@/frontend/shared/ui/Modal.vue'
 import Button from '@/frontend/shared/ui/Button.vue'
 import Slider from '@/frontend/shared/ui/Slider.vue'
 import { useAdminControls } from '@/frontend/features/admin/useAdminControls'
 import { useGridStore } from '@/frontend/features/game/store/grid'
+import { apiAdminGetCurrentPlayer, apiUsersResolve, apiUsersAssign } from '@/frontend/shared/api/client'
 
 const showModal = ref(false)
 const seed = ref<number | null>(null)
@@ -71,6 +72,42 @@ const botSpeedHz = ref(1.0)
 let speedTimer: number | null = null
 const { reset: adminReset, setBotSpeed, getBotDelay } = useAdminControls()
 const grid = useGridStore()
+
+// Current player display
+const currentPlayerId = ref<string | undefined>(undefined)
+const currentPlayerName = ref<string>('')
+// Stable client id (same approach as Header.vue)
+const clientId = (() => {
+  const storageKey = 'nlo-player-id'
+  try {
+    const existing = localStorage.getItem(storageKey)
+    if (existing) return existing
+    const rnd = crypto.getRandomValues(new Uint32Array(4))
+    const v = Array.from(rnd).map((n) => n.toString(16).padStart(8, '0')).join('')
+    localStorage.setItem(storageKey, v)
+    return v
+  } catch {
+    return `anon-${Math.random().toString(36).slice(2)}`
+  }
+})()
+
+async function refreshCurrentPlayer() {
+  try {
+    const { currentPlayerId: id } = await apiAdminGetCurrentPlayer()
+    currentPlayerId.value = id
+    if (id) {
+      const res = await apiUsersResolve([id])
+      currentPlayerName.value = res.users[0]?.name ?? ''
+      return
+    }
+    // Fallback: show this browser's assigned user name
+    const assigned = await apiUsersAssign(clientId)
+    currentPlayerName.value = assigned.name || ''
+  } catch {
+    // ignore in dev
+    currentPlayerName.value = ''
+  }
+}
 
 defineEmits<{ (e: 'toggle'): void }>()
 
@@ -136,6 +173,21 @@ onMounted(async () => {
     await setBotSpeed({ intervalMs: avg, minMs, maxMs })
   } catch {
     // ignore fetch errors in dev
+  }
+  // Fetch current player name after boot completes (avoid early calls during init)
+  if (!grid.isBooting) {
+    await refreshCurrentPlayer()
+  } else {
+    const stop = watch(
+      () => grid.isBooting,
+      async (booting) => {
+        if (!booting) {
+          await refreshCurrentPlayer()
+          stop()
+        }
+      },
+      { immediate: false },
+    )
   }
 })
 </script>
