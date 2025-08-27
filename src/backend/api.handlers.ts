@@ -191,7 +191,11 @@ export const handlers = [
       const offset = Number(url.searchParams.get('offset') ?? '0')
       const limit = Number(url.searchParams.get('limit') ?? '100')
       const query = url.searchParams.get('query') ?? undefined
-      const res = listEligibleUsers(Number.isFinite(offset) ? offset : 0, Number.isFinite(limit) ? limit : 100, query)
+      const res = listEligibleUsers(
+        Number.isFinite(offset) ? offset : 0,
+        Number.isFinite(limit) ? limit : 100,
+        query,
+      )
       return HttpResponse.json(res)
     } catch (err) {
       return HttpResponse.json({ error: String(err) }, { status: 500 })

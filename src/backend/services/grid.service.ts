@@ -116,7 +116,9 @@ export function getSnapshotForClient(): {
 } {
   const memory = getMemory()
   ensureBooted(memory)
-  const revealed = Object.values(memory.cells).filter((c): c is Cell => (c as Cell).revealed === true)
+  const revealed = Object.values(memory.cells).filter(
+    (c): c is Cell => (c as Cell).revealed === true,
+  )
   return {
     meta: { version: memory.meta.version, etag: memory.meta.etag },
     revealed,
@@ -144,7 +146,9 @@ export async function revealCell(
   options?: { overrideRevealedBy?: string; bypassEligibility?: boolean },
 ): Promise<
   | { ok: true; cell: Cell; meta: GridMeta }
-  | { error: 'NOT_FOUND' | 'ALREADY_REVEALED' | 'ALREADY_PLAYED' | 'NOT_YOUR_TURN' | 'NOT_ELIGIBLE' }
+  | {
+      error: 'NOT_FOUND' | 'ALREADY_REVEALED' | 'ALREADY_PLAYED' | 'NOT_YOUR_TURN' | 'NOT_ELIGIBLE'
+    }
 > {
   const memory = getMemory()
   ensureBooted(memory)

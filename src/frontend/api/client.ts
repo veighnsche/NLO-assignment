@@ -35,7 +35,9 @@ export interface Snapshot {
 // Response types mirroring backend contracts
 export type RevealResponse =
   | { ok: true; cell: Cell; meta: GridMeta }
-  | { error: 'NOT_FOUND' | 'ALREADY_REVEALED' | 'ALREADY_PLAYED' | 'NOT_YOUR_TURN' | 'NOT_ELIGIBLE' }
+  | {
+      error: 'NOT_FOUND' | 'ALREADY_REVEALED' | 'ALREADY_PLAYED' | 'NOT_YOUR_TURN' | 'NOT_ELIGIBLE'
+    }
 
 export type BotStepResponse =
   | { ok: true; revealed?: Cell; meta: GridMeta; done: boolean }
@@ -144,7 +146,9 @@ export async function apiUsersAssign(clientId?: string): Promise<{ userId: strin
   })
 }
 
-export async function apiUsersResolve(ids: string[]): Promise<{ users: Array<{ id: string; name: string }> }> {
+export async function apiUsersResolve(
+  ids: string[],
+): Promise<{ users: Array<{ id: string; name: string }> }> {
   return jsonFetch('/api/users/resolve', {
     method: 'POST',
     body: JSON.stringify({ ids }),
@@ -155,14 +159,18 @@ export async function apiAdminGetCurrentPlayer(): Promise<{ currentPlayerId?: st
   return jsonFetch('/api/admin/current-player')
 }
 
-export async function apiAdminSetCurrentPlayer(playerId: string | null): Promise<{ ok: true } | { error: 'NOT_ELIGIBLE' }> {
+export async function apiAdminSetCurrentPlayer(
+  playerId: string | null,
+): Promise<{ ok: true } | { error: 'NOT_ELIGIBLE' }> {
   return jsonFetch('/api/admin/current-player', {
     method: 'POST',
     body: JSON.stringify({ playerId }),
   })
 }
 
-export async function apiAdminPickRandomPlayer(): Promise<{ ok: true; playerId: string } | { error: 'NO_ELIGIBLE' }> {
+export async function apiAdminPickRandomPlayer(): Promise<
+  { ok: true; playerId: string } | { error: 'NO_ELIGIBLE' }
+> {
   return jsonFetch('/api/admin/pick-random-player', { method: 'POST' })
 }
 

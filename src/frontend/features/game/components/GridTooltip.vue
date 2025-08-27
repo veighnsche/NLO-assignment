@@ -123,15 +123,21 @@ defineExpose<GridTooltipApi>({ hover, move, leave })
       </div>
       <div class="tt-row">
         <span class="tt-emoji" aria-hidden="true">👤</span>
-        <span>Geopend door: <strong>{{ opener ?? '—' }}</strong></span>
+        <span
+          >Geopend door: <strong>{{ opener ?? '—' }}</strong></span
+        >
       </div>
       <div class="tt-row" :class="statusClass">
         <span class="tt-emoji" aria-hidden="true">🎯</span>
-        <span>Status: <strong>{{ revealed ? 'Geopend' : 'Gesloten' }}</strong></span>
+        <span
+          >Status: <strong>{{ revealed ? 'Geopend' : 'Gesloten' }}</strong></span
+        >
       </div>
       <div v-if="whenText" class="tt-row">
         <span class="tt-emoji" aria-hidden="true">⏰</span>
-        <span>Geopend op: <strong>{{ whenText }}</strong></span>
+        <span
+          >Geopend op: <strong>{{ whenText }}</strong></span
+        >
       </div>
       <div class="tt-row" :class="prizeClass">
         <span class="tt-emoji" aria-hidden="true">🏆</span>

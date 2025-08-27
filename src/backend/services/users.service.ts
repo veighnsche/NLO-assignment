@@ -41,14 +41,15 @@ async function persistMeta(): Promise<void> {
   await tx.done
 }
 
-
 export function getCurrentPlayer(): { currentPlayerId?: string } {
   const memory = getMemory()
   ensureBooted(memory)
   return { currentPlayerId: memory.meta.currentPlayerId }
 }
 
-export async function setCurrentPlayer(playerId: string | null): Promise<{ ok: true } | { error: 'NOT_ELIGIBLE' }> {
+export async function setCurrentPlayer(
+  playerId: string | null,
+): Promise<{ ok: true } | { error: 'NOT_ELIGIBLE' }> {
   const memory = getMemory()
   ensureBooted(memory)
   const users = getUsersMemory()
