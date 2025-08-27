@@ -1,8 +1,5 @@
 <template>
-  <Modal
-    v-model="open"
-    :ariaLabelledby="step === 'confirm' ? 'confirm-title' : 'result-title'"
-  >
+  <Modal v-model="open" :ariaLabelledby="step === 'confirm' ? 'confirm-title' : 'result-title'">
     <!-- Step 1: Confirm -->
     <div v-if="step === 'confirm'">
       <h2 id="confirm-title">Vakje openen bevestigen</h2>
@@ -21,11 +18,15 @@
         <p v-if="result.type === 'none'">Helaas, geen prijs deze keer. Probeer het nog eens!</p>
         <p v-else-if="result.type === 'consolation'">
           Gefeliciteerd! Je hebt een <strong>Troostprijs</strong> gewonnen
-          <template v-if="result.amount">van <strong>{{ nfCurrency.format(result.amount) }}</strong></template>.
+          <template v-if="result.amount"
+            >van <strong>{{ nfCurrency.format(result.amount) }}</strong></template
+          >.
         </p>
         <p v-else-if="result.type === 'grand'">
           Fantastisch! Je hebt de <strong>Hoofdprijs</strong> gewonnen
-          <template v-if="result.amount">van <strong>{{ nfCurrency.format(result.amount) }}</strong></template>! 🎉
+          <template v-if="result.amount"
+            >van <strong>{{ nfCurrency.format(result.amount) }}</strong></template
+          >! 🎉
         </p>
       </div>
     </div>

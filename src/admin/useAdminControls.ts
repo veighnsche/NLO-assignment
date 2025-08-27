@@ -1,5 +1,10 @@
 import { useGridStore } from '@/frontend/store/grid'
-import { apiAdminReset, apiAdminSetBotDelay, apiAdminGetBotDelay, apiAdminGetTargets } from '@/frontend/api'
+import {
+  apiAdminReset,
+  apiAdminSetBotDelay,
+  apiAdminGetBotDelay,
+  apiAdminGetTargets,
+} from '@/frontend/api'
 
 export function useAdminControls() {
   const grid = useGridStore()

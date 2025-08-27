@@ -92,10 +92,14 @@ const networkOk = computed(() => grid.networkOk)
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  box-shadow: 0 0 0 2px rgba(0,0,0,0.04) inset;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.04) inset;
 }
-.net-indicator.ok .dot { background: #2ecc71; }
-.net-indicator.down .dot { background: #e74c3c; }
+.net-indicator.ok .dot {
+  background: #2ecc71;
+}
+.net-indicator.down .dot {
+  background: #e74c3c;
+}
 .net-indicator .label {
   color: var(--text-muted, #777);
 }

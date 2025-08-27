@@ -44,7 +44,7 @@ function exposedPrizeType(i: number): 'grand' | 'consolation' | undefined {
   if (!isExposed(i)) return undefined
   const id = cellIdFromIndex(i)
   const t = grid.exposedTargets.find((x) => x.id === id)?.prize?.type
-  return (t === 'grand' || t === 'consolation') ? t : undefined
+  return t === 'grand' || t === 'consolation' ? t : undefined
 }
 
 // Accessible label helper
@@ -292,8 +292,6 @@ function onGridLeave() {
   color: #0b6db8; /* blue accent */
   text-shadow: 0 0 4px rgba(0, 123, 255, 0.5);
 }
-
-
 
 .cell:focus-visible {
   outline: 0;

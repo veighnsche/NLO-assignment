@@ -37,7 +37,7 @@ const props = withDefaults(
     suffix: '',
     showValue: true,
     decimals: 0,
-  }
+  },
 )
 
 const emit = defineEmits<{
@@ -51,7 +51,7 @@ watch(
   () => props.modelValue,
   (nv) => {
     if (nv !== localValue.value) localValue.value = nv
-  }
+  },
 )
 
 function onInput() {
