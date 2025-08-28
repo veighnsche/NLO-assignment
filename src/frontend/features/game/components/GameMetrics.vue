@@ -29,7 +29,7 @@ const canOpen = computed(
 </script>
 
 <template>
-  <div class="metrics-sticky">
+  <div class="game-metrics">
     <div class="meta-row" role="group" aria-label="Spelstatistieken">
       <div class="metric opened" aria-label="Aantal geopende vakjes">
         <Icon class="emoji" icon="mdi:archive-outline" aria-hidden="true" />
@@ -73,15 +73,6 @@ const canOpen = computed(
 </template>
 
 <style scoped>
-.metrics-sticky {
-  /* Sticky positioning beneath TopBar (56px) */
-  position: sticky;
-  top: 56px;
-  z-index: 10;
-  padding: 0.5rem 1rem;
-  background: transparent; /* fully transparent */
-  pointer-events: none; /* allow clicks to pass through to the grid */
-}
 
 .meta-row {
   display: flex;

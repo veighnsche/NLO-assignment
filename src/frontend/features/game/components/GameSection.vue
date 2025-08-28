@@ -15,7 +15,9 @@ const tooltipRef = ref<GridTooltipApi | null>(null)
 
 <template>
   <section class="game-section" aria-label="Spel">
-    <GameMetrics />
+    <div class="metrics-sticky" aria-hidden="false">
+      <GameMetrics />
+    </div>
     <CalendarGrid :tooltip="tooltipRef" />
   </section>
   <!-- Tooltip instance is hoisted here to avoid any coupling to the 10k grid subtree -->
@@ -33,6 +35,16 @@ const tooltipRef = ref<GridTooltipApi | null>(null)
   /* Constrain width and keep gutters from screen edges */
   width: min(100% - calc(var(--container-gutter) * 2), var(--container-max));
   margin-inline: auto;
+}
+
+/* Sticky metrics bar just below the TopBar (56px) */
+.metrics-sticky {
+  position: sticky;
+  top: 56px;
+  z-index: 10;
+  padding: 0.5rem 1rem;
+  background: transparent;
+  pointer-events: none; /* allow interactions with the grid beneath */
 }
 
 /* Decorative gold accent at the top to echo festive vibe */
