@@ -1,21 +1,25 @@
-# Frontend Testing Guide
+# Testing Guide
 
 This project uses Vitest + Vue Test Utils for unit tests.
 
 ## Commands
-- Run all frontend tests: `pnpm test:frontend`
-- Run headless (CI): `pnpm test:frontend:run`
-- Coverage report: `pnpm test:frontend:coverage` (see `coverage/index.html`)
+- Run tests (watch): `pnpm test`
+- Run once (CI/local): `pnpm test:run`
+- Coverage report: `pnpm test:coverage` (open `coverage/index.html`)
 
 ## Test locations
 - Co-located specs under `src/**/__tests__/*.spec.ts`
-- Frontend-specific patterns are configured in `vitest.frontend.config.ts`.
+
 
 ## Environment
 - `vitest.config.ts` sets `environment: jsdom`
 - Global test setup: `src/setupTests.ts`
   - `msw` server auto-starts
   - `fake-indexeddb` is installed for IDB APIs
+
+## Running specific tests
+- Single file: `pnpm test path/to/spec.spec.ts`
+- By pattern: `pnpm test -- -t "test name substring"`
 
 ## Common mocking patterns
 - Pinia stores: mock modules per test
@@ -52,3 +56,8 @@ This project uses Vitest + Vue Test Utils for unit tests.
 ## Linting
 - Run `pnpm lint` to fix common issues.
 - Prefer typed mocks; if necessary, cast narrowly instead of `any`.
+
+## CI & Coverage badge
+- GitHub Actions workflow `tests-and-coverage.yml` runs `pnpm test:coverage`.
+- CI generates `public/coverage.svg` and commits it on `main`/`master`.
+- The README shows a local badge referencing that SVG.
