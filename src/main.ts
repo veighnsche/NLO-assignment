@@ -5,7 +5,8 @@ import './frontend/styles/index.css'
 import { setupConnectivity } from './frontend/lib/connectivity'
 
 async function prepareMocks() {
-  if (import.meta.env.DEV) {
+  const enableMsw = import.meta.env.DEV || import.meta.env.VITE_ENABLE_MSW === 'true'
+  if (enableMsw) {
     const { worker } = await import('./backend/msw/browser')
     await worker.start({ onUnhandledRequest: 'bypass' })
   }
