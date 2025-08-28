@@ -60,9 +60,10 @@ const resolvedMediaAspect = computed(() => props.mediaAspect ?? '16/9')
     />
     <div class="card-content">
       <div class="top-row">
-        <span class="count">{{ props.count }}×</span>
+        <span class="count chip" aria-label="Aantal">{{ props.count }}×</span>
         <span class="amount num-tabular">{{ formatCurrency(props.amount) }}</span>
       </div>
+      <div class="divider" role="presentation" />
       <div class="label">{{ resolvedLabel }}</div>
     </div>
   </div>
@@ -96,27 +97,50 @@ const resolvedMediaAspect = computed(() => props.mediaAspect ?? '16/9')
 
 .card-content {
   display: grid;
-  gap: 8px;
-  padding: 14px 16px 16px;
+  gap: 6px;
+  padding: 8px 10px 10px;
 }
 
 .top-row {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  gap: 10px;
+  gap: 6px;
 }
 
 .count {
   font-weight: var(--font-weight-semibold);
-  color: var(--color-primary-green);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--chip-bg, color-mix(in srgb, var(--surface-contrast) 6%, transparent));
+  border: 1px solid var(--chip-border, var(--border-subtle));
+  color: var(--chip-fg, currentColor);
+  line-height: 1.2;
 }
 
 .amount {
   font-family: var(--font-family-display);
   font-weight: var(--font-weight-bold);
-  font-size: clamp(22px, 2.8vw, 28px);
+  font-size: clamp(18px, 2.2vw, 24px);
   letter-spacing: 0.2px;
+  line-height: 1.1;
+}
+
+.divider {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in srgb, var(--border-subtle) 70%, transparent) 15%,
+    color-mix(in srgb, var(--border-subtle) 80%, transparent) 85%,
+    transparent 100%
+  );
 }
 
 .label {
@@ -134,6 +158,9 @@ const resolvedMediaAspect = computed(() => props.mediaAspect ?? '16/9')
   );
   --card-border: color-mix(in srgb, var(--color-accent-gold) 65%, var(--border-subtle));
   --card-media-bg: linear-gradient(180deg, rgba(218, 165, 32, 0.15), rgba(218, 165, 32, 0));
+  --chip-bg: color-mix(in srgb, var(--color-accent-gold) 15%, #fff);
+  --chip-border: color-mix(in srgb, var(--color-accent-gold) 45%, var(--border-subtle));
+  --chip-fg: color-mix(in srgb, var(--color-accent-gold) 40%, #2b2100);
 }
 
 .prize-card.consolation {
@@ -145,15 +172,25 @@ const resolvedMediaAspect = computed(() => props.mediaAspect ?? '16/9')
   );
   --card-border: color-mix(in srgb, var(--color-primary-green) 45%, var(--border-subtle));
   --card-media-bg: linear-gradient(180deg, rgba(0, 128, 0, 0.12), rgba(0, 128, 0, 0));
+  --chip-bg: color-mix(in srgb, var(--color-primary-green) 12%, #fff);
+  --chip-border: color-mix(in srgb, var(--color-primary-green) 38%, var(--border-subtle));
+  --chip-fg: color-mix(in srgb, var(--color-primary-green) 35%, #062b12);
 }
 
 @media (max-width: 520px) {
   .prize-card {
     grid-template-columns: 1fr;
     grid-template-areas: 'content';
-    padding: 12px;
+    padding: 8px;
   }
   .card-media {
+    display: none;
+  }
+  .card-content {
+    padding: 8px 8px 10px;
+    gap: 4px;
+  }
+  .divider {
     display: none;
   }
 }
