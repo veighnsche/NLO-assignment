@@ -24,8 +24,8 @@
         </div>
         <UiButton
           class="admin-toggle"
-          color="primary"
-          variant="outline"
+          color="default"
+          variant="filled"
           size="sm"
           :aria-pressed="showAdminBar ? 'true' : 'false'"
           @click="$emit('toggle')"
@@ -61,10 +61,10 @@ const networkOk = computed(() => status.networkOk)
   left: 0;
   right: 0;
   height: 56px;
-  background: var(--surface-elevated);
-  color: var(--text);
-  border-bottom: 1px solid var(--border-subtle);
-  box-shadow: var(--shadow-md);
+  background: var(--topbar-bg);
+  color: var(--topbar-text);
+  border-bottom: 1px solid var(--topbar-border);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
   z-index: 1500;
 }
 
@@ -100,15 +100,15 @@ const networkOk = computed(() => status.networkOk)
   gap: 10px;
 }
 .main-nav a {
-  color: var(--text);
+  color: var(--topbar-text);
   text-decoration: none;
   padding: 6px 8px;
   border-radius: 999px;
   line-height: 1;
 }
 .main-nav a:hover {
-  background: color-mix(in srgb, var(--color-primary-green) 12%, transparent);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-primary-green) 35%, var(--border-subtle));
+  background: color-mix(in srgb, var(--color-accent-gold) 22%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-accent-gold) 55%, transparent);
 }
 
 /* Show main nav on >=768px */
@@ -126,8 +126,8 @@ const networkOk = computed(() => status.networkOk)
   margin-right: 8px;
   padding: 4px 8px;
   border-radius: 999px;
-  border: 1px solid var(--border-subtle);
-  background: var(--surface);
+  border: 1px solid color-mix(in srgb, var(--topbar-border) 65%, transparent);
+  background: color-mix(in srgb, var(--topbar-bg) 60%, black);
   font-size: 0.85rem;
 }
 .net-indicator .dot {
@@ -143,7 +143,7 @@ const networkOk = computed(() => status.networkOk)
   background: var(--state-danger);
 }
 .net-indicator .label {
-  color: var(--text-muted, #777);
+  color: color-mix(in srgb, var(--topbar-text) 88%, white);
 }
 
 .topbar-right {
@@ -156,13 +156,14 @@ const networkOk = computed(() => status.networkOk)
   gap: 12px;
 }
 .topbar-right .links a {
-  color: var(--text);
+  color: var(--topbar-text);
   text-decoration: none;
   opacity: 0.9;
 }
 .topbar-right .links a:hover {
-  color: var(--color-primary-green);
+  color: var(--topbar-text);
   text-decoration: underline;
+  text-decoration-color: var(--color-accent-gold);
   text-underline-offset: 2px;
 }
 @media (min-width: 900px) {
@@ -176,5 +177,13 @@ const networkOk = computed(() => status.networkOk)
   min-width: 18ch; /* fits both labels */
   justify-content: center;
   text-align: center;
+  /* Force white filled style with dark text for contrast on dark topbar */
+  --btn-bg: white;
+  --btn-text: #111111;
+  --btn-border: color-mix(in srgb, black 12%, white);
+  --btn-hover-bg: color-mix(in srgb, black 6%, white);
+  --btn-shadow: none;
+  /* Visible focus on dark background */
+  --btn-focus-ring: 0 0 0 3px color-mix(in srgb, var(--color-accent-gold) 55%, transparent);
 }
 </style>

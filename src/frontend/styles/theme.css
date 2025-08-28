@@ -93,6 +93,11 @@
   --shadow-sm: 0 1px 2px rgba(6, 68, 32, 0.08);
   --shadow-md: 0 4px 12px rgba(6, 68, 32, 0.12);
   --shadow-lg: 0 10px 30px rgba(6, 68, 32, 0.16);
+
+  /* Chrome: Top bar */
+  --topbar-bg: color-mix(in srgb, var(--color-primary-green) 88%, black);
+  --topbar-text: var(--color-text-on-dark);
+  --topbar-border: color-mix(in srgb, var(--color-primary-green) 75%, black);
 }
 
 /* --------------------------------------------------
@@ -276,6 +281,13 @@
   --play-grand-bg: color-mix(in srgb, var(--color-accent-gold) 32%, transparent);
   --play-grand-border: color-mix(in srgb, var(--color-accent-gold) 85%, black);
   --play-grand-text: #111111;
+}
+
+/* Top bar — dark overrides */
+.theme-dark {
+  --topbar-bg: color-mix(in srgb, var(--color-primary-green) 82%, black);
+  --topbar-text: var(--color-text-on-dark);
+  --topbar-border: color-mix(in srgb, var(--color-primary-green) 70%, black);
 }
 
 /* --------------------------------------------------
