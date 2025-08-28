@@ -14,7 +14,6 @@ vi.mock('@/frontend/features/game/store/status', () => ({
 }))
 
 const originalNavigator = globalThis.navigator
-const originalReload = globalThis.location.reload
 
 function setNavigatorOnlineState(online: boolean) {
   Object.defineProperty(globalThis, 'navigator', {
@@ -29,11 +28,6 @@ beforeEach(() => {
   statusMock.setNetworkOk.mockClear()
   // Default to online
   setNavigatorOnlineState(true)
-  // Stub reload
-  Object.defineProperty(globalThis, 'location', {
-    value: { ...globalThis.location, reload: vi.fn() },
-    configurable: true,
-  })
 })
 
 afterEach(() => {
@@ -46,10 +40,6 @@ afterEach(() => {
     }
   }
   Object.defineProperty(globalThis, 'navigator', { value: originalNavigator, configurable: true })
-  Object.defineProperty(globalThis, 'location', {
-    value: { ...globalThis.location, reload: originalReload },
-    configurable: true,
-  })
   vi.resetModules()
   vi.restoreAllMocks()
 })
@@ -74,36 +64,6 @@ describe('setupConnectivity', () => {
     lastCleanup = undefined
   })
 
-  it('auto reloads when coming back online after being offline (autoReloadOnReconnect=true)', async () => {
-    const { setupConnectivity } = await importConnectivity()
-    const cleanup = setupConnectivity({ autoReloadOnReconnect: true })
-    lastCleanup = cleanup || undefined
-
-    // Go offline then online
-    window.dispatchEvent(new Event('offline'))
-    window.dispatchEvent(new Event('online'))
-
-    expect(globalThis.location.reload).toHaveBeenCalledTimes(1)
-
-    cleanup?.()
-    lastCleanup = undefined
-  })
-
-  it('does not auto reload when option disabled', async () => {
-    const { setupConnectivity } = await importConnectivity()
-    const cleanup = setupConnectivity({ autoReloadOnReconnect: false })
-    lastCleanup = cleanup || undefined
-
-    // Go offline then online
-    window.dispatchEvent(new Event('offline'))
-    window.dispatchEvent(new Event('online'))
-
-    expect(globalThis.location.reload).not.toHaveBeenCalled()
-
-    cleanup?.()
-    lastCleanup = undefined
-  })
-
   it('cleanup removes listeners (no further updates after cleanup)', async () => {
     const { setupConnectivity } = await importConnectivity()
     const cleanup = setupConnectivity()
@@ -120,3 +80,4 @@ describe('setupConnectivity', () => {
     expect(statusMock.setNetworkOk).not.toHaveBeenCalled()
   })
 })
+

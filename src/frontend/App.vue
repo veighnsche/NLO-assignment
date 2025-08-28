@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import AdminBar from '@/frontend/features/admin/components/AdminBar.vue'
 import TopBar from '@/frontend/features/chrome/components/TopBar.vue'
+import OfflineModal from '@/frontend/features/chrome/components/OfflineModal.vue'
 import Header from '@/frontend/features/chrome/components/Header.vue'
 import Footer from '@/frontend/features/chrome/components/Footer.vue'
 import GameSection from '@/frontend/features/game/components/GameSection.vue'
@@ -27,6 +28,7 @@ const { isInitializing } = useInitApp(grid)
   </template>
   <AdminBar v-if="showAdminBar" @toggle="showAdminBar = false" />
   <ToastContainer />
+  <OfflineModal />
 </template>
 
 <style scoped>

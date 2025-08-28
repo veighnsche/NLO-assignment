@@ -66,7 +66,7 @@ describe('main bootstrap', () => {
     expect(createApp).toHaveBeenCalled()
     expect(createPinia).toHaveBeenCalled()
     expect(setActivePinia).toHaveBeenCalled()
-    expect(setupConnectivity).toHaveBeenCalledWith({ autoReloadOnReconnect: true })
+    expect(setupConnectivity).toHaveBeenCalled()
     expect(msw.worker.start).toHaveBeenCalled()
 
     const appInstance = (createApp as any).mock.results[0].value

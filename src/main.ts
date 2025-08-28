@@ -19,8 +19,8 @@ async function bootstrap() {
   app.use(pinia)
   // Ensure Pinia is active for composables used outside components
   setActivePinia(pinia)
-  // Initialize connectivity monitoring (updates status store and auto-reloads on reconnect)
-  setupConnectivity({ autoReloadOnReconnect: true })
+  // Initialize connectivity monitoring (updates status store; no auto-reload)
+  setupConnectivity()
   app.mount('#app')
 }
 
