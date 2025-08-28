@@ -1,11 +1,10 @@
 import { openDB, type IDBPDatabase } from 'idb'
+import { DB_NAME, DB_VERSION, STORE_GRID, STORE_META, STORE_USERS } from '@/shared/constants/db'
+
+// Re-export for existing import sites within backend
+export { DB_NAME, DB_VERSION, STORE_GRID, STORE_META, STORE_USERS } from '@/shared/constants/db'
 
 // Centralized IndexedDB configuration and opener
-export const DB_NAME = 'nlo-db'
-export const DB_VERSION = 2
-export const STORE_GRID = 'grid'
-export const STORE_META = 'meta'
-export const STORE_USERS = 'users'
 
 let cachedDb: IDBPDatabase | null = null
 

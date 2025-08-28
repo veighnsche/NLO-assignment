@@ -1,9 +1,10 @@
 // Shared client-side representations (mirroring backend schema)
+import type { PrizeAmount } from '@/shared/constants/prizes'
 export type PrizeType = 'none' | 'consolation' | 'grand'
 
 export interface Prize {
   type: PrizeType
-  amount: 0 | 100 | 25000
+  amount: PrizeAmount
 }
 
 export interface Cell {

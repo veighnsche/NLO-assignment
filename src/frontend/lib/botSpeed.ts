@@ -6,10 +6,9 @@ export interface DelayWindow {
   maxMs: number
 }
 
-export const DEFAULT_MIN_MS = 300
-export const DEFAULT_MAX_MS = 1500
-export const MIN_HZ = 0.3
-export const MAX_HZ = 10
+// Centralized constants
+import { MIN_HZ, MAX_HZ } from '@/shared/constants/bot'
+export { DEFAULT_MIN_MS, DEFAULT_MAX_MS, MIN_HZ, MAX_HZ } from '@/shared/constants/bot'
 
 export function clampHz(hz: number, min = MIN_HZ, max = MAX_HZ): number {
   const v = Number(hz)

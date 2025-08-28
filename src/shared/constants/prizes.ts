@@ -10,3 +10,7 @@ export const PRIZES = {
 } as const
 
 export const { CONSOLATION_COUNT, CONSOLATION_AMOUNT, GRAND_COUNT, GRAND_AMOUNT } = PRIZES
+
+// Keep prize amounts as a compile-time derived union
+export const PRIZE_AMOUNTS = [0, PRIZES.CONSOLATION_AMOUNT, PRIZES.GRAND_AMOUNT] as const
+export type PrizeAmount = (typeof PRIZE_AMOUNTS)[number]

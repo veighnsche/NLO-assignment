@@ -6,6 +6,8 @@ import type { RevealResult } from '@/frontend/types/api'
 import { useGridHoverTooltip } from '@/frontend/features/game/composables/useGridHoverTooltip'
 import { useStatusStore } from '@/frontend/features/game/store/status'
 import { useSessionStore } from '@/frontend/features/game/store/session'
+import { CONSOLATION_AMOUNT, GRAND_AMOUNT } from '@/shared/constants/prizes'
+import { GRID_ROWS, GRID_COLS } from '@/shared/constants/grid'
 
 // Encapsulated grid logic via composable
 const {
@@ -22,7 +24,7 @@ const {
   exposedPrizeType,
   isCellDisabled,
   ariaLabelForCell,
-} = useGridCells(100, 100)
+} = useGridCells(GRID_ROWS, GRID_COLS)
 
 const status = useStatusStore()
 const session = useSessionStore()
@@ -49,8 +51,8 @@ async function performReveal(id: string): Promise<RevealResult> {
   await grid.reveal(id)
   const entry = grid.revealed.find((c) => c.id === id)
   const t = entry?.prize?.type
-  if (t === 'grand') return { type: 'grand' as const, amount: 25000 }
-  if (t === 'consolation') return { type: 'consolation' as const, amount: 100 }
+  if (t === 'grand') return { type: 'grand' as const, amount: GRAND_AMOUNT }
+  if (t === 'consolation') return { type: 'consolation' as const, amount: CONSOLATION_AMOUNT }
   return { type: 'none' as const, amount: 0 }
 }
 

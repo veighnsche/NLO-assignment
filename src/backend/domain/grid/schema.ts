@@ -4,9 +4,11 @@ export type CellId = string // format: r{row}-c{col}
 
 export type PrizeType = 'none' | 'consolation' | 'grand'
 
+import type { PrizeAmount } from '@/shared/constants/prizes'
+
 export interface Prize {
   type: PrizeType
-  amount: 0 | 100 | 25000
+  amount: PrizeAmount
 }
 
 export interface Cell {
@@ -49,9 +51,8 @@ export interface GridState {
   meta: GridMeta
 }
 
-export const GRID_ROWS = 100
-export const GRID_COLS = 100
-export const GRID_TOTAL = GRID_ROWS * GRID_COLS // 10_000
+// Centralized grid constants
+export { GRID_ROWS, GRID_COLS, GRID_TOTAL } from '@/shared/constants/grid'
 
 export function cellId(row: number, col: number): CellId {
   return `r${row}-c${col}`
@@ -61,6 +62,9 @@ export function makeEtag(version: number): string {
   return `v-${version}`
 }
 
+// Use shared prize amounts to avoid drift
+import { CONSOLATION_AMOUNT, GRAND_AMOUNT } from '@/shared/constants/prizes'
+
 export const PrizeNone: Prize = { type: 'none', amount: 0 }
-export const PrizeConsolation: Prize = { type: 'consolation', amount: 100 }
-export const PrizeGrand: Prize = { type: 'grand', amount: 25000 }
+export const PrizeConsolation: Prize = { type: 'consolation', amount: CONSOLATION_AMOUNT }
+export const PrizeGrand: Prize = { type: 'grand', amount: GRAND_AMOUNT }
