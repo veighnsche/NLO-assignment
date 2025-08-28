@@ -19,11 +19,11 @@ export function useAdminControls() {
 
   async function reset(seed?: number): Promise<void> {
     await apiAdminReset(seed)
-    // Explicitly clear any active player on the server
+    // Explicitly clear any active player on the server (best-effort)
     try {
       await apiAdminSetCurrentPlayer(null)
     } catch {
-      // ignore in dev
+      // ignore optional failure; not critical for reset completion
     }
     // Clear any admin-exposed overlay so it doesn't show stale targets after reseed
     exposed.clearTargets()
@@ -35,11 +35,7 @@ export function useAdminControls() {
     minMs: number
     maxMs: number
   }): Promise<void> {
-    try {
-      await apiAdminSetBotDelay(payload.minMs, payload.maxMs)
-    } catch {
-      // ignore in dev
-    }
+    await apiAdminSetBotDelay(payload.minMs, payload.maxMs)
     bot.setPollingInterval(payload.intervalMs)
   }
 
@@ -60,13 +56,11 @@ export function useAdminControls() {
   }
 
   async function pickRandomPlayer(): Promise<void> {
-    try {
-      const res = await apiAdminPickRandomPlayer()
-      if ('ok' in res && res.ok) {
-        await session.refreshCurrentPlayer()
-      }
-    } catch {
-      // ignore in dev
+    const res = await apiAdminPickRandomPlayer()
+    if ('ok' in res && res.ok) {
+      await session.refreshCurrentPlayer()
+    } else {
+      throw new Error('Kon geen speler kiezen')
     }
   }
 

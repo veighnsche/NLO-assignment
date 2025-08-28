@@ -8,6 +8,7 @@ import GameSection from '@/frontend/features/game/components/GameSection.vue'
 import InitScreen from '@/frontend/features/game/components/InitScreen.vue'
 import { useGridStore } from '@/frontend/features/game/store/grid'
 import { useInitApp } from '@/frontend/features/game/composables/useInitApp'
+import ToastContainer from '@/frontend/ui/ToastContainer.vue'
 
 const showAdminBar = ref(true)
 const grid = useGridStore()
@@ -25,6 +26,7 @@ const { isInitializing } = useInitApp(grid)
     </div>
   </template>
   <AdminBar v-if="showAdminBar" @toggle="showAdminBar = false" />
+  <ToastContainer />
 </template>
 
 <style scoped>

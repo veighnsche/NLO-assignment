@@ -9,7 +9,7 @@
       <div class="section left">
         <span class="label">Actieve speler:</span>
         <span class="value">{{ session.activePlayerName || '—' }}</span>
-        <Button @click="pickRandomPlayer">Verander van speler</Button>
+        <Button @click="pickRandomPlayerSafe">Verander van speler</Button>
       </div>
 
       <div class="section center">
@@ -73,6 +73,7 @@ import { useAdminControls } from '@/frontend/features/admin/useAdminControls'
 import { useAdminUiStore } from '@/frontend/features/admin/store/adminUI'
 import { useSessionStore } from '@/frontend/features/game/store/session'
 import { useStatusStore } from '@/frontend/features/game/store/status'
+import { useToastStore } from '@/frontend/ui/toast.store'
 import {
   hzToIntervalMs,
   intervalWindow,
@@ -92,6 +93,7 @@ const { reset: adminReset, setBotSpeed, getBotDelay, pickRandomPlayer } = useAdm
 const admin = useAdminUiStore()
 const session = useSessionStore()
 const status = useStatusStore()
+const toast = useToastStore()
 
 defineEmits<{ (e: 'toggle'): void }>()
 
@@ -101,10 +103,15 @@ function closeModal() {
 
 async function confirmReset() {
   const raw = seed.value
-  await adminReset(typeof raw === 'number' && !Number.isNaN(raw) ? raw : undefined)
-  showModal.value = false
-  // Refresh the current player display after a reset
-  await session.refreshCurrentPlayer()
+  try {
+    await adminReset(typeof raw === 'number' && !Number.isNaN(raw) ? raw : undefined)
+    showModal.value = false
+    // Refresh the current player display after a reset
+    await session.refreshCurrentPlayer()
+    toast.success('Spel gereset')
+  } catch {
+    toast.error('Reset mislukt')
+  }
 }
 
 // --- Change active player (admin) ---
@@ -115,8 +122,13 @@ function scheduleSetSpeed() {
     const speed = clampHz(Number(botSpeedHz.value) || 1)
     const interval = hzToIntervalMs(speed)
     const { minMs, maxMs } = intervalWindow(interval)
-    await setBotSpeed({ intervalMs: interval, minMs, maxMs })
-    speedTimer = null
+    try {
+      await setBotSpeed({ intervalMs: interval, minMs, maxMs })
+    } catch {
+      toast.error('Bijwerken botsnelheid mislukt')
+    } finally {
+      speedTimer = null
+    }
   }, 250)
 }
 
@@ -137,7 +149,12 @@ async function resetBotSpeed() {
   // Update slider (Hz) from ms
   const speed = intervalToHz(avg)
   botSpeedHz.value = clampHz(speed)
-  await setBotSpeed({ intervalMs: avg, minMs: defaultMin, maxMs: defaultMax })
+  try {
+    await setBotSpeed({ intervalMs: avg, minMs: defaultMin, maxMs: defaultMax })
+    toast.success('Botsnelheid hersteld')
+  } catch {
+    toast.error('Herstellen botsnelheid mislukt')
+  }
 }
 
 onMounted(async () => {
@@ -148,9 +165,14 @@ onMounted(async () => {
     const speed = clampHz(intervalToHz(avg))
     botSpeedHz.value = speed
     // Align frontend polling interval with backend range
-    await setBotSpeed({ intervalMs: hzToIntervalMs(speed), minMs, maxMs })
+    try {
+      await setBotSpeed({ intervalMs: hzToIntervalMs(speed), minMs, maxMs })
+    } catch {
+      // If aligning interval fails, surface but continue
+      toast.error('Synchroniseren botsnelheid mislukt')
+    }
   } catch {
-    // ignore fetch errors in dev
+    toast.error('Ophalen botsnelheid mislukt')
   }
   // Fetch current player name after boot completes (avoid early calls during init)
   if (!status.isBooting) {
@@ -168,6 +190,16 @@ onMounted(async () => {
     )
   }
 })
+
+// Wrap pickRandomPlayer to surface errors via toast
+async function pickRandomPlayerSafe() {
+  try {
+    await pickRandomPlayer()
+    toast.success('Nieuwe speler geselecteerd')
+  } catch {
+    toast.error('Geen speler kunnen selecteren')
+  }
+}
 </script>
 
 <style scoped>
