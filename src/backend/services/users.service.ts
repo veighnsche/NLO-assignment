@@ -3,7 +3,6 @@ import { mixSeedWithString } from '../domain/shared/rng'
 import type { User } from '../domain/users/model'
 import { bumpVersion, persistMeta } from '../infra/meta'
 
-// bumpVersion provided by infra/meta.ts
 
 export async function pickRandomEligibleUser(): Promise<
   { ok: true; playerId: string } | { error: 'NO_ELIGIBLE' }
@@ -25,8 +24,6 @@ export async function pickRandomEligibleUser(): Promise<
   await persistMeta()
   return { ok: true, playerId: chosen.id }
 }
-
-// persistMeta provided by infra/meta.ts
 
 export function getCurrentPlayer(): { currentPlayerId?: string } {
   const memory = getMemory()

@@ -93,8 +93,6 @@ const admin = useAdminUiStore()
 const session = useSessionStore()
 const status = useStatusStore()
 
-// Current player display is provided by session store (activePlayerName)
-
 defineEmits<{ (e: 'toggle'): void }>()
 
 function closeModal() {
@@ -355,7 +353,6 @@ onMounted(async () => {
 }
 
 /* Icon button */
-/* Icon button now uses UiButton's icon mode */
 
 .subtext {
   margin: 0 0 12px;
@@ -381,6 +378,4 @@ onMounted(async () => {
   border-color: #7aa7ff;
   box-shadow: 0 0 0 3px rgba(100, 150, 255, 0.2);
 }
-
-/* Modal actions now provided by Modal.vue footer styling */
 </style>
