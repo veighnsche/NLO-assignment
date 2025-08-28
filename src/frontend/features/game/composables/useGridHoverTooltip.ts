@@ -3,7 +3,7 @@ import type { GridTooltipApi } from '@/frontend/features/game/composables/useGri
 import type { Cell } from '@/frontend/types/api'
 
 export type UseGridHoverArgs = {
-  tooltip: GridTooltipApi | null
+  getTooltip: () => GridTooltipApi | null
   getRow: (i: number) => number
   getCol: (i: number) => number
   cellIdFromIndex: (i: number) => string
@@ -12,7 +12,7 @@ export type UseGridHoverArgs = {
 }
 
 export function useGridHoverTooltip({
-  tooltip,
+  getTooltip,
   getRow,
   getCol,
   cellIdFromIndex,
@@ -34,24 +34,24 @@ export function useGridHoverTooltip({
     schedule(() => {
       const target = (e.target as HTMLElement).closest('button.cell') as HTMLElement | null
       if (!target) {
-        tooltip?.leave()
+        getTooltip()?.leave()
         lastIdx.value = null
         return
       }
       const idxAttr = target.getAttribute('data-index')
       if (idxAttr == null) {
-        tooltip?.leave()
+        getTooltip()?.leave()
         lastIdx.value = null
         return
       }
       const idx = Number(idxAttr)
       if (Number.isNaN(idx)) {
-        tooltip?.leave()
+        getTooltip()?.leave()
         lastIdx.value = null
         return
       }
       if (lastIdx.value === idx) {
-        tooltip?.move(e.clientX, e.clientY)
+        getTooltip()?.move(e.clientX, e.clientY)
         return
       }
       lastIdx.value = idx
@@ -59,7 +59,7 @@ export function useGridHoverTooltip({
       const id = cellIdFromIndex(idx)
       const cell = revealedById.value.get(id)
       const openerName = userNameById(cell?.revealedBy) || cell?.revealedBy || null
-      tooltip?.hover({
+      getTooltip()?.hover({
         text,
         x: e.clientX,
         y: e.clientY,
@@ -73,7 +73,7 @@ export function useGridHoverTooltip({
   }
 
   function onGridLeave() {
-    tooltip?.leave()
+    getTooltip()?.leave()
     lastIdx.value = null
   }
 

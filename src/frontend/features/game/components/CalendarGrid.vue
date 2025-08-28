@@ -33,7 +33,8 @@ const session = useSessionStore()
 const props = withDefaults(
   defineProps<{
     confirmBeforeReveal?: boolean
-    tooltip?: GridTooltipApi | null
+    // Can be the actual API or a Ref to it (as passed from parent via template ref)
+    tooltip?: GridTooltipApi | null | { value: GridTooltipApi | null }
   }>(),
   {
     confirmBeforeReveal: true,
@@ -68,9 +69,20 @@ async function onReveal(i: number) {
   await grid.reveal(cellIdFromIndex(i))
 }
 
-// Tooltip control comes from parent via prop (available on props.tooltip)
+// Resolve tooltip whether passed as instance or ref
+function resolveTooltip(): GridTooltipApi | null {
+  const anyT = props.tooltip as unknown as
+    | GridTooltipApi
+    | null
+    | { value: GridTooltipApi | null }
+    | undefined
+  if (anyT && typeof anyT === 'object' && 'value' in anyT) return anyT.value ?? null
+  return (anyT as GridTooltipApi | null | undefined) ?? null
+}
+
+// Tooltip control comes from parent via getter to avoid capturing null before mount
 const { onGridMove, onGridLeave } = useGridHoverTooltip({
-  tooltip: props.tooltip ?? null,
+  getTooltip: () => resolveTooltip(),
   getRow,
   getCol,
   cellIdFromIndex,
