@@ -19,7 +19,7 @@ describe('services/users.service', () => {
 
   beforeEach(async () => {
     // Reset deterministic state and users each test
-    await adminReset('hard', SEED)
+    await adminReset(SEED)
   })
 
   it('pickRandomEligibleUser selects a player and sets currentPlayerId', async () => {

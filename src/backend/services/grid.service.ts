@@ -185,11 +185,8 @@ export async function revealCell(
   return { ok: true, cell, meta: memory!.meta }
 }
 
-export async function adminReset(
-  mode: 'soft' | 'hard',
-  seed?: number,
-): Promise<{ ok: true; meta: GridMeta }> {
-  // Both soft and hard perform a full reseed for this assignment
+export async function adminReset(seed?: number): Promise<{ ok: true; meta: GridMeta }> {
+  // Reset performs a full reseed
   const { state, targets: t } = seedGrid(GRID_ROWS, GRID_COLS, seed)
   setMemory(state)
   setTargetsRef(t)

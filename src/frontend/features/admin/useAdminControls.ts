@@ -18,7 +18,7 @@ export function useAdminControls() {
   const session = useSessionStore()
 
   async function reset(seed?: number): Promise<void> {
-    await apiAdminReset('hard', seed)
+    await apiAdminReset(seed)
     // Explicitly clear any active player on the server
     try {
       await apiAdminSetCurrentPlayer(null)

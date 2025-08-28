@@ -26,7 +26,7 @@ async function get(path: string, init?: RequestInit) {
 describe('api.handlers (MSW integration)', () => {
   beforeEach(async () => {
     // reset DB between tests
-    await post('/api/admin/reset', { mode: 'hard', seed: 1234 })
+    await post('/api/admin/reset', { seed: 1234 })
   })
 
   it('POST /api/boot initializes DB (idempotent)', async () => {
@@ -109,7 +109,7 @@ describe('api.handlers (MSW integration)', () => {
   })
 
   it('POST /api/admin/reset returns ok and meta', async () => {
-    const r = await post('/api/admin/reset', { mode: 'hard', seed: 777 })
+    const r = await post('/api/admin/reset', { seed: 777 })
     expect(r.status).toBe(200)
     const j = await r.json()
     expect(j).toHaveProperty('ok', true)
@@ -118,7 +118,7 @@ describe('api.handlers (MSW integration)', () => {
     expect(j.meta).toHaveProperty('etag')
   })
 
-  it('POST /api/admin/reset tolerates invalid JSON body (defaults mode to hard)', async () => {
+  it('POST /api/admin/reset tolerates invalid JSON body', async () => {
     const r = await rawPost('/api/admin/reset', '{ nope')
     expect(r.status).toBe(200)
     const j = await r.json()
@@ -243,7 +243,7 @@ describe('api.handlers (MSW integration)', () => {
   })
 
   it('POST /api/reveal maps ALREADY_REVEALED, NOT_ELIGIBLE and ALREADY_PLAYED to proper statuses', async () => {
-    await post('/api/admin/reset', { mode: 'hard', seed: 4242 })
+    await post('/api/admin/reset', { seed: 4242 })
     // First reveal a cell (no player attribution), then reveal again => 409
     let r = await post('/api/reveal', { id: 'r0-c0' })
     expect(r.status).toBe(200)

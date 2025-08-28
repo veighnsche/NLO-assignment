@@ -20,7 +20,7 @@ describe('services/grid.service', () => {
   })
 
   beforeEach(async () => {
-    await adminReset('hard', SEED)
+    await adminReset(SEED)
   })
 
   it('getSnapshotForClient returns counts and revealed filter; openedCount maintained', async () => {
@@ -128,7 +128,7 @@ describe('services/grid.service', () => {
 
   it('bootDatabase backfills users when grid/meta exist but users missing in DB', async () => {
     // Ensure DB has grid/meta from reset
-    await adminReset('hard', SEED)
+    await adminReset(SEED)
     // Remove users from IDB to simulate older DB
     const db = await openDatabase()
     const tx = db.transaction([STORE_USERS], 'readwrite')
@@ -145,7 +145,7 @@ describe('services/grid.service', () => {
   })
 
   it('bootDatabase backfills revealOrder/revealIndex when missing in stored meta', async () => {
-    await adminReset('hard', SEED)
+    await adminReset(SEED)
     const mem = getMemory()!
     const legacyMeta: Record<string, unknown> = {
       ...(mem.meta as unknown as Record<string, unknown>),
@@ -166,7 +166,7 @@ describe('services/grid.service', () => {
   })
 
   it('botStep reseeds revealOrder when missing in memory', async () => {
-    await adminReset('hard', SEED)
+    await adminReset(SEED)
     const mem = getMemory()!
     // Simulate missing fields in-memory
     delete (mem.meta as unknown as Record<string, unknown>).revealOrder
@@ -179,7 +179,7 @@ describe('services/grid.service', () => {
   })
 
   it('botStep returns done=true when no id left to reveal', async () => {
-    await adminReset('hard', SEED)
+    await adminReset(SEED)
     const mem = getMemory()!
     const order = mem.meta.revealOrder!
     mem.meta.revealIndex = order.length
@@ -190,7 +190,7 @@ describe('services/grid.service', () => {
   })
 
   it('botStep skips already-revealed cells and continues', async () => {
-    await adminReset('hard', SEED)
+    await adminReset(SEED)
     const mem = getMemory()!
     const order2 = mem.meta.revealOrder!
     const targetId = order2[0]

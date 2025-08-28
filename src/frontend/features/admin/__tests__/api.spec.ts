@@ -21,12 +21,12 @@ afterEach(() => {
 })
 
 describe('admin api wrappers', () => {
-  it('apiAdminReset posts mode and seed', async () => {
+  it('apiAdminReset posts seed', async () => {
     ;(jsonFetch as any).mockResolvedValueOnce({ ok: true })
-    await apiAdminReset('hard', 123)
+    await apiAdminReset(123)
     expect(jsonFetch).toHaveBeenCalledWith('/api/admin/reset', {
       method: 'POST',
-      body: JSON.stringify({ mode: 'hard', seed: 123 }),
+      body: JSON.stringify({ seed: 123 }),
     })
   })
 

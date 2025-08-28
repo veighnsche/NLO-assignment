@@ -222,7 +222,7 @@ Core:
 
 Admin:
 
-- `POST /api/admin/reset` — Reset state; optional `{ mode: 'soft'|'hard', seed }`.
+- `POST /api/admin/reset` — Reset state; optional `{ seed }`.
 - `POST /api/admin/bot-delay` — Set bot delay range `{ minMs, maxMs }`.
 - `GET /api/admin/bot-delay` — Get current bot delay range.
 - `GET /api/admin/targets` — Reveal hidden target cells (grand + consolation) for admin.

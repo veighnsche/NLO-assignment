@@ -1,13 +1,10 @@
 import { jsonFetch } from '@/frontend/lib/http'
 import type { AdminResetResponse } from '@/frontend/types/api'
 
-export async function apiAdminReset(
-  mode: 'soft' | 'hard',
-  seed?: number,
-): Promise<AdminResetResponse> {
+export async function apiAdminReset(seed?: number): Promise<AdminResetResponse> {
   return jsonFetch<AdminResetResponse>('/api/admin/reset', {
     method: 'POST',
-    body: JSON.stringify({ mode, seed }),
+    body: JSON.stringify({ seed }),
   })
 }
 

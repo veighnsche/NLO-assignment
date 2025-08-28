@@ -122,9 +122,8 @@ export const handlers = [
 
   http.post('/api/admin/reset', async ({ request }) => {
     try {
-      const body = await safeJson<{ mode?: 'soft' | 'hard'; seed?: number }>(request, {})
-      const mode = body.mode ?? 'hard'
-      const res = await adminReset(mode, typeof body?.seed === 'number' ? body.seed : undefined)
+      const body = await safeJson<{ seed?: number }>(request, {})
+      const res = await adminReset(typeof body?.seed === 'number' ? body.seed : undefined)
       return HttpResponse.json(res)
     } catch (err) {
       return HttpResponse.json({ error: String(err) }, { status: 500 })
