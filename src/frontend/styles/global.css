@@ -1,3 +1,4 @@
+@import './breakpoints.css';
 @import './theme.css';
 @import './design-system.css';
 /* Global resets to ensure no gap around the viewport */

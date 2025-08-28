@@ -1,0 +1,37 @@
+/*
+  Centralized responsive tokens & helpers
+  --------------------------------------------------
+  - Define canonical breakpoints and semantic layout vars
+  - Components should consume variables (inheritance) instead of redefining @media
+*/
+
+:root {
+  /* Canonical breakpoints (documentation; not directly usable in @media via var()) */
+  --bp-xs: 360px;
+  --bp-sm: 480px;
+  --bp-md: 768px;
+  --bp-lg: 900px;
+  --bp-xl: 1200px;
+
+  /* Header layout tokens */
+  --header-topbar-direction: column; /* stacks by default */
+  --header-topbar-justify: flex-start;
+  --header-topbar-align: flex-start;
+  --header-prize-cols: 1; /* 1 column by default */
+}
+
+/* Small and up */
+@media (min-width: 480px) {
+  :root {
+    --header-prize-cols: 2;
+  }
+}
+
+/* Large and up */
+@media (min-width: 900px) {
+  :root {
+    --header-topbar-direction: row;
+    --header-topbar-justify: space-between;
+    --header-topbar-align: center;
+  }
+}

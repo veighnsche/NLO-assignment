@@ -27,13 +27,15 @@ const playerName = computed(() => session.activePlayerName)
       <h2 v-if="props.title" class="overline">{{ props.title }}</h2>
 
       <!-- Spectacular greeting -->
-      <div class="greeting spectacular" aria-live="polite">
-        <span class="hi">Hallo</span>
-        <span class="name">{{ playerName || '—' }}</span>
-      </div>
+      <div class="topbar-row">
+        <div class="greeting spectacular" aria-live="polite">
+          <span class="hi">Hallo</span>
+          <span class="name">{{ playerName || '—' }}</span>
+        </div>
 
-      <!-- Single-source Play State Banner remains -->
-      <PlayStateBanner />
+        <!-- Single-source Play State Banner remains -->
+        <PlayStateBanner />
+      </div>
 
       <!-- Prize highlights -->
       <div class="prize-strip" role="group" aria-label="Te winnen prijzen">
@@ -91,6 +93,17 @@ const playerName = computed(() => session.activePlayerName)
   flex-wrap: wrap;
   text-shadow: 0 1px 0 rgba(255,255,255,0.35);
 }
+.topbar-row {
+  display: flex;
+  flex-direction: var(--header-topbar-direction);
+  align-items: var(--header-topbar-align);
+  justify-content: var(--header-topbar-justify);
+  gap: 10px;
+  margin: 0.5rem 0 1rem 0;
+}
+.topbar-row :where(.state-banner) {
+  margin: 0; /* remove extra space when inside the row */
+}
 .greeting .hi {
   color: var(--color-accent-gold);
   font-size: 1.35em; /* scale Hallo up */
@@ -104,7 +117,7 @@ const playerName = computed(() => session.activePlayerName)
 /* Prize strip */
 .prize-strip {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(var(--header-prize-cols), minmax(0, 1fr));
   gap: 14px;
   margin: 0.75rem 0 1.25rem 0;
 }
@@ -118,6 +131,7 @@ const playerName = computed(() => session.activePlayerName)
     gap: 10px;
     margin: 1rem 0 1.25rem 0;
   }
+  /* layout direction/align is controlled by CSS variables in breakpoints.css */
   .greeting .hi {
     font-size: 1.5em; /* larger Hallo on wide screens */
   }
