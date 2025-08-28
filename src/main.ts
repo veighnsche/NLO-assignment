@@ -1,7 +1,7 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import App from './frontend/App.vue'
-import './frontend/styles/global.css'
+import './frontend/styles/index.css'
 
 async function prepareMocks() {
   if (import.meta.env.DEV) {

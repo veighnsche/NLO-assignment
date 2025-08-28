@@ -1,0 +1,40 @@
+/* Minimal utilities built on tokens; keep scope tight to avoid sprawl */
+
+/* Display */
+.flex { display: flex; }
+.inline-flex { display: inline-flex; }
+.grid { display: grid; }
+
+/* Flex alignment */
+.items-center { align-items: center; }
+.items-start { align-items: flex-start; }
+.items-end { align-items: flex-end; }
+.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between; }
+.justify-start { justify-content: flex-start; }
+.justify-end { justify-content: flex-end; }
+.flex-col { flex-direction: column; }
+.flex-row { flex-direction: row; }
+.flex-wrap { flex-wrap: wrap; }
+
+/* Place utilities (grid/flex) */
+.place-center { place-items: center; place-content: center; }
+
+/* Gap scale (token-friendly defaults) */
+/* You can override these by setting --u-gap on a container */
+.gap-4 { gap: 4px; }
+.gap-8 { gap: 8px; }
+.gap-12 { gap: 12px; }
+.gap-16 { gap: 16px; }
+.gap-20 { gap: 20px; }
+.gap-24 { gap: 24px; }
+
+/* Grid helpers */
+.grid-center { justify-items: center; align-items: center; }
+.grid-auto-cards { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+
+/* Width helpers */
+.w-full { width: 100%; }
+
+/* Container padding override via tokens if needed */
+.pad-inline-gutter { padding-inline: var(--container-gutter, 24px); }

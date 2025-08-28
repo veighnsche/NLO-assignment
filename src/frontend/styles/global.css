@@ -1,7 +1,3 @@
-@import './breakpoints.css';
-@import './theme.css';
-@import './design-system.css';
-@import './layout.css';
 /* Global resets to ensure no gap around the viewport */
 html,
 body {
