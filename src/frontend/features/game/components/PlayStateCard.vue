@@ -47,6 +47,18 @@ const label = computed(() => {
 })
 
 const resolvedMediaAspect = computed(() => props.mediaAspect ?? '16/9')
+
+// Map each state to a public asset. Place these files in /public
+// /playstate-can-open.png, /playstate-lost.png, /playstate-consolation.png, /playstate-grand.png
+const imageMap = computed(() => ({
+  'can-open': '/playstate-can-open.png',
+  lost: '/playstate-lost.png',
+  consolation: '/playstate-consolation.png',
+  grand: '/playstate-grand.png',
+}))
+
+// Allow explicit override via backgroundImage prop; otherwise use the per-state image
+const mediaUrl = computed(() => props.backgroundImage ?? imageMap.value[state.value as keyof typeof imageMap.value])
 </script>
 
 <template>
@@ -56,6 +68,9 @@ const resolvedMediaAspect = computed(() => props.mediaAspect ?? '16/9')
       aria-hidden="true"
       :style="{
         aspectRatio: String(resolvedMediaAspect),
+        backgroundImage: mediaUrl ? `url(${mediaUrl})` : undefined,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
       }"
     >
       <!-- Simple icon-centered visual by state; could be replaced with an image -->
