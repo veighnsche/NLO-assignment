@@ -2,9 +2,14 @@
 defineOptions({ name: 'AppHeader' })
 import { computed } from 'vue'
 import { useSessionStore } from '@/frontend/features/game/store/session'
-import PrizeBadge from '@/frontend/ui/PrizeBadge.vue'
+import PrizeCard from '@/frontend/ui/PrizeCard.vue'
 import PlayStateBanner from '@/frontend/features/game/components/PlayStateBanner.vue'
-import { CONSOLATION_COUNT, CONSOLATION_AMOUNT, GRAND_COUNT, GRAND_AMOUNT } from '@/shared/constants/prizes'
+import {
+  CONSOLATION_COUNT,
+  CONSOLATION_AMOUNT,
+  GRAND_COUNT,
+  GRAND_AMOUNT,
+} from '@/shared/constants/prizes'
 
 const props = defineProps<{
   title?: string
@@ -14,7 +19,6 @@ const session = useSessionStore()
 
 // Active player name (admin-selected or assigned)
 const playerName = computed(() => session.activePlayerName)
-
 
 // Prize model is centralized in '@/shared/constants/prizes'
 
@@ -39,14 +43,14 @@ const playerName = computed(() => session.activePlayerName)
 
       <!-- Prize highlights -->
       <div class="prize-strip" role="group" aria-label="Te winnen prijzen">
-        <PrizeBadge
+        <PrizeCard
           variant="consolation"
           :count="CONSOLATION_COUNT"
           :amount="CONSOLATION_AMOUNT"
           label="troostprijs"
           aria-label="Honderd troostprijzen van 100 euro"
         />
-        <PrizeBadge
+        <PrizeCard
           variant="grand"
           :count="GRAND_COUNT"
           :amount="GRAND_AMOUNT"
@@ -91,7 +95,7 @@ const playerName = computed(() => session.activePlayerName)
   align-items: flex-start;
   gap: var(--greeting-gap);
   flex-wrap: wrap;
-  text-shadow: 0 1px 0 rgba(255,255,255,0.35);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.35);
 }
 .topbar-row {
   display: flex;
@@ -117,7 +121,9 @@ const playerName = computed(() => session.activePlayerName)
 /* Prize strip */
 .prize-strip {
   display: grid;
-  grid-template-columns: repeat(var(--header-prize-cols), minmax(0, 1fr));
+  grid-template-columns: auto auto;
+  justify-content: center;
+  align-items: start;
   gap: var(--prize-strip-gap);
   margin: var(--prize-strip-margin);
 }
