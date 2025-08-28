@@ -125,6 +125,15 @@ const mediaUrl = computed(() => props.backgroundImage ?? imageMap.value[state.va
   font-weight: var(--font-weight-bold);
   font-size: clamp(18px, 2.4vw, 26px);
   line-height: 1.2;
+  /* Fix height for exactly two lines to prevent layout jump */
+  height: 2.4em; /* 2 lines * 1.2 line-height */
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  /* Fallbacks */
+  line-clamp: 2;
+  word-break: break-word;
 }
 
 /* State palettes */
