@@ -95,11 +95,6 @@ export const useGridStore = defineStore('grid', {
       return this.revealed.some((c) => c.revealedBy === pid)
     },
 
-    // Kept for compatibility; no longer used to set truth
-    markUserRevealed() {
-      /* no-op: backend/state is source of truth */
-    },
-
     async reveal(id: string, playerId?: string) {
       const status = useStatusStore()
       const session = useSessionStore()
