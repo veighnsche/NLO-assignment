@@ -1,6 +1,6 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <template>
-  <label class="slider">
+  <label class="slider inline-flex items-center gap-8">
     <span v-if="label" class="label">{{ label }}</span>
     <input
       type="range"
@@ -71,9 +71,6 @@ const ariaLabel = computed(() => (props.label ? props.label : 'Slider'))
 
 <style scoped>
 .slider {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
   white-space: nowrap; /* keep label, input, and value in one line */
 }
 
@@ -82,7 +79,7 @@ input[type='range'] {
 }
 
 .label {
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
 }
 
 .value {

@@ -163,6 +163,14 @@
   --modal-shadow: var(--shadow-lg);
   --overlay-bg: var(--overlay-scrim);
 
+  /* Tooltip */
+  --tooltip-bg: rgba(17, 17, 17, 0.95);
+  --tooltip-text: var(--color-text-on-dark);
+  --tooltip-radius: var(--radius-sm);
+  --tooltip-shadow: var(--shadow-md);
+  --tooltip-padding: 8px 10px;
+  --tooltip-font-size: 12px;
+
   /* Links and accents */
   --link-color: var(--color-primary-green);
   --link-hover-underline-color: var(--color-accent-gold); /* gold hover underline only */

@@ -84,15 +84,13 @@ const placementClass = computed(() => `tt-${props.placement}`)
 
 /* Base look */
 .tooltip {
-  background: rgba(17, 17, 17, 0.95);
-  color: #fff;
-  border-radius: 6px;
-  padding: 8px 10px;
-  font-size: 12px;
+  background: var(--tooltip-bg);
+  color: var(--tooltip-text);
+  border-radius: var(--tooltip-radius);
+  padding: var(--tooltip-padding);
+  font-size: var(--tooltip-font-size);
   line-height: 1.2;
-  box-shadow:
-    0 6px 24px rgba(0, 0, 0, 0.18),
-    0 2px 8px rgba(0, 0, 0, 0.12);
+  box-shadow: var(--tooltip-shadow);
 }
 
 /* Arrow */

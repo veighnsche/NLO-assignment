@@ -1,6 +1,6 @@
 <template>
   <teleport to="body">
-    <div v-if="modelValue" class="modal-overlay" @click.self="onOverlayClick">
+    <div v-if="modelValue" class="modal-overlay flex items-center justify-center" @click.self="onOverlayClick">
       <div
         ref="dialogRef"
         class="modal"
@@ -12,7 +12,7 @@
         @keydown.tab.prevent="onTabKey"
       >
         <slot />
-        <div v-if="$slots.footer" class="modal-footer">
+        <div v-if="$slots.footer" class="modal-footer flex gap-8 justify-end">
           <slot name="footer" />
         </div>
       </div>
@@ -132,28 +132,22 @@ onBeforeUnmount(() => {
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  background: var(--overlay-bg);
   z-index: 2000;
   padding: 16px;
 }
 
 .modal {
-  background: #fff;
-  color: #222;
+  background: var(--modal-bg);
+  color: var(--modal-text);
   width: min(520px, 100%);
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  border-radius: var(--modal-radius);
+  box-shadow: var(--modal-shadow);
   padding: 20px;
   outline: none;
 }
 
 .modal-footer {
-  display: flex;
-  gap: 8px;
-  justify-content: flex-end;
   margin-top: 16px;
 }
 </style>

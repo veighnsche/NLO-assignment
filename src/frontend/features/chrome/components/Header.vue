@@ -3,7 +3,7 @@ defineOptions({ name: 'AppHeader' })
 import { computed } from 'vue'
 import { useSessionStore } from '@/frontend/features/game/store/session'
 import PrizeCard from '@/frontend/features/chrome/ui/PrizeCard.vue'
-import PlayStateCard from '@/frontend/features/game/components/PlayStateCard.vue'
+import PlayStateCard from '@/frontend/features/chrome/ui/PlayStateCard.vue'
 import {
   CONSOLATION_COUNT,
   CONSOLATION_AMOUNT,
