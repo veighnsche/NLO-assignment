@@ -65,9 +65,38 @@ const playerName = computed(() => session.activePlayerName)
 
 <style scoped>
 .game-header {
-  background: var(--header-bg);
+  /* Preserve theme color while adding image background */
+  background-color: var(--header-bg);
+  /* Fade out the image towards the bottom using an overlay gradient */
+  background-image:
+    linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0) 60%,
+      var(--bg) 85%,
+      var(--bg) 100%
+    ),
+    url('/header-bg.png');
+  background-repeat: no-repeat, no-repeat;
+  background-size: 100% 100%, cover;
+  background-position: center, center;
   color: var(--header-text);
-  border-bottom: 1px solid var(--header-border);
+  /* Remove hard divider; use a very subtle shadow instead to avoid a harsh seam */
+  border-bottom: none;
+  /* No shadow to avoid an apparent dividing line */
+  box-shadow: none;
+  position: relative;
+}
+
+/* Extend a soft gradient below the header to cross-fade into page bg */
+.game-header::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -24px; /* overlap below header */
+  height: 32px;
+  background: linear-gradient(to bottom, var(--bg) 0%, rgba(255, 255, 255, 0) 100%);
+  pointer-events: none;
 }
 
 .game-header > .container {
