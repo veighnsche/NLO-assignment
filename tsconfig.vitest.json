@@ -4,8 +4,14 @@
   "exclude": [],
   "compilerOptions": {
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.vitest.tsbuildinfo",
-
     "lib": [],
-    "types": ["node", "jsdom"]
+    "types": ["node", "jsdom", "vitest"],
+    "strict": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noImplicitAny": false,
+    "noImplicitThis": false,
+    "useUnknownInCatchVariables": false,
+    "skipLibCheck": true
   }
 }
