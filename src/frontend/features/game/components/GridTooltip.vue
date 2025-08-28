@@ -105,24 +105,24 @@ defineExpose({ hover, move, leave })
 
 /* Color coding */
 .status--open {
-  color: #9be09b;
+  color: color-mix(in srgb, var(--color-primary-green) 55%, white);
 }
 .status--closed {
-  color: #bbbbbb;
+  color: var(--color-silver);
 }
 
 .prize--grand {
-  color: #ffd700;
+  color: color-mix(in srgb, var(--color-accent-gold) 85%, black);
 }
 .prize--consolation {
-  color: #9be09b;
+  color: color-mix(in srgb, var(--color-primary-green) 65%, white);
 }
 .prize--none {
-  color: #bfbfbf;
+  color: color-mix(in srgb, var(--text) 55%, var(--color-silver));
 }
 
 .tt-amount {
-  color: #ffffff;
+  color: var(--text);
   font-weight: 600;
   margin-left: 4px;
 }

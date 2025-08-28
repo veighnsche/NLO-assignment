@@ -135,6 +135,72 @@
 }
 
 /* --------------------------------------------------
+   Player State tokens (can-open, lost, consolation, grand)
+   These are consumed by components like PlayStateBanner and any state badges.
+   Do not use raw hex; only derive from base tokens above.
+   -------------------------------------------------- */
+:root {
+  /* Can open (positive, invitation) */
+  --play-can-open-bg: color-mix(in srgb, var(--color-primary-green) 18%, transparent);
+  --play-can-open-border: color-mix(in srgb, var(--color-primary-green) 55%, var(--border-subtle));
+  --play-can-open-text: var(--text);
+  --play-can-open-shadow: 0 0 0 0 transparent;
+
+  /* Lost (neutral with slight red tint) */
+  --play-lost-bg: color-mix(in srgb, var(--color-primary-red) 10%, transparent);
+  --play-lost-border: color-mix(in srgb, var(--color-primary-red) 45%, var(--border-subtle));
+  --play-lost-text: var(--text);
+  --play-lost-shadow: 0 0 0 0 transparent;
+
+  /* Consolation (green highlight) */
+  --play-consolation-bg: color-mix(in srgb, var(--color-primary-green) 22%, transparent);
+  --play-consolation-border: color-mix(in srgb, var(--color-primary-green) 60%, var(--border-subtle));
+  --play-consolation-text: var(--text);
+  --play-consolation-shadow: 0 0 0 2px color-mix(in srgb, var(--color-primary-green) 25%, transparent);
+
+  /* Grand (gold highlight) */
+  --play-grand-bg: color-mix(in srgb, var(--color-accent-gold) 60%, white);
+  --play-grand-border: color-mix(in srgb, var(--color-accent-gold) 75%, black);
+  --play-grand-text: #111111; /* on gold, use dark text for contrast */
+  --play-grand-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--color-accent-gold) 90%, black),
+    0 6px 18px color-mix(in srgb, var(--color-accent-gold) 25%, transparent);
+}
+
+/* Optional utility classes for quick application (token consumers) */
+.playstate {
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-sm);
+  color: var(--text);
+  background: var(--surface-elevated);
+}
+.playstate--can-open {
+  background: var(--play-can-open-bg);
+  border-color: var(--play-can-open-border);
+  color: var(--play-can-open-text);
+  box-shadow: var(--play-can-open-shadow);
+}
+.playstate--lost {
+  background: var(--play-lost-bg);
+  border-color: var(--play-lost-border);
+  color: var(--play-lost-text);
+  box-shadow: var(--play-lost-shadow);
+}
+.playstate--consolation {
+  background: var(--play-consolation-bg);
+  border-color: var(--play-consolation-border);
+  color: var(--play-consolation-text);
+  box-shadow: var(--play-consolation-shadow);
+}
+.playstate--grand {
+  background: var(--play-grand-bg);
+  border-color: var(--play-grand-border);
+  color: var(--play-grand-text);
+  box-shadow: var(--play-grand-shadow);
+}
+
+/* --------------------------------------------------
    Dark variant overrides
    Usage: add class .theme-dark at a high level (e.g., on <html> or <body>)
    -------------------------------------------------- */
@@ -170,6 +236,25 @@
   --btn-border: color-mix(in srgb, var(--border-subtle) 65%, black);
   --btn-hover-bg: color-mix(in srgb, var(--surface-elevated) 85%, black);
   --btn-disabled-bg: color-mix(in srgb, var(--surface-alt) 60%, black);
+}
+
+/* Player State tokens — dark overrides */
+.theme-dark {
+  --play-can-open-bg: color-mix(in srgb, var(--color-primary-green) 24%, transparent);
+  --play-can-open-border: color-mix(in srgb, var(--color-primary-green) 65%, var(--border-subtle));
+  --play-can-open-text: var(--text);
+
+  --play-lost-bg: color-mix(in srgb, var(--color-primary-red) 16%, transparent);
+  --play-lost-border: color-mix(in srgb, var(--color-primary-red) 55%, var(--border-subtle));
+  --play-lost-text: var(--text);
+
+  --play-consolation-bg: color-mix(in srgb, var(--color-primary-green) 28%, transparent);
+  --play-consolation-border: color-mix(in srgb, var(--color-primary-green) 70%, var(--border-subtle));
+  --play-consolation-text: var(--text);
+
+  --play-grand-bg: color-mix(in srgb, var(--color-accent-gold) 32%, transparent);
+  --play-grand-border: color-mix(in srgb, var(--color-accent-gold) 85%, black);
+  --play-grand-text: #111111;
 }
 
 /* --------------------------------------------------

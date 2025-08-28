@@ -130,13 +130,22 @@ function onCloseResult() {
   border: 1px solid var(--border-subtle);
 }
 
+.result-none {
+  background: var(--play-lost-bg);
+  border-color: var(--play-lost-border);
+  color: var(--play-lost-text);
+}
+
 .result-consolation {
-  border-color: color-mix(in srgb, var(--color-primary-green) 45%, var(--border-subtle));
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-primary-green) 25%, transparent);
+  background: var(--play-consolation-bg);
+  border-color: var(--play-consolation-border);
+  box-shadow: var(--play-consolation-shadow);
 }
 
 .result-grand {
-  border-color: color-mix(in srgb, var(--color-accent-gold) 55%, var(--border-subtle));
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-accent-gold) 28%, transparent);
+  background: var(--play-grand-bg);
+  border-color: var(--play-grand-border);
+  color: var(--play-grand-text);
+  box-shadow: var(--play-grand-shadow);
 }
 </style>
