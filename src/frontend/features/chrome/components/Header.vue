@@ -3,7 +3,7 @@ defineOptions({ name: 'AppHeader' })
 import { computed } from 'vue'
 import { useSessionStore } from '@/frontend/features/game/store/session'
 import PrizeCard from '@/frontend/features/chrome/ui/PrizeCard.vue'
-import PlayStateBanner from '@/frontend/features/game/components/PlayStateBanner.vue'
+import PlayStateCard from '@/frontend/features/game/components/PlayStateCard.vue'
 import {
   CONSOLATION_COUNT,
   CONSOLATION_AMOUNT,
@@ -37,13 +37,10 @@ const playerName = computed(() => session.activePlayerName)
           <span class="name">{{ playerName || '—' }}</span>
           <span class="note" aria-hidden="true">(fictief)</span>
         </div>
-
-        <!-- Single-source Play State Banner remains -->
-        <PlayStateBanner />
       </div>
 
-      <!-- Prize highlights -->
-      <div class="prize-strip" role="group" aria-label="Te winnen prijzen">
+      <!-- Prize highlights with play state centered -->
+      <div class="prize-strip" role="group" aria-label="Te winnen prijzen en speelstatus">
         <PrizeCard
           variant="consolation"
           :count="CONSOLATION_COUNT"
@@ -51,6 +48,9 @@ const playerName = computed(() => session.activePlayerName)
           label="troostprijs"
           aria-label="Honderd troostprijzen van 100 euro"
         />
+
+        <PlayStateCard />
+
         <PrizeCard
           variant="grand"
           :count="GRAND_COUNT"
@@ -106,9 +106,6 @@ const playerName = computed(() => session.activePlayerName)
   gap: 10px;
   margin: 0.5rem 0 1rem 0;
 }
-.topbar-row :where(.state-banner) {
-  margin: 0; /* remove extra space when inside the row */
-}
 .greeting .hi {
   color: var(--color-accent-gold);
   font-size: var(--greeting-hi-scale); /* scale Hallo up via tokens */
@@ -128,9 +125,9 @@ const playerName = computed(() => session.activePlayerName)
 /* Prize strip */
 .prize-strip {
   display: grid;
-  grid-template-columns: auto auto;
+  grid-template-columns: auto auto auto; /* center card larger via its own width */
   justify-content: center;
-  align-items: start;
+  align-items: center; /* vertically center cards to align horizontally */
   gap: var(--prize-strip-gap);
   margin: var(--prize-strip-margin);
 }
