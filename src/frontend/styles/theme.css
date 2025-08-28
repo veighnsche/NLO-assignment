@@ -100,6 +100,7 @@
   --topbar-bg: color-mix(in srgb, var(--color-primary-green) 88%, black);
   --topbar-text: var(--color-text-on-dark);
   --topbar-border: color-mix(in srgb, var(--color-primary-green) 75%, black);
+  --topbar-height: 56px;
 
   /* Chrome: Header */
   --header-bg: color-mix(in srgb, var(--color-primary-green) 10%, white);

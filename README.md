@@ -84,6 +84,47 @@ Performance & a11y
 - Verify Lighthouse/PSI (CLS should remain stable). If needed, preload a single critical weight.
 
 
+## Styling guide
+
+Use the shared design tokens and primitives before adding new component CSS. Keep raw values out of components; prefer tokens from `src/frontend/styles/theme.css` and responsive tokens from `src/frontend/styles/breakpoints.css`.
+
+* __Tokens (`theme.css`)__
+  - Colors, surfaces, borders, states, typography, radii, shadows, focus.
+  - Component aliases: buttons, admin bar, modal/overlay, links, play states.
+  - Dark mode overrides via `.theme-dark` (only variable overrides, no selectors).
+  - Do: `color: var(--text)`; Don't: `color: #111`.
+
+* __Responsive tokens (`breakpoints.css`)__
+  - Defines canonical breakpoints and semantic layout vars, e.g. `--header-topbar-direction`, `--prize-strip-gap`, `--footer-grid-cols`, `--topbar-height`.
+  - Components should consume these variables; avoid repeating media queries in components.
+
+* __Global styles (`global.css`)__
+  - Imports order: theme → breakpoints → design-system → layout.
+  - Element typography (`h1–h6`) and form controls mapping.
+  - App chrome uses `#app { padding-top: var(--topbar-height); }`.
+
+* __Primitives & utilities__
+  - `design-system.css`: `.ds-card`, `.ds-badge`, `.ds-chip`, `.ds-grid`, `.h-*` helpers.
+  - `layout.css`: canonical container `.container` using `--container-max` and `--container-gutter`.
+  - Prefer `.container` (we've removed `.ds-container`).
+
+* __Conventions__
+  - Prefer tokens and helpers before writing new CSS.
+  - If you need a new reusable pattern (e.g., a grid helper), add it to `design-system.css`.
+  - If you need app-wide layout spacing, consider a token in `breakpoints.css`.
+  - Keep scoped component CSS minimal and token-driven.
+
+Examples
+
+```vue
+<template>
+  <section class="container">
+    <h2 class="overline overline--muted">Section</h2>
+    <div class="ds-card">…</div>
+  </section>
+</template>
+```
+
 ## Quick start
 
 1. Install deps

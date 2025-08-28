@@ -27,8 +27,8 @@ const playerName = computed(() => session.activePlayerName)
 
 <template>
   <div class="game-header">
-    <div class="ds-container">
-      <h2 v-if="props.title" class="overline">{{ props.title }}</h2>
+    <div class="container">
+      <h2 v-if="props.title" class="overline overline--muted">{{ props.title }}</h2>
 
       <!-- Spectacular greeting -->
       <div class="topbar-row">
@@ -70,18 +70,11 @@ const playerName = computed(() => session.activePlayerName)
   border-bottom: 1px solid var(--header-border);
 }
 
-.game-header > .ds-container {
+.game-header > .container {
   padding: var(--header-container-padding);
 }
 
-/* Overline label */
-.overline {
-  margin: 0 0 0.5rem 0;
-  font-size: var(--fs-overline);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: color-mix(in srgb, var(--text) 72%, var(--border-subtle));
-}
+/* Overline label now uses global .overline + .overline--muted */
 
 /* Spectacular greeting */
 .greeting.spectacular {

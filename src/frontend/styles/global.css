@@ -18,7 +18,7 @@ body {
 #app {
   min-height: 100vh;
   /* Account for fixed topbar height */
-  padding-top: 56px;
+  padding-top: var(--topbar-height);
 }
 
 /* Typography scale mapping */
@@ -97,4 +97,10 @@ textarea {
 }
 .num-proportional {
   font-variant-numeric: proportional-nums;
+}
+
+/* Overline muted variant (used by Header) */
+.overline--muted {
+  color: color-mix(in srgb, var(--text) 72%, var(--border-subtle));
+  margin: 0 0 0.5rem 0;
 }

@@ -17,11 +17,6 @@
    Layout primitives & utilities
    -------------------------------------------------- */
 
-.ds-container {
-  width: min(1100px, 92%);
-  margin-inline: auto;
-}
-
 .ds-section {
   padding: 48px 0;
 }
