@@ -57,6 +57,12 @@ const playerName = computed(() => session.activePlayerName)
 </template>
 
 <style scoped>
+.game-header {
+  background: var(--header-bg);
+  color: var(--header-text);
+  border-bottom: 1px solid var(--header-border);
+}
+
 .game-header > .ds-container {
   padding: 1rem 1.25rem 1rem;
 }
