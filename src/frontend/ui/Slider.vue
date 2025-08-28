@@ -74,6 +74,7 @@ const ariaLabel = computed(() => (props.label ? props.label : 'Slider'))
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  white-space: nowrap; /* keep label, input, and value in one line */
 }
 
 input[type='range'] {
@@ -86,5 +87,6 @@ input[type='range'] {
 
 .value {
   font-variant-numeric: tabular-nums;
+  white-space: nowrap; /* keep number and suffix together */
 }
 </style>

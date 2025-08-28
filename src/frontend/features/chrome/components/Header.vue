@@ -66,7 +66,7 @@ const playerName = computed(() => session.activePlayerName)
 }
 
 .game-header > .ds-container {
-  padding: 1rem 1.25rem 1rem;
+  padding: var(--header-container-padding);
 }
 
 /* Overline label */
@@ -80,16 +80,16 @@ const playerName = computed(() => session.activePlayerName)
 
 /* Spectacular greeting */
 .greeting.spectacular {
-  margin: 0.75rem 0 1rem 0;
+  margin: var(--greeting-margin);
   font-family: var(--font-family-display);
   font-weight: var(--font-weight-bold);
-  font-size: clamp(28px, 5vw, 72px);
+  font-size: var(--greeting-size);
   line-height: 1.02;
   letter-spacing: 0.2px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 8px;
+  gap: var(--greeting-gap);
   flex-wrap: wrap;
   text-shadow: 0 1px 0 rgba(255,255,255,0.35);
 }
@@ -106,7 +106,7 @@ const playerName = computed(() => session.activePlayerName)
 }
 .greeting .hi {
   color: var(--color-accent-gold);
-  font-size: 1.35em; /* scale Hallo up */
+  font-size: var(--greeting-hi-scale); /* scale Hallo up via tokens */
   line-height: 1;
 }
 .greeting .name {
@@ -118,35 +118,7 @@ const playerName = computed(() => session.activePlayerName)
 .prize-strip {
   display: grid;
   grid-template-columns: repeat(var(--header-prize-cols), minmax(0, 1fr));
-  gap: 14px;
-  margin: 0.75rem 0 1.25rem 0;
-}
-
-@media (min-width: 900px) {
-  .game-header > .ds-container {
-    padding: 1.75rem 1.75rem 1.5rem;
-  }
-  .greeting.spectacular {
-    font-size: clamp(40px, 4.5vw, 84px);
-    gap: 10px;
-    margin: 1rem 0 1.25rem 0;
-  }
-  /* layout direction/align is controlled by CSS variables in breakpoints.css */
-  .greeting .hi {
-    font-size: 1.5em; /* larger Hallo on wide screens */
-  }
-  .prize-strip {
-    gap: 18px;
-    margin: 1rem 0 1.5rem 0;
-  }
-}
-
-@media (min-width: 1200px) {
-  .greeting.spectacular {
-    font-size: clamp(44px, 4.2vw, 96px);
-  }
-  .greeting .hi {
-    font-size: 1.6em;
-  }
+  gap: var(--prize-strip-gap);
+  margin: var(--prize-strip-margin);
 }
 </style>

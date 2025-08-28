@@ -13,16 +13,18 @@
       </div>
 
       <div class="section center">
-        <Slider
-          v-model="botSpeedHz"
-          :min="0.3"
-          :max="10"
-          :step="0.1"
-          label="Botsnelheid"
-          suffix=" /s"
-          :decimals="1"
-          @input="scheduleSetSpeed()"
-        />
+        <div class="slider-wrap">
+          <Slider
+            v-model="botSpeedHz"
+            :min="0.3"
+            :max="10"
+            :step="0.1"
+            label="Botsnelheid"
+            suffix=" /s"
+            :decimals="1"
+            @input="scheduleSetSpeed()"
+          />
+        </div>
         <Button size="sm" variant="outline" @click="resetBotSpeed">Reset snelheid</Button>
         <Button size="sm" variant="outline" @click="toggleExpose">
           {{ admin.showExposed ? 'Verberg prijzen' : 'Toon prijzen' }}
@@ -177,8 +179,8 @@ onMounted(async () => {
   right: 0;
   bottom: 0;
   z-index: 1000;
-  height: 140px;
-  padding: 0 16px;
+  height: var(--adminbar-height);
+  padding: var(--adminbar-padding);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -191,35 +193,44 @@ onMounted(async () => {
 }
 
 .admin-header {
-  position: absolute;
+  position: var(--adminbar-header-position);
   top: 6px;
   left: 0;
   right: 0;
   display: flex;
   align-items: center;
-  justify-content: center;
-  pointer-events: none; /* allow clicks through the header area */
+  justify-content: var(--adminbar-header-justify);
+  pointer-events: var(--adminbar-header-pointer);
+  margin: var(--adminbar-header-margin);
+  z-index: var(--adminbar-header-z);
 }
 
 .bar-card {
   width: 100%;
-  height: 56px;
+  height: var(--adminbar-card-height);
   background: #fff;
   color: #111;
   border-radius: 10px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
   display: flex;
+  flex-direction: var(--adminbar-card-direction);
+  flex-wrap: var(--adminbar-card-wrap);
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  padding: 8px 12px;
+  gap: var(--adminbar-card-gap);
+  padding: calc(8px + var(--adminbar-card-top-offset)) 12px 8px;
 }
 
 .section {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--adminbar-section-gap);
+  order: var(--order, 0);
+  flex: 0 1 var(--basis, auto);
 }
+
+/* Allow the identity/left section to wrap nicely on small screens */
+.section.left { flex-wrap: var(--adminbar-card-wrap); }
 
 .admin-badge {
   display: inline-flex;
@@ -237,13 +248,35 @@ onMounted(async () => {
   pointer-events: auto; /* restore pointer events for the badge (e.g., text selection) */
 }
 
+.section.left { --order: var(--adminbar-left-order); --basis: var(--adminbar-left-basis); }
+.section.center { --order: var(--adminbar-center-order); --basis: var(--adminbar-center-basis); flex-grow: var(--adminbar-center-grow); }
+.section.right { --order: var(--adminbar-right-order); --basis: var(--adminbar-right-basis); }
+
+/* Center section becomes a responsive grid: slider + actions */
 .section.center {
+  display: grid;
+  grid-template-columns: var(--adminbar-center-grid);
+  align-items: center;
   justify-content: center;
+  width: 100%;
 }
 
-.section.right {
-  justify-content: flex-end;
+/* Make child controls stretch on mobile */
+.section.center > * {
+  min-width: 0;
+  width: var(--adminbar-control-width);
 }
+
+/* Stretch actual native controls rendered by child components on mobile */
+.section.center :deep(input[type='range']) {
+  width: 100%;
+}
+.section.center :deep(button) {
+  width: var(--adminbar-control-width);
+}
+.slider-wrap { min-width: 0; }
+
+.section.right { justify-content: flex-end; }
 
 .slider {
   display: inline-flex;

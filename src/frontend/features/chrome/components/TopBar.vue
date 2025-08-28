@@ -96,7 +96,7 @@ const networkOk = computed(() => status.networkOk)
 }
 
 .main-nav {
-  display: none;
+  display: var(--topbar-main-nav-display);
   gap: 10px;
 }
 .main-nav a {
@@ -111,12 +111,6 @@ const networkOk = computed(() => status.networkOk)
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-accent-gold) 55%, transparent);
 }
 
-/* Show main nav on >=768px */
-@media (min-width: 768px) {
-  .main-nav {
-    display: inline-flex;
-  }
-}
 
 /* Network indicator */
 .net-indicator {
@@ -152,7 +146,7 @@ const networkOk = computed(() => status.networkOk)
   gap: 10px;
 }
 .topbar-right .links {
-  display: none;
+  display: var(--topbar-right-links-display);
   gap: 12px;
 }
 .topbar-right .links a {
@@ -165,11 +159,6 @@ const networkOk = computed(() => status.networkOk)
   text-decoration: underline;
   text-decoration-color: var(--color-accent-gold);
   text-underline-offset: 2px;
-}
-@media (min-width: 900px) {
-  .topbar-right .links {
-    display: inline-flex;
-  }
 }
 
 /* Ensure admin toggle doesn't change layout when text swaps */

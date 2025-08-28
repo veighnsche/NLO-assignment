@@ -18,6 +18,46 @@
   --header-topbar-justify: flex-start;
   --header-topbar-align: flex-start;
   --header-prize-cols: 1; /* 1 column by default */
+  --header-container-padding: 1rem 1.25rem 1rem;
+  --greeting-size: clamp(28px, 5vw, 72px);
+  --greeting-gap: 8px;
+  --greeting-margin: 0.75rem 0 1rem 0;
+  --greeting-hi-scale: 1.35em;
+  --prize-strip-gap: 14px;
+  --prize-strip-margin: 0.75rem 0 1.25rem 0;
+
+  /* TopBar tokens */
+  --topbar-main-nav-display: none; /* show at >= md */
+  --topbar-right-links-display: none; /* show at >= lg */
+
+  /* Footer tokens */
+  --footer-grid-cols: 1; /* 1 col on narrow */
+
+  /* AdminBar tokens */
+  --adminbar-height: auto; /* stack content on small screens */
+  --adminbar-padding: 8px 12px;
+  --adminbar-card-height: auto;
+  --adminbar-card-direction: column;
+  --adminbar-card-gap: 8px;
+  --adminbar-card-wrap: wrap;
+  --adminbar-section-gap: 8px;
+  --adminbar-control-width: 100%;
+  --adminbar-center-grid: 1fr; /* stack slider and buttons */
+  --adminbar-left-order: 1;
+  --adminbar-center-order: 2;
+  --adminbar-right-order: 3;
+  --adminbar-left-basis: 100%;
+  --adminbar-center-basis: 100%;
+  --adminbar-right-basis: 100%;
+  --adminbar-center-grow: 1;
+  /* Admin header badge layout: overlay on top on all sizes */
+  --adminbar-header-position: absolute;
+  --adminbar-header-justify: center;
+  --adminbar-header-pointer: none; /* don't block controls */
+  --adminbar-header-margin: 0;
+  --adminbar-header-z: 2;
+  /* Space inside card to avoid badge overlap on small screens */
+  --adminbar-card-top-offset: 34px; /* approx badge height incl. shadow */
 }
 
 /* Small and up */
@@ -27,11 +67,68 @@
   }
 }
 
+/* Small+ (540) and up: footer 2 cols */
+@media (min-width: 540px) {
+  :root {
+    --footer-grid-cols: 2;
+  }
+}
+
+/* Medium and up: show topbar main nav */
+@media (min-width: 768px) {
+  :root {
+    --topbar-main-nav-display: inline-flex;
+  }
+}
+
 /* Large and up */
 @media (min-width: 900px) {
   :root {
     --header-topbar-direction: row;
     --header-topbar-justify: space-between;
     --header-topbar-align: center;
+    --topbar-right-links-display: inline-flex;
+    --footer-grid-cols: 4;
+    --header-container-padding: 1.75rem 1.75rem 1.5rem;
+    --greeting-size: clamp(40px, 4.5vw, 84px);
+    --greeting-gap: 10px;
+    --greeting-margin: 1rem 0 1.25rem 0;
+    --greeting-hi-scale: 1.5em;
+    --prize-strip-gap: 18px;
+    --prize-strip-margin: 1rem 0 1.5rem 0;
+
+    /* AdminBar desktop defaults */
+    --adminbar-height: 140px;
+    --adminbar-padding: 0 16px;
+    --adminbar-card-height: 56px;
+    --adminbar-card-direction: row;
+    --adminbar-card-gap: 12px;
+    --adminbar-card-wrap: nowrap;
+    --adminbar-section-gap: 12px;
+    --adminbar-control-width: auto;
+    --adminbar-center-grid: minmax(260px, 520px) auto auto; /* slider, reset, toggle */
+    --adminbar-left-order: 1;
+    --adminbar-center-order: 2;
+    --adminbar-right-order: 3;
+    --adminbar-left-basis: auto;
+    --adminbar-center-basis: 0%; /* allow center to grow */
+    --adminbar-right-basis: auto;
+    --adminbar-center-grow: 1;
+    /* Admin header badge overlay on desktop */
+    --adminbar-header-position: absolute;
+    --adminbar-header-justify: center;
+    --adminbar-header-pointer: none;
+    --adminbar-header-margin: 0;
+    --adminbar-header-z: 1;
+    /* No extra offset on desktop */
+    --adminbar-card-top-offset: 0px;
+  }
+}
+
+/* Extra-large and up */
+@media (min-width: 1200px) {
+  :root {
+    --greeting-size: clamp(44px, 4.2vw, 96px);
+    --greeting-hi-scale: 1.6em;
   }
 }

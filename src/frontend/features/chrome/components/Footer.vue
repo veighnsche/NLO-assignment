@@ -110,7 +110,7 @@ const remaining = computed(() => Math.max(0, grid.total - grid.openedCount))
 
 .footer-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(var(--footer-grid-cols), minmax(0, 1fr));
   gap: 24px 36px;
 }
 
@@ -201,15 +201,5 @@ const remaining = computed(() => Math.max(0, grid.total - grid.openedCount))
   font-variant-numeric: tabular-nums;
 }
 
-@media (max-width: 900px) {
-  .footer-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 540px) {
-  .footer-grid {
-    grid-template-columns: 1fr;
-  }
-}
+/* Column count driven by --footer-grid-cols in breakpoints.css */
 </style>
