@@ -16,9 +16,7 @@ const myReveal = computed(() => {
   return grid.revealed.find((c) => c.revealedBy === pid) ?? null
 })
 
-const canOpen = computed(
-  () => !grid.userHasRevealed() && grid.openedCount < grid.total,
-)
+const canOpen = computed(() => !grid.userHasRevealed() && grid.openedCount < grid.total)
 
 const state = computed(() => {
   const mine = myReveal.value
@@ -63,5 +61,7 @@ const label = computed(() => {
   border-radius: var(--radius-lg);
   margin: 0 0 12px 0;
 }
-.state-banner .label { font-weight: 700; }
+.state-banner .label {
+  font-weight: 700;
+}
 </style>

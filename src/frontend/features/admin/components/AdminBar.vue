@@ -230,7 +230,9 @@ onMounted(async () => {
 }
 
 /* Allow the identity/left section to wrap nicely on small screens */
-.section.left { flex-wrap: var(--adminbar-card-wrap); }
+.section.left {
+  flex-wrap: var(--adminbar-card-wrap);
+}
 
 .admin-badge {
   display: inline-flex;
@@ -248,9 +250,19 @@ onMounted(async () => {
   pointer-events: auto; /* restore pointer events for the badge (e.g., text selection) */
 }
 
-.section.left { --order: var(--adminbar-left-order); --basis: var(--adminbar-left-basis); }
-.section.center { --order: var(--adminbar-center-order); --basis: var(--adminbar-center-basis); flex-grow: var(--adminbar-center-grow); }
-.section.right { --order: var(--adminbar-right-order); --basis: var(--adminbar-right-basis); }
+.section.left {
+  --order: var(--adminbar-left-order);
+  --basis: var(--adminbar-left-basis);
+}
+.section.center {
+  --order: var(--adminbar-center-order);
+  --basis: var(--adminbar-center-basis);
+  flex-grow: var(--adminbar-center-grow);
+}
+.section.right {
+  --order: var(--adminbar-right-order);
+  --basis: var(--adminbar-right-basis);
+}
 
 /* Center section becomes a responsive grid: slider + actions */
 .section.center {
@@ -274,9 +286,13 @@ onMounted(async () => {
 .section.center :deep(button) {
   width: var(--adminbar-control-width);
 }
-.slider-wrap { min-width: 0; }
+.slider-wrap {
+  min-width: 0;
+}
 
-.section.right { justify-content: flex-end; }
+.section.right {
+  justify-content: flex-end;
+}
 
 .slider {
   display: inline-flex;

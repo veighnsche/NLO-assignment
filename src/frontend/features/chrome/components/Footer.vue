@@ -2,80 +2,80 @@
   <footer class="game-footer" aria-label="Voettekst">
     <div class="footer-container">
       <div class="footer-grid">
-      <!-- Column 1: Over NLO -->
-      <section class="col">
-        <h3 class="col-title">Over Nederlandse Loterij</h3>
-        <ul class="link-list">
-          <li><a href="#" @click.prevent>Klantenservice</a></li>
-          <li><a href="#" @click.prevent>Werken bij</a></li>
-          <li><a href="#" @click.prevent>Acties</a></li>
-          <li><a href="#" @click.prevent>Over ons</a></li>
-          <li><a href="#" @click.prevent>Nieuws</a></li>
-          <li><a href="#" @click.prevent>Beeldbank</a></li>
-          <li><a href="#" @click.prevent>Apps</a></li>
-        </ul>
-        <div class="social-row" aria-label="Social media">
-          <Icon icon="mdi:facebook" />
-          <Icon icon="mdi:instagram" />
-          <Icon icon="mdi:youtube" />
-          <Icon icon="mdi:linkedin" />
-        </div>
-      </section>
+        <!-- Column 1: Over NLO -->
+        <section class="col">
+          <h3 class="col-title">Over Nederlandse Loterij</h3>
+          <ul class="link-list">
+            <li><a href="#" @click.prevent>Klantenservice</a></li>
+            <li><a href="#" @click.prevent>Werken bij</a></li>
+            <li><a href="#" @click.prevent>Acties</a></li>
+            <li><a href="#" @click.prevent>Over ons</a></li>
+            <li><a href="#" @click.prevent>Nieuws</a></li>
+            <li><a href="#" @click.prevent>Beeldbank</a></li>
+            <li><a href="#" @click.prevent>Apps</a></li>
+          </ul>
+          <div class="social-row" aria-label="Social media">
+            <Icon icon="mdi:facebook" />
+            <Icon icon="mdi:instagram" />
+            <Icon icon="mdi:youtube" />
+            <Icon icon="mdi:linkedin" />
+          </div>
+        </section>
 
-      <!-- Column 2: Reglementen & Beleid -->
-      <section class="col">
-        <h3 class="col-title">Reglementen & Beleid</h3>
-        <ul class="link-list">
-          <li><a href="#" @click.prevent>Deelnemersreglement</a></li>
-          <li><a href="#" @click.prevent>Verantwoord spelen</a></li>
-          <li><a href="#" @click.prevent>Trekkingsprocedures</a></li>
-          <li><a href="#" @click.prevent>Gedragscodes</a></li>
-          <li><a href="#" @click.prevent>Cookies</a></li>
-          <li><a href="#" @click.prevent>Disclaimer</a></li>
-          <li><a href="#" @click.prevent>Privacy</a></li>
-          <li><a href="#" @click.prevent>Beveiliging</a></li>
-          <li><a href="#" @click.prevent>Toegankelijkheid</a></li>
-          <li><a href="#" @click.prevent>Vergunningen</a></li>
-          <li><a href="#" @click.prevent>Jaarstukken</a></li>
-        </ul>
-      </section>
+        <!-- Column 2: Reglementen & Beleid -->
+        <section class="col">
+          <h3 class="col-title">Reglementen & Beleid</h3>
+          <ul class="link-list">
+            <li><a href="#" @click.prevent>Deelnemersreglement</a></li>
+            <li><a href="#" @click.prevent>Verantwoord spelen</a></li>
+            <li><a href="#" @click.prevent>Trekkingsprocedures</a></li>
+            <li><a href="#" @click.prevent>Gedragscodes</a></li>
+            <li><a href="#" @click.prevent>Cookies</a></li>
+            <li><a href="#" @click.prevent>Disclaimer</a></li>
+            <li><a href="#" @click.prevent>Privacy</a></li>
+            <li><a href="#" @click.prevent>Beveiliging</a></li>
+            <li><a href="#" @click.prevent>Toegankelijkheid</a></li>
+            <li><a href="#" @click.prevent>Vergunningen</a></li>
+            <li><a href="#" @click.prevent>Jaarstukken</a></li>
+          </ul>
+        </section>
 
-      <!-- Column 3: Spellen -->
-      <section class="col">
-        <h3 class="col-title">Nederlandse Loterij spellen</h3>
-        <div class="games-grid" aria-label="Spellen">
-          <div class="game-tile" style="--tile: #1e88e5">StateLoterij</div>
-          <div class="game-tile" style="--tile: #ef6c00">Krasloten</div>
-          <div class="game-tile" style="--tile: #fdd835; color: #111">Lotto</div>
-          <div class="game-tile" style="--tile: #43a047">Lucky Day</div>
-          <div class="game-tile" style="--tile: #ec407a">Toto</div>
-          <div class="game-tile" style="--tile: #7e57c2">Miljoenenspel</div>
-        </div>
-      </section>
+        <!-- Column 3: Spellen -->
+        <section class="col">
+          <h3 class="col-title">Nederlandse Loterij spellen</h3>
+          <div class="games-grid" aria-label="Spellen">
+            <div class="game-tile" style="--tile: #1e88e5">StateLoterij</div>
+            <div class="game-tile" style="--tile: #ef6c00">Krasloten</div>
+            <div class="game-tile" style="--tile: #fdd835; color: #111">Lotto</div>
+            <div class="game-tile" style="--tile: #43a047">Lucky Day</div>
+            <div class="game-tile" style="--tile: #ec407a">Toto</div>
+            <div class="game-tile" style="--tile: #7e57c2">Miljoenenspel</div>
+          </div>
+        </section>
 
-      <!-- Column 4: Goede doelen -->
-      <section class="col">
-        <h3 class="col-title">Met jouw loten steun je o.a. deze goede doelen:</h3>
-        <ul class="charity-list" aria-label="Goede doelen">
-          <li class="charity">Hersenstichting</li>
-          <li class="charity">Cultuurfonds</li>
-          <li class="charity">Brandwonden stichting</li>
-          <li class="charity">Hartstichting</li>
-        </ul>
-      </section>
+        <!-- Column 4: Goede doelen -->
+        <section class="col">
+          <h3 class="col-title">Met jouw loten steun je o.a. deze goede doelen:</h3>
+          <ul class="charity-list" aria-label="Goede doelen">
+            <li class="charity">Hersenstichting</li>
+            <li class="charity">Cultuurfonds</li>
+            <li class="charity">Brandwonden stichting</li>
+            <li class="charity">Hartstichting</li>
+          </ul>
+        </section>
       </div>
 
       <div class="certs-row" aria-label="Certificeringen">
-      <span class="cert"><Icon icon="mdi:shield-check" /> Veilig spelen</span>
-      <span class="cert"><Icon icon="mdi:certificate" /> WLA certified</span>
-      <span class="cert"><Icon icon="mdi:account-check" /> Responsible Gaming</span>
+        <span class="cert"><Icon icon="mdi:shield-check" /> Veilig spelen</span>
+        <span class="cert"><Icon icon="mdi:certificate" /> WLA certified</span>
+        <span class="cert"><Icon icon="mdi:account-check" /> Responsible Gaming</span>
       </div>
 
       <div class="legal-row">
-      <small>
-        Copyright Nederlandse Loterij 2025. Alle rechten voorbehouden.
-        <span class="right">Nog {{ remaining }} van {{ total }} te openen</span>
-      </small>
+        <small>
+          Copyright Nederlandse Loterij 2025. Alle rechten voorbehouden.
+          <span class="right">Nog {{ remaining }} van {{ total }} te openen</span>
+        </small>
       </div>
     </div>
   </footer>
@@ -159,7 +159,7 @@ const remaining = computed(() => Math.max(0, grid.total - grid.openedCount))
   border-radius: 6px;
   padding: 12px 8px;
   text-align: center;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
 }
 
 .charity-list {

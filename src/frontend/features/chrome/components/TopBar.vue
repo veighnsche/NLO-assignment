@@ -111,7 +111,6 @@ const networkOk = computed(() => status.networkOk)
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-accent-gold) 55%, transparent);
 }
 
-
 /* Network indicator */
 .net-indicator {
   display: inline-flex;

@@ -65,7 +65,9 @@
 .ds-card--hover:hover {
   box-shadow: var(--shadow-lg);
   transform: translateY(-1px);
-  transition: box-shadow 150ms ease, transform 120ms ease;
+  transition:
+    box-shadow 150ms ease,
+    transform 120ms ease;
 }
 
 /* Badge and chip */

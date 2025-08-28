@@ -55,10 +55,12 @@
   --overlay-scrim: rgba(17, 17, 17, 0.45);
 
   /* Typography: families & weights */
-  --font-family-ui: 'Nunito Sans', ui-rounded, system-ui, -apple-system, BlinkMacSystemFont,
-    'Segoe UI', Roboto, Helvetica, Arial, 'Apple Color Emoji', 'Segoe UI Emoji';
-  --font-family-display: 'Fredoka', ui-rounded, system-ui, -apple-system, BlinkMacSystemFont,
-    'Segoe UI', Roboto, Helvetica, Arial;
+  --font-family-ui:
+    'Nunito Sans', ui-rounded, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    Helvetica, Arial, 'Apple Color Emoji', 'Segoe UI Emoji';
+  --font-family-display:
+    'Fredoka', ui-rounded, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    Helvetica, Arial;
   --font-weight-regular: 400;
   --font-weight-semibold: 600;
   --font-weight-bold: 700;
@@ -185,9 +187,14 @@
 
   /* Consolation (green highlight) */
   --play-consolation-bg: color-mix(in srgb, var(--color-primary-green) 22%, transparent);
-  --play-consolation-border: color-mix(in srgb, var(--color-primary-green) 60%, var(--border-subtle));
+  --play-consolation-border: color-mix(
+    in srgb,
+    var(--color-primary-green) 60%,
+    var(--border-subtle)
+  );
   --play-consolation-text: var(--text);
-  --play-consolation-shadow: 0 0 0 2px color-mix(in srgb, var(--color-primary-green) 25%, transparent);
+  --play-consolation-shadow: 0 0 0 2px
+    color-mix(in srgb, var(--color-primary-green) 25%, transparent);
 
   /* Grand (gold highlight) */
   --play-grand-bg: color-mix(in srgb, var(--color-accent-gold) 60%, white);
@@ -280,7 +287,11 @@
   --play-lost-text: var(--text);
 
   --play-consolation-bg: color-mix(in srgb, var(--color-primary-green) 28%, transparent);
-  --play-consolation-border: color-mix(in srgb, var(--color-primary-green) 70%, var(--border-subtle));
+  --play-consolation-border: color-mix(
+    in srgb,
+    var(--color-primary-green) 70%,
+    var(--border-subtle)
+  );
   --play-consolation-text: var(--text);
 
   --play-grand-bg: color-mix(in srgb, var(--color-accent-gold) 32%, transparent);

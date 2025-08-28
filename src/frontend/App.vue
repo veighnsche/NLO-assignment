@@ -18,10 +18,7 @@ const { isInitializing } = useInitApp(grid)
   <TopBar :showAdminBar="showAdminBar" @toggle="showAdminBar = !showAdminBar" />
   <InitScreen v-if="isInitializing" />
   <template v-else>
-    <div
-      class="app-content"
-      :style="{ paddingBottom: showAdminBar ? '160px' : '24px' }"
-    >
+    <div class="app-content" :style="{ paddingBottom: showAdminBar ? '160px' : '24px' }">
       <Header />
       <GameSection />
       <Footer />
