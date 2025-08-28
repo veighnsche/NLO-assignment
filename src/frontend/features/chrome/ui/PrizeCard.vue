@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import { formatCurrency } from '@/frontend/lib/format'
 
 type Variant = 'consolation' | 'grand'
+type CardState = 'default' | 'lost' | 'won'
 
 const props = defineProps<{
   variant: Variant
@@ -12,6 +13,7 @@ const props = defineProps<{
   ariaLabel?: string
   backgroundImage?: string
   mediaAspect?: string | number // e.g. '16/9', '3/1', 1.777...
+  state?: CardState
 }>()
 
 const fallbackLabel = computed(() => (props.variant === 'grand' ? 'hoofdprijs' : 'troostprijs'))
@@ -42,7 +44,7 @@ const resolvedMediaAspect = computed(() => props.mediaAspect ?? '16/9')
 </script>
 
 <template>
-  <div class="prize-card" :class="variant" :aria-label="resolvedAriaLabel" role="group">
+  <div class="prize-card" :class="[variant, props.state ? 'state--' + props.state : 'state--default']" :aria-label="resolvedAriaLabel" role="group">
     <div
       class="card-media"
       aria-hidden="true"
@@ -87,6 +89,81 @@ const resolvedMediaAspect = computed(() => props.mediaAspect ?? '16/9')
     0 1px 0 rgba(255, 255, 255, 0.5) inset,
     0 4px 18px rgba(0, 0, 0, 0.12),
     0 10px 28px rgba(0, 0, 0, 0.06);
+}
+
+/* State base adjustments */
+.prize-card.state--lost {
+  position: relative;
+  --card-bg: color-mix(in srgb, var(--surface) 96%, var(--surface-contrast));
+  --card-border: color-mix(in srgb, var(--border-subtle) 90%, var(--text) 10%);
+  --chip-bg: color-mix(in srgb, var(--surface-contrast) 6%, transparent);
+  --chip-border: color-mix(in srgb, var(--border-subtle) 90%, black 0%);
+  --chip-fg: color-mix(in srgb, currentColor 60%, var(--border-subtle));
+  border-style: dashed;
+}
+
+.prize-card.state--lost::before {
+  /* diagonal hatch overlay */
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    45deg,
+    color-mix(in srgb, var(--text) 6%, transparent) 0px,
+    color-mix(in srgb, var(--text) 6%, transparent) 6px,
+    transparent 6px,
+    transparent 14px
+  );
+  mix-blend-mode: multiply;
+}
+
+.prize-card.state--lost .card-media {
+  filter: grayscale(1) brightness(0.9) contrast(0.95);
+}
+
+.prize-card.state--lost .amount,
+.prize-card.state--lost .count,
+.prize-card.state--lost .label {
+  opacity: 0.6;
+}
+
+.prize-card.state--won {
+  /* Strong celebratory emphasis */
+  position: relative;
+  transform: translateZ(0);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.75) inset,
+    0 10px 26px rgba(0, 0, 0, 0.18),
+    0 18px 44px rgba(0, 0, 0, 0.12),
+    0 0 48px color-mix(in srgb, currentColor 26%, transparent);
+  outline: 2px solid color-mix(in srgb, currentColor 28%, transparent);
+  outline-offset: -2px;
+}
+
+.prize-card.state--won::after {
+  /* Animated shimmer sweep */
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0) 30%,
+    rgba(255, 255, 255, 0.55) 45%,
+    rgba(255, 255, 255, 0) 60%
+  );
+  mix-blend-mode: screen;
+  background-size: 200% 100%;
+  animation: prizecard-shimmer 2.4s ease-in-out infinite;
+}
+
+.prize-card.state--won .card-media {
+  box-shadow: inset 0 -12px 24px rgba(255, 255, 255, 0.25);
+}
+
+.prize-card.state--won .amount {
+  text-shadow: 0 0 14px color-mix(in srgb, currentColor 22%, transparent);
 }
 
 .card-media {
@@ -198,6 +275,22 @@ const resolvedMediaAspect = computed(() => props.mediaAspect ?? '16/9')
 @media (prefers-reduced-motion: reduce) {
   .prize-card {
     transition: none;
+  }
+  .prize-card.state--won::after {
+    animation: none;
+    background: none;
+  }
+}
+
+@keyframes prizecard-shimmer {
+  0% {
+    background-position: -120% 0;
+  }
+  50% {
+    background-position: 120% 0;
+  }
+  100% {
+    background-position: 200% 0;
   }
 }
 </style>

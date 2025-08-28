@@ -2,6 +2,7 @@
 defineOptions({ name: 'AppHeader' })
 import { computed } from 'vue'
 import { useSessionStore } from '@/frontend/features/game/store/session'
+import { useGridStore } from '@/frontend/features/game/store/grid'
 import PrizeCard from '@/frontend/features/chrome/ui/PrizeCard.vue'
 import PlayStateCard from '@/frontend/features/chrome/ui/PlayStateCard.vue'
 import {
@@ -11,18 +12,49 @@ import {
   GRAND_AMOUNT,
 } from '@/shared/constants/prizes'
 
+type PrizeCardState = 'default' | 'lost' | 'won'
+
 const props = defineProps<{
   title?: string
 }>()
 
 const session = useSessionStore()
+const grid = useGridStore()
 
 // Active player name (admin-selected or assigned)
 const playerName = computed(() => session.activePlayerName)
 
-// Prize model is centralized in '@/shared/constants/prizes'
+// Derive current player's reveal and play-state (mirror of PlayStateCard logic)
+const activePid = computed(() => session.activePlayerId)
+const myReveal = computed(() => {
+  const pid = activePid.value
+  if (!pid) return null
+  return grid.revealed.find((c) => c.revealedBy === pid) ?? null
+})
+const canOpen = computed(() => !grid.userHasRevealed() && grid.openedCount < grid.total)
 
-// Labels can be built inline in template; avoid unused computed values
+// Map to each card's visual state
+const consolationState = computed<PrizeCardState>(() => {
+  if (canOpen.value) return 'default'
+  const mine = myReveal.value
+  if (!mine) return 'lost'
+  const t = mine.prize?.type
+  if (t === 'consolation') return 'won'
+  if (t === 'grand') return 'lost'
+  return 'lost'
+})
+
+const grandState = computed<PrizeCardState>(() => {
+  if (canOpen.value) return 'default'
+  const mine = myReveal.value
+  if (!mine) return 'lost'
+  const t = mine.prize?.type
+  if (t === 'grand') return 'won'
+  if (t === 'consolation') return 'lost'
+  return 'lost'
+})
+
+// Prize model is centralized in '@/shared/constants/prizes'
 </script>
 
 <template>
@@ -47,6 +79,7 @@ const playerName = computed(() => session.activePlayerName)
           :amount="CONSOLATION_AMOUNT"
           label="troostprijs"
           aria-label="Honderd troostprijzen van 100 euro"
+          :state="consolationState"
         />
 
         <PlayStateCard />
@@ -57,6 +90,7 @@ const playerName = computed(() => session.activePlayerName)
           :amount="GRAND_AMOUNT"
           label="hoofdprijs"
           aria-label="Eén hoofdprijs van 25.000 euro"
+          :state="grandState"
         />
       </div>
     </div>
