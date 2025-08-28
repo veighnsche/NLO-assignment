@@ -4,6 +4,7 @@ import { computed } from 'vue'
 import { useSessionStore } from '@/frontend/features/game/store/session'
 import PrizeBadge from '@/frontend/ui/PrizeBadge.vue'
 import PlayStateBanner from '@/frontend/features/game/components/PlayStateBanner.vue'
+import { CONSOLATION_COUNT, CONSOLATION_AMOUNT, GRAND_COUNT, GRAND_AMOUNT } from '@/shared/constants/prizes'
 
 const props = defineProps<{
   title?: string
@@ -15,11 +16,7 @@ const session = useSessionStore()
 const playerName = computed(() => session.activePlayerName)
 
 
-// Prize model (frontend mirrors backend constants: 100 and 25,000)
-const CONSOLATION_COUNT = 100
-const CONSOLATION_AMOUNT = 100
-const GRAND_COUNT = 1
-const GRAND_AMOUNT = 25000
+// Prize model is centralized in '@/shared/constants/prizes'
 
 // Labels can be built inline in template; avoid unused computed values
 </script>
@@ -34,6 +31,9 @@ const GRAND_AMOUNT = 25000
         <span class="hi">Hallo</span>
         <span class="name">{{ playerName || '—' }}</span>
       </div>
+
+      <!-- Single-source Play State Banner remains -->
+      <PlayStateBanner />
 
       <!-- Prize highlights -->
       <div class="prize-strip" role="group" aria-label="Te winnen prijzen">
@@ -52,21 +52,18 @@ const GRAND_AMOUNT = 25000
           aria-label="Eén hoofdprijs van 25.000 euro"
         />
       </div>
-
-      <!-- Single-source Play State Banner remains -->
-      <PlayStateBanner />
     </div>
   </div>
 </template>
 
 <style scoped>
 .game-header > .ds-container {
-  padding: 0.5rem 1rem 0.25rem;
+  padding: 1rem 1.25rem 1rem;
 }
 
 /* Overline label */
 .overline {
-  margin: 0 0 0.25rem 0;
+  margin: 0 0 0.5rem 0;
   font-size: var(--fs-overline);
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -75,29 +72,61 @@ const GRAND_AMOUNT = 25000
 
 /* Spectacular greeting */
 .greeting.spectacular {
-  margin: 2px 0 6px 0;
+  margin: 0.75rem 0 1rem 0;
   font-family: var(--font-family-display);
   font-weight: var(--font-weight-bold);
-  font-size: clamp(28px, 6.2vw, 56px);
-  line-height: 1.05;
+  font-size: clamp(28px, 5vw, 72px);
+  line-height: 1.02;
   letter-spacing: 0.2px;
   display: flex;
-  align-items: baseline;
-  gap: 10px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  flex-wrap: wrap;
   text-shadow: 0 1px 0 rgba(255,255,255,0.35);
 }
 .greeting .hi {
   color: var(--color-accent-gold);
+  font-size: 1.35em; /* scale Hallo up */
+  line-height: 1;
 }
 .greeting .name {
   color: var(--color-primary-green);
+  font-size: 1em; /* keep name smaller than Hallo */
 }
 
 /* Prize strip */
 .prize-strip {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-  margin: 4px 0 8px 0;
+  gap: 14px;
+  margin: 0.75rem 0 1.25rem 0;
+}
+
+@media (min-width: 900px) {
+  .game-header > .ds-container {
+    padding: 1.75rem 1.75rem 1.5rem;
+  }
+  .greeting.spectacular {
+    font-size: clamp(40px, 4.5vw, 84px);
+    gap: 10px;
+    margin: 1rem 0 1.25rem 0;
+  }
+  .greeting .hi {
+    font-size: 1.5em; /* larger Hallo on wide screens */
+  }
+  .prize-strip {
+    gap: 18px;
+    margin: 1rem 0 1.5rem 0;
+  }
+}
+
+@media (min-width: 1200px) {
+  .greeting.spectacular {
+    font-size: clamp(44px, 4.2vw, 96px);
+  }
+  .greeting .hi {
+    font-size: 1.6em;
+  }
 }
 </style>

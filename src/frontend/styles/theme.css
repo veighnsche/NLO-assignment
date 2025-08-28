@@ -98,6 +98,11 @@
   --topbar-bg: color-mix(in srgb, var(--color-primary-green) 88%, black);
   --topbar-text: var(--color-text-on-dark);
   --topbar-border: color-mix(in srgb, var(--color-primary-green) 75%, black);
+
+  /* Chrome: Header */
+  --header-bg: color-mix(in srgb, var(--color-primary-green) 10%, white);
+  --header-text: var(--text);
+  --header-border: color-mix(in srgb, var(--color-primary-green) 40%, var(--border-subtle));
 }
 
 /* --------------------------------------------------
@@ -288,6 +293,11 @@
   --topbar-bg: color-mix(in srgb, var(--color-primary-green) 82%, black);
   --topbar-text: var(--color-text-on-dark);
   --topbar-border: color-mix(in srgb, var(--color-primary-green) 70%, black);
+
+  /* Header — dark overrides */
+  --header-bg: color-mix(in srgb, var(--color-primary-green) 18%, transparent);
+  --header-text: var(--text);
+  --header-border: color-mix(in srgb, var(--color-primary-green) 60%, var(--border-subtle));
 }
 
 /* --------------------------------------------------
