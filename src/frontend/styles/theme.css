@@ -214,38 +214,7 @@
     0 6px 18px color-mix(in srgb, var(--color-accent-gold) 25%, transparent);
 }
 
-/* Optional utility classes for quick application (token consumers) */
-.playstate {
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border-subtle);
-  box-shadow: var(--shadow-sm);
-  color: var(--text);
-  background: var(--surface-elevated);
-}
-.playstate--can-open {
-  background: var(--play-can-open-bg);
-  border-color: var(--play-can-open-border);
-  color: var(--play-can-open-text);
-  box-shadow: var(--play-can-open-shadow);
-}
-.playstate--lost {
-  background: var(--play-lost-bg);
-  border-color: var(--play-lost-border);
-  color: var(--play-lost-text);
-  box-shadow: var(--play-lost-shadow);
-}
-.playstate--consolation {
-  background: var(--play-consolation-bg);
-  border-color: var(--play-consolation-border);
-  color: var(--play-consolation-text);
-  box-shadow: var(--play-consolation-shadow);
-}
-.playstate--grand {
-  background: var(--play-grand-bg);
-  border-color: var(--play-grand-border);
-  color: var(--play-grand-text);
-  box-shadow: var(--play-grand-shadow);
-}
+/* (Removed) .playstate utility classes were unused; components consume tokens directly */
 
 /* --------------------------------------------------
    Dark variant overrides
