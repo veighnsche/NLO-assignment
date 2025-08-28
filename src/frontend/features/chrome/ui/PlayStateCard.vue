@@ -141,8 +141,8 @@ const mediaUrl = computed(() => props.backgroundImage ?? imageMap.value[state.va
   --glow-color: color-mix(in srgb, var(--color-accent-gold) 28%, transparent);
   --card-bg: linear-gradient(
     135deg,
-    color-mix(in srgb, var(--color-accent-gold) 70%, #fff) 0%,
-    color-mix(in srgb, var(--color-accent-gold) 35%, #fff) 45%,
+    color-mix(in srgb, var(--color-accent-gold) 70%, var(--surface-contrast)) 0%,
+    color-mix(in srgb, var(--color-accent-gold) 35%, var(--surface-contrast)) 45%,
     color-mix(in srgb, var(--color-accent-gold) 60%, var(--surface)) 100%
   );
   --card-border: color-mix(in srgb, var(--color-accent-gold) 65%, var(--border-subtle));
@@ -153,8 +153,8 @@ const mediaUrl = computed(() => props.backgroundImage ?? imageMap.value[state.va
   --glow-color: color-mix(in srgb, var(--color-primary-green) 22%, transparent);
   --card-bg: linear-gradient(
     135deg,
-    color-mix(in srgb, var(--color-primary-green) 30%, #fff) 0%,
-    color-mix(in srgb, var(--color-primary-green) 18%, #fff) 45%,
+    color-mix(in srgb, var(--color-primary-green) 30%, var(--surface-contrast)) 0%,
+    color-mix(in srgb, var(--color-primary-green) 18%, var(--surface-contrast)) 45%,
     color-mix(in srgb, var(--color-primary-green) 35%, var(--surface)) 100%
   );
   --card-border: color-mix(in srgb, var(--color-primary-green) 45%, var(--border-subtle));
@@ -162,25 +162,25 @@ const mediaUrl = computed(() => props.backgroundImage ?? imageMap.value[state.va
 }
 
 .playstate-card.state--lost {
-  --glow-color: color-mix(in srgb, #777 18%, transparent);
+  --glow-color: color-mix(in srgb, color-mix(in srgb, var(--text) 40%, var(--border-subtle)) 18%, transparent);
   --card-bg: linear-gradient(
     135deg,
-    color-mix(in srgb, #999 18%, #fff) 0%,
-    color-mix(in srgb, #999 10%, #fff) 45%,
-    color-mix(in srgb, #777 20%, var(--surface)) 100%
+    color-mix(in srgb, color-mix(in srgb, var(--text) 50%, var(--border-subtle)) 18%, var(--surface-contrast)) 0%,
+    color-mix(in srgb, color-mix(in srgb, var(--text) 50%, var(--border-subtle)) 10%, var(--surface-contrast)) 45%,
+    color-mix(in srgb, color-mix(in srgb, var(--text) 40%, var(--border-subtle)) 20%, var(--surface)) 100%
   );
-  --card-border: color-mix(in srgb, #777 35%, var(--border-subtle));
+  --card-border: color-mix(in srgb, color-mix(in srgb, var(--text) 40%, var(--border-subtle)) 35%, var(--border-subtle));
 }
 
 .playstate-card.state--can-open {
-  --glow-color: color-mix(in srgb, var(--color-accent-blue, #4b9cff) 22%, transparent);
+  --glow-color: color-mix(in srgb, var(--color-accent-blue) 22%, transparent);
   --card-bg: linear-gradient(
     135deg,
-    color-mix(in srgb, var(--color-accent-blue, #4b9cff) 26%, #fff) 0%,
-    color-mix(in srgb, var(--color-accent-blue, #4b9cff) 14%, #fff) 45%,
-    color-mix(in srgb, var(--color-accent-blue, #4b9cff) 24%, var(--surface)) 100%
+    color-mix(in srgb, var(--color-accent-blue) 26%, var(--surface-contrast)) 0%,
+    color-mix(in srgb, var(--color-accent-blue) 14%, var(--surface-contrast)) 45%,
+    color-mix(in srgb, var(--color-accent-blue) 24%, var(--surface)) 100%
   );
-  --card-border: color-mix(in srgb, var(--color-accent-blue, #4b9cff) 35%, var(--border-subtle));
+  --card-border: color-mix(in srgb, var(--color-accent-blue) 35%, var(--border-subtle));
 }
 
 @media (max-width: 700px) {

@@ -26,19 +26,20 @@
   justify-items: center;
   gap: 0.75rem;
   padding: 1.25rem 1.5rem;
-  border: 1px solid #e5e7eb; /* gray-200 */
-  border-radius: 12px;
-  background: #fff;
-  color: #111827; /* gray-900 */
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background: var(--surface-elevated);
+  color: var(--text);
+  box-shadow: var(--shadow-md);
   text-align: center;
 }
 
 .spinner {
   width: 28px;
   height: 28px;
-  border: 3px solid #e5e7eb;
-  border-top-color: #3b82f6; /* blue-500 */
+  border: 3px solid var(--border-subtle);
+  /* Use an accent/state token for the animated ring */
+  border-top-color: var(--state-info);
   border-radius: 50%;
   animation: spin 0.9s linear infinite;
 }
@@ -56,6 +57,7 @@ h2 {
 
 p {
   margin: 0;
-  color: #6b7280; /* gray-500 */
+  /* Subtle secondary text using tokenized mix */
+  color: color-mix(in srgb, var(--text) 65%, white);
 }
 </style>

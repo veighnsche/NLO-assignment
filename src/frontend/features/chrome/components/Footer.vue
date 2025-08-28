@@ -97,8 +97,8 @@ const remaining = computed(() => Math.max(0, grid.total - grid.openedCount))
   margin-top: 16px;
   margin-bottom: 12px; /* overlap handled by App.vue */
   padding: 24px 12px 12px;
-  background: #fff;
-  color: #143b8d; /* NLO blue tone */
+  background: var(--surface-elevated);
+  color: var(--color-brand-blue, var(--text));
   box-shadow: var(--shadow-sm);
 }
 
@@ -129,7 +129,7 @@ const remaining = computed(() => Math.max(0, grid.total - grid.openedCount))
 }
 
 .link-list a {
-  color: #143b8d;
+  color: var(--color-brand-blue, var(--text));
   text-decoration: none;
 }
 
@@ -142,7 +142,7 @@ const remaining = computed(() => Math.max(0, grid.total - grid.openedCount))
   display: flex;
   gap: 10px;
   margin-top: 12px;
-  color: #0a2a6b;
+  color: color-mix(in srgb, var(--color-brand-blue, var(--text)) 85%, black);
 }
 
 .games-grid {
@@ -152,14 +152,14 @@ const remaining = computed(() => Math.max(0, grid.total - grid.openedCount))
 }
 
 .game-tile {
-  background: var(--tile, #e0e0e0);
-  color: #fff;
+  background: var(--tile, color-mix(in srgb, var(--surface-contrast) 8%, var(--surface)));
+  color: var(--surface-contrast);
   font-weight: 700;
   font-size: 0.9rem;
   border-radius: 6px;
   padding: 12px 8px;
   text-align: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-sm);
 }
 
 .charity-list {
@@ -171,14 +171,14 @@ const remaining = computed(() => Math.max(0, grid.total - grid.openedCount))
 }
 
 .charity {
-  color: #8a94a6;
+  color: color-mix(in srgb, var(--text) 55%, var(--border-subtle));
 }
 
 .certs-row {
   display: flex;
   gap: 16px;
   align-items: center;
-  color: #6b7aa6;
+  color: color-mix(in srgb, var(--text) 65%, var(--border-subtle));
   margin-top: 22px;
 }
 
@@ -190,14 +190,14 @@ const remaining = computed(() => Math.max(0, grid.total - grid.openedCount))
 
 .legal-row {
   margin-top: 12px;
-  color: #6b7aa6;
+  color: color-mix(in srgb, var(--text) 65%, var(--border-subtle));
   display: flex;
   justify-content: center;
 }
 
 .legal-row .right {
   margin-left: 10px;
-  color: #7d7d7d;
+  color: color-mix(in srgb, var(--text) 55%, var(--border-subtle));
   font-variant-numeric: tabular-nums;
 }
 

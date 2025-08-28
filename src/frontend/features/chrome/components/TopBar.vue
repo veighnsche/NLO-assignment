@@ -165,10 +165,10 @@ const networkOk = computed(() => status.networkOk)
   min-width: 18ch; /* fits both labels */
   justify-content: center;
   text-align: center;
-  /* Force white filled style with dark text for contrast on dark topbar */
+  /* High-contrast filled style on dark topbar using theme tokens */
   --btn-bg: white;
-  --btn-text: #111111;
-  --btn-border: color-mix(in srgb, black 12%, white);
+  --btn-text: var(--text-strong, #111111);
+  --btn-border: var(--border-subtle);
   --btn-hover-bg: color-mix(in srgb, black 6%, white);
   --btn-shadow: none;
   /* Visible focus on dark background */
