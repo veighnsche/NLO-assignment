@@ -1,0 +1,140 @@
+/*
+  Design System (Primitives only)
+  --------------------------------------------------
+  Purpose: provide reusable primitives that consume the Christmas tokens from
+  `src/frontend/styles/theme.css`. No brand-scoped palettes or duplicate tokens
+  live here; colors, radii, shadows, etc. are single-sourced in theme.css.
+
+  How to use
+  - Use primitives: .ds-container, .ds-hero, .ds-hero--xmas, .ds-card,
+    .ds-badge, .ds-chip, .ds-ticket, grid and type helpers.
+  - Components like <UiButton> already read token values from theme.css.
+*/
+
+/* No brand-scoped variables live here to avoid duplication with theme.css */
+
+/* --------------------------------------------------
+   Layout primitives & utilities
+   -------------------------------------------------- */
+
+.ds-container {
+  width: min(1100px, 92%);
+  margin-inline: auto;
+}
+
+.ds-section {
+  padding: 48px 0;
+}
+
+/* Hero block (neutral base); pair with .ds-hero--xmas for festive gradient */
+.ds-hero {
+  position: relative;
+  color: var(--text);
+  background: var(--surface-alt);
+  padding: 56px 0 36px;
+}
+.ds-hero--xmas {
+  color: var(--color-text-on-dark);
+  background: linear-gradient(
+    135deg,
+    var(--color-primary-green),
+    color-mix(in srgb, var(--color-primary-red) 88%, var(--color-primary-green))
+  );
+}
+.ds-hero__title {
+  font-size: clamp(28px, 5vw, 48px);
+  font-weight: 800;
+  letter-spacing: 0.2px;
+  margin: 0 0 12px 0;
+}
+.ds-hero__subtitle {
+  font-size: clamp(16px, 2.4vw, 20px);
+  opacity: 0.95;
+  margin: 0 0 24px 0;
+}
+
+/* Card primitive */
+.ds-card {
+  background: var(--surface-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: 16px;
+}
+.ds-card--hover:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-1px);
+  transition: box-shadow 150ms ease, transform 120ms ease;
+}
+
+/* Badge and chip */
+.ds-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.3px;
+  background: color-mix(in srgb, var(--color-primary-green) 16%, white);
+  color: var(--text);
+  /* Fallback for older browsers */
+  border: 1px solid var(--border-subtle);
+  /* Preferred in modern browsers */
+  border: 1px solid color-mix(in srgb, var(--color-primary-green) 28%, white);
+}
+
+.ds-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 13px;
+  background: var(--surface-alt);
+  border: 1px solid var(--border-subtle);
+}
+
+/* CTA link style */
+.ds-cta-link {
+  color: var(--link-color);
+  text-decoration: none;
+}
+.ds-cta-link:hover {
+  text-decoration: underline;
+  text-decoration-color: var(--color-accent-gold);
+}
+
+/* Panel header utility resembling tickets */
+.ds-ticket {
+  background: var(--surface-elevated);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  padding: 10px 12px;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Grid helpers */
+.ds-grid {
+  display: grid;
+  gap: 16px;
+}
+.ds-grid--cards {
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+}
+
+/* Typography helpers */
+.h-eyebrow {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 800;
+}
+.h-title {
+  font-size: 22px;
+  font-weight: 800;
+}
+.h-subtle {
+  opacity: 0.8;
+}

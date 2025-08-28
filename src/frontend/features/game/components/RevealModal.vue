@@ -15,7 +15,7 @@
     <div v-else>
       <h2 id="result-title">Uitslag</h2>
       <div class="result-card" :class="['result-' + result.type]">
-        <p v-if="result.type === 'none'">Helaas, geen prijs deze keer. Probeer het nog eens!</p>
+        <p v-if="result.type === 'none'">Helaas, geen prijs deze keer.</p>
         <p v-else-if="result.type === 'consolation'">
           Gefeliciteerd! Je hebt een <strong>Troostprijs</strong> gewonnen
           <template v-if="result.amount"
@@ -126,17 +126,17 @@ function onCloseResult() {
   margin-top: 8px;
   padding: 12px;
   border-radius: var(--radius-md);
-  background: var(--surface);
+  background: var(--surface-elevated);
   border: 1px solid var(--border-subtle);
 }
 
 .result-consolation {
-  border-color: color-mix(in srgb, #2ecc71 35%, var(--border-subtle));
-  box-shadow: 0 0 0 2px color-mix(in srgb, #2ecc71 20%, transparent);
+  border-color: color-mix(in srgb, var(--color-primary-green) 45%, var(--border-subtle));
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-primary-green) 25%, transparent);
 }
 
 .result-grand {
-  border-color: color-mix(in srgb, #f39c12 45%, var(--border-subtle));
-  box-shadow: 0 0 0 2px color-mix(in srgb, #f39c12 25%, transparent);
+  border-color: color-mix(in srgb, var(--color-accent-gold) 55%, var(--border-subtle));
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-accent-gold) 28%, transparent);
 }
 </style>
