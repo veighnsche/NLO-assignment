@@ -1,23 +1,81 @@
 <template>
   <footer class="game-footer" aria-label="Voettekst">
-    <div class="footer-inner">
-      <div class="footer-left">
-        <span class="brand">Verrassingskalender</span>
+    <div class="footer-container">
+      <div class="footer-grid">
+      <!-- Column 1: Over NLO -->
+      <section class="col">
+        <h3 class="col-title">Over Nederlandse Loterij</h3>
+        <ul class="link-list">
+          <li><a href="#" @click.prevent>Klantenservice</a></li>
+          <li><a href="#" @click.prevent>Werken bij</a></li>
+          <li><a href="#" @click.prevent>Acties</a></li>
+          <li><a href="#" @click.prevent>Over ons</a></li>
+          <li><a href="#" @click.prevent>Nieuws</a></li>
+          <li><a href="#" @click.prevent>Beeldbank</a></li>
+          <li><a href="#" @click.prevent>Apps</a></li>
+        </ul>
+        <div class="social-row" aria-label="Social media">
+          <Icon icon="mdi:facebook" />
+          <Icon icon="mdi:instagram" />
+          <Icon icon="mdi:youtube" />
+          <Icon icon="mdi:linkedin" />
+        </div>
+      </section>
+
+      <!-- Column 2: Reglementen & Beleid -->
+      <section class="col">
+        <h3 class="col-title">Reglementen & Beleid</h3>
+        <ul class="link-list">
+          <li><a href="#" @click.prevent>Deelnemersreglement</a></li>
+          <li><a href="#" @click.prevent>Verantwoord spelen</a></li>
+          <li><a href="#" @click.prevent>Trekkingsprocedures</a></li>
+          <li><a href="#" @click.prevent>Gedragscodes</a></li>
+          <li><a href="#" @click.prevent>Cookies</a></li>
+          <li><a href="#" @click.prevent>Disclaimer</a></li>
+          <li><a href="#" @click.prevent>Privacy</a></li>
+          <li><a href="#" @click.prevent>Beveiliging</a></li>
+          <li><a href="#" @click.prevent>Toegankelijkheid</a></li>
+          <li><a href="#" @click.prevent>Vergunningen</a></li>
+          <li><a href="#" @click.prevent>Jaarstukken</a></li>
+        </ul>
+      </section>
+
+      <!-- Column 3: Spellen -->
+      <section class="col">
+        <h3 class="col-title">Nederlandse Loterij spellen</h3>
+        <div class="games-grid" aria-label="Spellen">
+          <div class="game-tile" style="--tile: #1e88e5">StateLoterij</div>
+          <div class="game-tile" style="--tile: #ef6c00">Krasloten</div>
+          <div class="game-tile" style="--tile: #fdd835; color: #111">Lotto</div>
+          <div class="game-tile" style="--tile: #43a047">Lucky Day</div>
+          <div class="game-tile" style="--tile: #ec407a">Toto</div>
+          <div class="game-tile" style="--tile: #7e57c2">Miljoenenspel</div>
+        </div>
+      </section>
+
+      <!-- Column 4: Goede doelen -->
+      <section class="col">
+        <h3 class="col-title">Met jouw loten steun je o.a. deze goede doelen:</h3>
+        <ul class="charity-list" aria-label="Goede doelen">
+          <li class="charity">Hersenstichting</li>
+          <li class="charity">Cultuurfonds</li>
+          <li class="charity">Brandwonden stichting</li>
+          <li class="charity">Hartstichting</li>
+        </ul>
+      </section>
       </div>
-      <nav class="footer-nav" aria-label="Footer links">
-        <a href="#" @click.prevent title="Over ons (fictief)">Over ons</a>
-        <span class="sep" aria-hidden="true">·</span>
-        <a href="#" @click.prevent title="Privacybeleid (fictief)">Privacy</a>
-        <span class="sep" aria-hidden="true">·</span>
-        <a href="#" @click.prevent title="Voorwaarden (fictief)">Voorwaarden</a>
-        <span class="sep" aria-hidden="true">·</span>
-        <a href="#" @click.prevent title="Contact (fictief)">Contact</a>
-        <span class="sep" aria-hidden="true">·</span>
-        <a href="#" @click.prevent title="Help (fictief)">Help</a>
-      </nav>
-      <div class="footer-spacer" />
-      <div class="footer-right">
-        <span class="meta">Nog {{ remaining }} van {{ total }} te openen</span>
+
+      <div class="certs-row" aria-label="Certificeringen">
+      <span class="cert"><Icon icon="mdi:shield-check" /> Veilig spelen</span>
+      <span class="cert"><Icon icon="mdi:certificate" /> WLA certified</span>
+      <span class="cert"><Icon icon="mdi:account-check" /> Responsible Gaming</span>
+      </div>
+
+      <div class="legal-row">
+      <small>
+        Copyright Nederlandse Loterij 2025. Alle rechten voorbehouden.
+        <span class="right">Nog {{ remaining }} van {{ total }} te openen</span>
+      </small>
       </div>
     </div>
   </footer>
@@ -26,6 +84,7 @@
 <script setup lang="ts">
 defineOptions({ name: 'AppFooter' })
 import { computed } from 'vue'
+import { Icon } from '@iconify/vue'
 import { useGridStore } from '@/frontend/features/game/store/grid'
 
 const grid = useGridStore()
@@ -35,52 +94,122 @@ const remaining = computed(() => Math.max(0, grid.total - grid.openedCount))
 
 <style scoped>
 .game-footer {
-  margin-top: 12px;
-  padding: 8px 12px;
-  background: var(--surface-elevated);
-  color: var(--text);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
+  margin-top: 16px;
+  margin-bottom: 12px; /* overlap handled by App.vue */
+  padding: 24px 12px 12px;
+  background: #fff;
+  color: #143b8d; /* NLO blue tone */
   box-shadow: var(--shadow-sm);
 }
 
-.footer-inner {
-  display: flex;
-  align-items: center;
+.footer-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px; /* horizontal margins */
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 24px 36px;
+}
+
+.col-title {
+  margin: 0 0 10px;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.link-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
   gap: 8px;
 }
 
-.footer-nav {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 0.95rem;
-}
-
-.footer-nav a {
-  color: color-mix(in srgb, var(--text) 85%, #888);
+.link-list a {
+  color: #143b8d;
   text-decoration: none;
 }
 
-.footer-nav a:hover,
-.footer-nav a:focus-visible {
+.link-list a:hover,
+.link-list a:focus-visible {
   text-decoration: underline;
 }
 
-.footer-nav .sep {
-  color: #a9a9a9;
+.social-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+  color: #0a2a6b;
 }
 
-.footer-spacer {
-  flex: 1;
+.games-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
 }
 
-.brand {
-  font-weight: 600;
+.game-tile {
+  background: var(--tile, #e0e0e0);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.9rem;
+  border-radius: 6px;
+  padding: 12px 8px;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.15);
 }
 
-.meta {
+.charity-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.charity {
+  color: #8a94a6;
+}
+
+.certs-row {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  color: #6b7aa6;
+  margin-top: 22px;
+}
+
+.cert {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legal-row {
+  margin-top: 12px;
+  color: #6b7aa6;
+  display: flex;
+  justify-content: center;
+}
+
+.legal-row .right {
+  margin-left: 10px;
   color: #7d7d7d;
   font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 900px) {
+  .footer-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 540px) {
+  .footer-grid {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

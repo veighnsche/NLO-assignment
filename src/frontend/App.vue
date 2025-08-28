@@ -18,11 +18,21 @@ const { isInitializing } = useInitApp(grid)
   <TopBar :showAdminBar="showAdminBar" @toggle="showAdminBar = !showAdminBar" />
   <InitScreen v-if="isInitializing" />
   <template v-else>
-    <Header />
-    <GameSection />
-    <Footer />
+    <div
+      class="app-content"
+      :style="{ paddingBottom: showAdminBar ? '160px' : '24px' }"
+    >
+      <Header />
+      <GameSection />
+      <Footer />
+    </div>
   </template>
   <AdminBar v-if="showAdminBar" @toggle="showAdminBar = false" />
 </template>
 
-<style scoped></style>
+<style scoped>
+.app-content {
+  /* ensure there's at least some spacing at bottom when admin bar hidden */
+  transition: padding-bottom 0.15s ease;
+}
+</style>

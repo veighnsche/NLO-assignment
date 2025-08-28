@@ -34,19 +34,50 @@ const resolvedAriaLabel = computed(() => {
 
 <style scoped>
 .prize-badge {
+  position: relative;
   display: grid;
   grid-template-columns: auto 1fr;
   grid-template-areas:
     'count amount'
     'count label';
   align-items: center;
-  column-gap: 10px;
-  row-gap: 2px;
-  padding: 10px 12px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border-subtle);
-  background: var(--surface);
-  box-shadow: var(--shadow-sm);
+  column-gap: 12px;
+  row-gap: 3px;
+  padding: 12px 14px;
+  border-radius: var(--radius-lg);
+  /* Premium layered background */
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.35), rgba(255,255,255,0.05)) padding-box,
+    var(--badge-bg, var(--surface)) border-box;
+  border: 1px solid var(--badge-border, var(--border-subtle));
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.5) inset,
+    0 1px 8px rgba(0, 0, 0, 0.12),
+    0 4px 16px rgba(0, 0, 0, 0.06);
+  transition: transform 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+}
+
+/* Subtle sheen */
+.prize-badge::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0) 40%);
+  pointer-events: none;
+}
+
+.prize-badge:where(:hover) {
+  transform: translateY(-1px);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.6) inset,
+    0 6px 18px rgba(0, 0, 0, 0.12),
+    0 10px 24px rgba(0, 0, 0, 0.08);
+}
+
+.prize-badge:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--color-accent-gold) 65%, white);
+  outline-offset: 2px;
 }
 .prize-badge .count {
   grid-area: count;
@@ -57,19 +88,41 @@ const resolvedAriaLabel = computed(() => {
   grid-area: amount;
   font-family: var(--font-family-display);
   font-weight: var(--font-weight-bold);
-  font-size: clamp(18px, 2.4vw, 24px);
+  font-size: clamp(20px, 2.6vw, 26px);
+  letter-spacing: 0.2px;
 }
 .prize-badge .label {
   grid-area: label;
   font-size: var(--fs-small);
-  opacity: 0.85;
+  opacity: 0.9;
 }
+/* Variant palettes with metallic accents */
 .prize-badge.grand {
-  background: color-mix(in srgb, var(--color-accent-gold) 16%, var(--surface));
-  border-color: color-mix(in srgb, var(--color-accent-gold) 60%, var(--border-subtle));
+  --badge-bg: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--color-accent-gold) 70%, #fff) 0%,
+      color-mix(in srgb, var(--color-accent-gold) 35%, #fff) 45%,
+      color-mix(in srgb, var(--color-accent-gold) 60%, var(--surface)) 100%
+    );
+  --badge-border: color-mix(in srgb, var(--color-accent-gold) 65%, var(--border-subtle));
 }
+
 .prize-badge.consolation {
-  background: color-mix(in srgb, var(--color-primary-green) 12%, var(--surface));
-  border-color: color-mix(in srgb, var(--color-primary-green) 45%, var(--border-subtle));
+  --badge-bg: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--color-primary-green) 30%, #fff) 0%,
+      color-mix(in srgb, var(--color-primary-green) 18%, #fff) 45%,
+      color-mix(in srgb, var(--color-primary-green) 35%, var(--surface)) 100%
+    );
+  --badge-border: color-mix(in srgb, var(--color-primary-green) 45%, var(--border-subtle));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .prize-badge {
+    transition: none;
+  }
+  .prize-badge:where(:hover) {
+    transform: none;
+  }
 }
 </style>

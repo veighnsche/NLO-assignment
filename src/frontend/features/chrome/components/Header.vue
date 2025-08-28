@@ -78,10 +78,13 @@ const GRAND_AMOUNT = 25000
   margin: 2px 0 6px 0;
   font-family: var(--font-family-display);
   font-weight: var(--font-weight-bold);
-  font-size: clamp(22px, 3.4vw, 34px);
+  font-size: clamp(28px, 6.2vw, 56px);
+  line-height: 1.05;
+  letter-spacing: 0.2px;
   display: flex;
   align-items: baseline;
-  gap: 8px;
+  gap: 10px;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.35);
 }
 .greeting .hi {
   color: var(--color-accent-gold);

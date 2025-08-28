@@ -1,5 +1,10 @@
 <template>
   <div class="admin-bar">
+    <div class="admin-header">
+      <span class="admin-badge" role="status" aria-label="Admin modus – niet voor productie">
+        ADMIN • NOT FOR PRODUCTION
+      </span>
+    </div>
     <div class="bar-card">
       <div class="section left">
         <span class="label">Actieve speler:</span>
@@ -172,7 +177,7 @@ onMounted(async () => {
   right: 0;
   bottom: 0;
   z-index: 1000;
-  height: 100px;
+  height: 140px;
   padding: 0 16px;
   display: flex;
   align-items: center;
@@ -183,6 +188,17 @@ onMounted(async () => {
     linear-gradient(rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0.35)),
     repeating-linear-gradient(30deg, #ffe14d 0 40px, #2b2b2b 40px 80px);
   box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.admin-header {
+  position: absolute;
+  top: 6px;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none; /* allow clicks through the header area */
 }
 
 .bar-card {
@@ -203,6 +219,22 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+.admin-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #b00020;
+  color: #fff;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 12px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  pointer-events: auto; /* restore pointer events for the badge (e.g., text selection) */
 }
 
 .section.center {
