@@ -37,7 +37,7 @@ export interface Snapshot {
 export type RevealResponse =
   | { ok: true; cell: Cell; meta: GridMeta }
   | {
-      error: 'NOT_FOUND' | 'ALREADY_REVEALED' | 'ALREADY_PLAYED' | 'NOT_YOUR_TURN' | 'NOT_ELIGIBLE'
+      error: 'NOT_FOUND' | 'ALREADY_REVEALED' | 'ALREADY_PLAYED' | 'NOT_ELIGIBLE'
     }
 
 export type BotStepResponse =
