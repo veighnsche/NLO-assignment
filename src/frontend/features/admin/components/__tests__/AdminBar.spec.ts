@@ -1,102 +1,87 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
-import AdminBar from '../AdminBar.vue'
+import { createPinia } from 'pinia'
 
-// Mocks
-const resetMock = vi.fn()
-const setBotSpeedMock = vi.fn()
-const getBotDelayMock = vi.fn(async () => ({ minMs: 500, maxMs: 1500 }))
-const pickRandomPlayerMock = vi.fn()
-const toggleExposedMock = vi.fn()
-const refreshCurrentPlayerMock = vi.fn()
+// Stubs for UI components used by AdminBar
+const ButtonStub = {
+  // Pass through attrs so tests can query aria-label etc.
+  template: '<button type="button" v-bind="$attrs" @click="$emit(\'click\')"><slot /></button>',
+}
+const ModalStub = {
+  props: { modelValue: { type: Boolean, default: false }, ariaLabelledby: { type: String, default: '' } },
+  emits: ['update:modelValue'],
+  template:
+    '<div v-if="modelValue" class="modal-stub"><slot /><div class="footer"><slot name="footer" /></div></div>',
+}
+const SliderStub = {
+  template: '<div class="slider-stub"><slot /></div>',
+}
 
-vi.mock('@/frontend/features/admin/useAdminControls', () => ({
-  useAdminControls: () => ({
-    reset: resetMock,
-    setBotSpeed: setBotSpeedMock,
-    getBotDelay: getBotDelayMock,
-    pickRandomPlayer: pickRandomPlayerMock,
-  }),
-}))
-
+// Mocks for Pinia stores consumed by AdminBar
 vi.mock('@/frontend/features/admin/store/adminUI', () => ({
-  useAdminUiStore: () => ({
-    showExposed: false,
-    toggleExposed: toggleExposedMock,
-  }),
+  useAdminUiStore: () => ({ showExposed: false, toggleExposed: vi.fn() }),
 }))
-
+const refreshCurrentPlayerMock = vi.fn()
 vi.mock('@/frontend/features/game/store/session', () => ({
-  useSessionStore: () => ({
-    activePlayerName: 'Alice',
-    refreshCurrentPlayer: refreshCurrentPlayerMock,
-  }),
+  useSessionStore: () => ({ activePlayerName: '', refreshCurrentPlayer: refreshCurrentPlayerMock, userNameById: () => '' }),
 }))
-
 vi.mock('@/frontend/features/game/store/status', () => ({
-  useStatusStore: () => ({
-    isBooting: false,
-  }),
+  useStatusStore: () => ({ isBooting: false }),
 }))
 
-// Stubs
-vi.mock('@/frontend/ui/Button.vue', () => ({
-  default: {
-    name: 'Button',
-    inheritAttrs: false,
-    emits: ['click'],
-    template: '<button v-bind="$attrs" @click="$emit(\'click\')"><slot /></button>',
-  },
+// Will be dynamically set per-test
+let controls: any
+vi.mock('@/frontend/features/admin/useAdminControls', () => ({
+  useAdminControls: () => controls,
 }))
 
-vi.mock('@/frontend/ui/Slider.vue', () => ({
-  default: {
-    name: 'Slider',
-    props: ['modelValue', 'min', 'max', 'step', 'label', 'suffix', 'decimals'],
-    emits: ['update:modelValue', 'input'],
-    template: '<input class="slider-stub" type="range" :min="min" :max="max" :step="step" :value="modelValue" @input="$emit(\'input\')" />',
-  },
-}))
+// Import after mocks
+import AdminBar from '@/frontend/features/admin/components/AdminBar.vue'
+import ToastContainer from '@/frontend/ui/ToastContainer.vue'
 
-vi.mock('@/frontend/ui/Modal.vue', () => ({
-  default: {
-    name: 'Modal',
-    props: {
-      modelValue: { type: Boolean, default: false },
-      ariaLabelledby: { type: String, default: '' },
+function mountAdminBar() {
+  return mount({
+    components: { AdminBar, ToastContainer },
+    template: '<div><AdminBar /><ToastContainer /></div>',
+  }, {
+    global: {
+      plugins: [createPinia()],
+      stubs: {
+        Button: ButtonStub,
+        Modal: ModalStub,
+        Slider: SliderStub,
+        Icon: true,
+      },
     },
-    emits: ['update:modelValue'],
-    template: `
-      <div v-if="modelValue" class="modal-stub" role="dialog" :aria-labelledby="ariaLabelledby">
-        <slot />
-        <div class="footer"><slot name="footer" /></div>
-      </div>
-    `,
-  },
-}))
-
-describe('AdminBar.vue', () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
   })
+}
 
+beforeEach(() => {
+  controls = {
+    reset: vi.fn().mockResolvedValue(undefined),
+    setBotSpeed: vi.fn().mockResolvedValue(undefined),
+    getBotDelay: vi.fn().mockResolvedValue({ minMs: 500, maxMs: 1500 }),
+    getTargets: vi.fn().mockResolvedValue([]),
+    pickRandomPlayer: vi.fn().mockResolvedValue(undefined),
+  }
+})
+
+describe('AdminBar toasts', () => {
   it('emits toggle when close button clicked', async () => {
-    const wrapper = mount(AdminBar)
+    const wrapper = mountAdminBar()
     const closeBtn = wrapper.find('button[aria-label="Sluit adminbalk"]')
     expect(closeBtn.exists()).toBe(true)
     await closeBtn.trigger('click')
-    expect(wrapper.emitted('toggle')).toBeTruthy()
+    const comp = wrapper.findComponent(AdminBar)
+    expect(comp.emitted('toggle')).toBeTruthy()
   })
 
   it('opens reset modal and confirms with seed', async () => {
-    const wrapper = mount(AdminBar)
-
+    const wrapper = mountAdminBar()
     // Open modal
-    const resetBtn = wrapper.find('button')
-    // Find the button with visible text 'Reset spel…'
-    const button = wrapper.findAll('button').find((b) => b.text().includes('Reset spel'))
-    expect(button).toBeTruthy()
-    await (button as any)!.trigger('click')
+    const resetBtn = wrapper.findAll('button').find((b) => b.text().includes('Reset spel'))
+    expect(resetBtn).toBeTruthy()
+    await (resetBtn as any)!.trigger('click')
 
     // Modal content visible
     const title = wrapper.find('#reset-title')
@@ -110,7 +95,65 @@ describe('AdminBar.vue', () => {
     expect(confirm).toBeTruthy()
     await (confirm as any)!.trigger('click')
 
-    expect(resetMock).toHaveBeenCalledWith(42)
+    expect(controls.reset).toHaveBeenCalledWith(42)
     expect(refreshCurrentPlayerMock).toHaveBeenCalled()
+  })
+
+  it('shows success toast when picking random player succeeds', async () => {
+    const wrapper = mountAdminBar()
+    const buttons = wrapper.findAll('button')
+    const pickBtn = buttons.find((b) => b.text().includes('Verander van speler'))!
+    await pickBtn.trigger('click')
+
+    await wrapper.vm.$nextTick()
+    expect(wrapper.html()).toContain('Nieuwe speler geselecteerd')
+  })
+
+  it('shows error toast when picking random player fails', async () => {
+    controls.pickRandomPlayer.mockRejectedValueOnce(new Error('fail'))
+    const wrapper = mountAdminBar()
+    const pickBtn = wrapper.findAll('button').find((b) => b.text().includes('Verander van speler'))!
+    await pickBtn.trigger('click')
+    await wrapper.vm.$nextTick()
+    expect(wrapper.html()).toContain('Geen speler kunnen selecteren')
+  })
+
+  it('shows success toast on reset success', async () => {
+    const wrapper = mountAdminBar()
+    // Open modal
+    const resetOpenBtn = wrapper.findAll('button').find((b) => b.text().includes('Reset spel'))!
+    await resetOpenBtn.trigger('click')
+    // Click confirm in modal
+    const confirmBtn = wrapper.findAll('button').find((b) => b.text().includes('Resetten'))!
+    await confirmBtn.trigger('click')
+    await wrapper.vm.$nextTick()
+    expect(wrapper.html()).toContain('Spel gereset')
+  })
+
+  it('shows error toast on reset failure', async () => {
+    controls.reset.mockRejectedValueOnce(new Error('fail'))
+    const wrapper = mountAdminBar()
+    const resetOpenBtn = wrapper.findAll('button').find((b) => b.text().includes('Reset spel'))!
+    await resetOpenBtn.trigger('click')
+    const confirmBtn = wrapper.findAll('button').find((b) => b.text().includes('Resetten'))!
+    await confirmBtn.trigger('click')
+    await wrapper.vm.$nextTick()
+    expect(wrapper.html()).toContain('Reset mislukt')
+  })
+
+  it('toasts on reset bot speed success/failure', async () => {
+    const wrapper = mountAdminBar()
+    // Success path
+    let btn = wrapper.findAll('button').find((b) => b.text().includes('Reset snelheid'))!
+    await btn.trigger('click')
+    await wrapper.vm.$nextTick()
+    expect(wrapper.html()).toContain('Botsnelheid hersteld')
+
+    // Failure path
+    controls.setBotSpeed.mockRejectedValueOnce(new Error('fail'))
+    btn = wrapper.findAll('button').find((b) => b.text().includes('Reset snelheid'))!
+    await btn.trigger('click')
+    await wrapper.vm.$nextTick()
+    expect(wrapper.html()).toContain('Herstellen botsnelheid mislukt')
   })
 })
