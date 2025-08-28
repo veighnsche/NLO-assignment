@@ -1,5 +1,7 @@
 # NLO
 
+![Coverage](public/coverage.svg)
+
 A Vue 3 + Vite project implementing a 100x100 surprise calendar with a mocked backend, deterministic seeding, IndexedDB persistence, and MSW-driven API.
 
 ## Tech stack
@@ -30,13 +32,13 @@ pnpm build
 ### Run Unit Tests with [Vitest](https://vitest.dev/)
 
 ```sh
-pnpm test:unit
+pnpm test
 ```
 
 Run once (no watch):
 
 ```sh
-pnpm test:unit:run
+pnpm test:run
 ```
 
 ### Lint with [ESLint](https://eslint.org/)
@@ -44,6 +46,17 @@ pnpm test:unit:run
 ```sh
 pnpm lint
 ```
+
+## Scripts
+
+- **dev**: `pnpm dev` — start Vite dev server.
+- **build**: `pnpm build` — type-check then build for production.
+- **preview**: `pnpm preview` — preview built app.
+- **test (watch)**: `pnpm test` — run Vitest in watch mode.
+- **test (once)**: `pnpm test:run` — run tests once.
+- **coverage**: `pnpm test:coverage` — run tests with coverage (used by CI badge).
+- **lint**: `pnpm lint` — lint and auto-fix.
+- **format**: `pnpm format` — format source files under `src/`.
 
 ---
 
@@ -74,7 +87,7 @@ This project uses a minimal, NLO-inspired typography system with performance in 
     - `h1–h3` mapped to Display family bold; `h4–h6` use UI semibold.
     - Controls (buttons, inputs, selects, textareas) inherit fonts and use `--fs-button`.
     - Numeric utilities: `.num-tabular` (tabular lining) and `.num-proportional`.
-- Design system helpers updated in `src/frontend/styles/design-system.css` to use tokens.
+- Utilities are defined in `src/frontend/styles/utilities.css` and use the same tokens.
 
 Adjusting the scale or families
 - Edit tokens in `theme.css`. All components derive from these tokens; avoid component-scoped font overrides.
@@ -98,19 +111,19 @@ Use the shared design tokens and primitives before adding new component CSS. Kee
   - Defines canonical breakpoints and semantic layout vars, e.g. `--header-topbar-direction`, `--prize-strip-gap`, `--footer-grid-cols`, `--topbar-height`.
   - Components should consume these variables; avoid repeating media queries in components.
 
-* __Global styles (`global.css`)__
-  - Imports order: theme → breakpoints → design-system → layout.
+* __Style entry (`index.css`)__
+  - Import order: theme → breakpoints → layout → utilities → global.
   - Element typography (`h1–h6`) and form controls mapping.
   - App chrome uses `#app { padding-top: var(--topbar-height); }`.
 
 * __Primitives & utilities__
-  - `design-system.css`: `.ds-card`, `.ds-badge`, `.ds-chip`, `.ds-grid`, `.h-*` helpers.
+  - `utilities.css`: utility classes for spacing, display, grid, typography helpers.
   - `layout.css`: canonical container `.container` using `--container-max` and `--container-gutter`.
-  - Prefer `.container` (we've removed `.ds-container`).
+  - Prefer `.container`.
 
 * __Conventions__
   - Prefer tokens and helpers before writing new CSS.
-  - If you need a new reusable pattern (e.g., a grid helper), add it to `design-system.css`.
+  - If you need a new reusable pattern (e.g., a grid helper), add it to `utilities.css`.
   - If you need app-wide layout spacing, consider a token in `breakpoints.css`.
   - Keep scoped component CSS minimal and token-driven.
 
@@ -120,7 +133,7 @@ Examples
 <template>
   <section class="container">
     <h2 class="overline overline--muted">Section</h2>
-    <div class="ds-card">…</div>
+    <div>…</div>
   </section>
 </template>
 ```
@@ -234,3 +247,13 @@ pnpm test:unit
 ```
 
 MSW server auto-starts in `src/setupTests.ts`.
+
+### Coverage
+
+Generate a full-project coverage report (used by CI for the README badge):
+
+```sh
+pnpm test:coverage
+```
+
+CI (GitHub Actions: `tests-and-coverage.yml`) parses `coverage/coverage-summary.json`, generates `public/coverage.svg`, and commits it on `main`/`master`. The badge at the top of this README reflects the latest default-branch run.
