@@ -35,6 +35,7 @@ const playerName = computed(() => session.activePlayerName)
         <div class="greeting spectacular" aria-live="polite">
           <span class="hi">Hallo</span>
           <span class="name">{{ playerName || '—' }}</span>
+          <span class="note" aria-hidden="true">(fictief)</span>
         </div>
 
         <!-- Single-source Play State Banner remains -->
@@ -116,6 +117,12 @@ const playerName = computed(() => session.activePlayerName)
 .greeting .name {
   color: var(--color-primary-green);
   font-size: 1em; /* keep name smaller than Hallo */
+}
+
+.greeting .note {
+  color: color-mix(in srgb, var(--text) 60%, var(--border-subtle));
+  font-size: 0.45em;
+  line-height: 1;
 }
 
 /* Prize strip */
