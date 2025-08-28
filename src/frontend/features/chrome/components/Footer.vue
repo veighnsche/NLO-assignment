@@ -73,7 +73,7 @@
 
       <div class="legal-row">
         <small>
-          Copyright Nederlandse Loterij 2025. Alle rechten voorbehouden.
+          Copyright 2025. Alle rechten voorbehouden.
           <span class="right">Nog {{ remaining }} van {{ total }} te openen</span>
         </small>
       </div>
