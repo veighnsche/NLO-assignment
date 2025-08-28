@@ -3,9 +3,11 @@ import { computed } from 'vue'
 import { Icon } from '@iconify/vue'
 import { useGridStore } from '@/frontend/features/game/store/grid'
 import { useStatusStore } from '@/frontend/features/game/store/status'
+import { useSessionStore } from '@/frontend/features/game/store/session'
 
 const grid = useGridStore()
 const status = useStatusStore()
+const session = useSessionStore()
 
 // Derived metrics locally to avoid prop drilling
 const openedCount = computed(() => grid.openedCount)
@@ -18,11 +20,14 @@ const consolationOpenedCount = computed(
         c.prize?.type === 'consolation',
     ).length,
 )
-const grandOpened = computed(() =>
-  grid.revealed.some(
-    (c: { prize?: { type?: 'consolation' | 'grand' | 'none' } }) => c.prize?.type === 'grand',
-  ),
+const grandReveal = computed(() =>
+  grid.revealed.find(
+    (c: { prize?: { type?: 'consolation' | 'grand' | 'none' }; revealedBy?: string }) =>
+      c.prize?.type === 'grand',
+  ) ?? null,
 )
+const grandOpened = computed(() => Boolean(grandReveal.value))
+const grandWinnerName = computed(() => session.userNameById(grandReveal.value?.revealedBy ?? null))
 const canOpen = computed(
   () => !status.isRevealing && !grid.userHasRevealed() && grid.openedCount < grid.total,
 )
@@ -51,7 +56,8 @@ const canOpen = computed(
       >
         <Icon class="emoji" icon="mdi:diamond-stone" aria-hidden="true" />
         <span class="label">Hoofdprijs:</span>
-        <span class="value">{{ grandOpened ? 'Geopend' : 'Nog verborgen' }}</span>
+        <span class="value">{{ grandOpened ? 'Gevonden door' : 'Nog verborgen' }}</span>
+        <span v-if="grandOpened && grandWinnerName" class="winner" aria-live="polite">{{ grandWinnerName }}</span>
         <span v-if="grandOpened" class="burst" aria-hidden="true"></span>
       </div>
 

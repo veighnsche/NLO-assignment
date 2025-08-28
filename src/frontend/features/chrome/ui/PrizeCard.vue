@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { formatCurrency } from '@/frontend/lib/format'
+import { useGridStore } from '@/frontend/features/game/store/grid'
+import { useSessionStore } from '@/frontend/features/game/store/session'
 
 type Variant = 'consolation' | 'grand'
 type CardState = 'default' | 'lost' | 'won'
@@ -41,10 +43,46 @@ const resolvedBgImageCss = computed(() => {
 
 // Aspect ratio for the media holder; default to 16/9
 const resolvedMediaAspect = computed(() => props.mediaAspect ?? '16/9')
+
+// Game-derived metrics for contextual info on cards
+const grid = useGridStore()
+const session = useSessionStore()
+
+// Consolation remaining
+const consolationOpenedCount = computed(() =>
+  grid.revealed.filter((c) => c.prize?.type === 'consolation').length,
+)
+const consolationLeft = computed(() => Math.max(0, (grid.consolationTotal ?? 0) - consolationOpenedCount.value))
+
+// Grand prize winner
+const grandReveal = computed(() => grid.revealed.find((c) => c.prize?.type === 'grand') ?? null)
+const grandFound = computed(() => Boolean(grandReveal.value))
+const grandWinnerName = computed(() => session.userNameById(grandReveal.value?.revealedBy ?? null))
+
+// Current player's reveal (to prefer personal win state)
+const activePid = computed(() => session.activePlayerId)
+const myReveal = computed(() => {
+  const pid = activePid.value
+  if (!pid) return null
+  return grid.revealed.find((c) => c.revealedBy === pid) ?? null
+})
+
+// Resolve visual state: allow external prop; for grand prize
+// - show 'won' for the active player's own win
+// - otherwise, once found by anyone else, show 'lost'
+const resolvedStateClass = computed(() => {
+  const s = props.state ?? 'default'
+  if (props.variant === 'grand') {
+    const mine = myReveal.value
+    if (mine?.prize?.type === 'grand') return 'state--won'
+    if (grandFound.value) return 'state--lost'
+  }
+  return 'state--' + s
+})
 </script>
 
 <template>
-  <div class="prize-card" :class="[variant, props.state ? 'state--' + props.state : 'state--default']" :aria-label="resolvedAriaLabel" role="group">
+  <div class="prize-card" :class="[variant, resolvedStateClass]" :aria-label="resolvedAriaLabel" role="group">
     <div
       class="card-media"
       aria-hidden="true"
@@ -67,6 +105,12 @@ const resolvedMediaAspect = computed(() => props.mediaAspect ?? '16/9')
       </div>
       <div class="divider" role="presentation" />
       <div class="label">{{ resolvedLabel }}</div>
+      <div v-if="props.variant === 'consolation'" class="meta" aria-live="polite">
+        Nog {{ consolationLeft }} over
+      </div>
+      <div v-if="props.variant === 'grand' && grandFound" class="meta" aria-live="polite">
+        <strong>{{ grandWinnerName || 'onbekend' }}</strong>
+      </div>
     </div>
   </div>
 </template>
@@ -223,6 +267,11 @@ const resolvedMediaAspect = computed(() => props.mediaAspect ?? '16/9')
 .label {
   font-size: var(--fs-small);
   opacity: 0.95;
+}
+
+.meta {
+  font-size: 12px;
+  color: color-mix(in srgb, var(--text) 70%, var(--border-subtle));
 }
 
 /* Variant palettes */
