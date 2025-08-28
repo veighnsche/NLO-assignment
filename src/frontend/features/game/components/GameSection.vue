@@ -3,14 +3,34 @@ import { ref } from 'vue'
 import GameMetrics from './GameMetrics.vue'
 import CalendarGrid from './CalendarGrid.vue'
 import GridTooltip from './GridTooltip.vue'
+import RevealModal from './RevealModal.vue'
 import type { GridTooltipApi } from '@/frontend/features/game/composables/useGridTooltip'
 
 // Tooltip instance owned here and passed down to grid as an imperative API
 const tooltipRef = ref<GridTooltipApi | null>(null)
 
-// Derived header metrics (kept for header if needed)
+// CalendarGrid instance to call exposed performReveal from the modal
+const gridRef = ref<InstanceType<typeof CalendarGrid> | null>(null)
 
-// Whether the user can open a cell now (moved into GameMetrics, not needed here)
+// Modal ownership: pending selection and open state
+const confirmOpen = ref(false)
+const pending = ref<{ id: string; row: number; col: number } | null>(null)
+
+function onRequestReveal(payload: { id: string; row: number; col: number }) {
+  pending.value = payload
+  confirmOpen.value = true
+}
+
+async function proxyPerformReveal(id: string) {
+  // Delegate to grid's exposed performReveal with safety check
+  const api = gridRef.value
+  if (!api) throw new Error('Grid is not ready')
+  return await api.performReveal(id)
+}
+
+function onModalClosed() {
+  pending.value = null
+}
 </script>
 
 <template>
@@ -18,10 +38,17 @@ const tooltipRef = ref<GridTooltipApi | null>(null)
     <div class="metrics-sticky" aria-hidden="false">
       <GameMetrics />
     </div>
-    <CalendarGrid :tooltip="tooltipRef" />
+    <CalendarGrid ref="gridRef" :tooltip="tooltipRef" @request-reveal="onRequestReveal" />
   </section>
   <!-- Tooltip instance is hoisted here to avoid any coupling to the 10k grid subtree -->
   <GridTooltip ref="tooltipRef" />
+  <!-- Reveal modal is owned here -->
+  <RevealModal
+    v-model="confirmOpen"
+    :pending="pending"
+    :performReveal="proxyPerformReveal"
+    @closed="onModalClosed"
+  />
 </template>
 
 <style scoped>

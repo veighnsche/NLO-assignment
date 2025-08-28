@@ -57,14 +57,8 @@ export const useGridStore = defineStore('grid', {
       try {
         const snap = await apiSnapshot()
         status.setNetworkOk(true)
-        const prevEtag = this.lastEtag
-        // If nothing changed on the backend, avoid touching reactive state to prevent giant rerenders
-        if (prevEtag === snap.meta.etag) {
-          // Keep meta in sync for consumers that read it, but do not assign arrays
-          this.meta = snap.meta
-          return
-        }
-        // Apply updated snapshot only when etag changes
+        // Always apply snapshot to ensure UI reflects server state, even if etag is unchanged.
+        // This avoids missing updates when backend etag is not bumped (e.g., bot-driven reveals).
         this.meta = snap.meta
         this.revealed = snap.revealed
         // Mutate stable revealedIds Set and revealedByIdMap in place

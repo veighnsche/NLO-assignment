@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
 import { Icon } from '@iconify/vue'
-import RevealModal from './RevealModal.vue'
 import type { GridTooltipApi } from '@/frontend/features/game/composables/useGridTooltip'
 import { useGridCells } from '@/frontend/features/game/composables/useGridCells'
 import type { RevealResult } from '@/frontend/types/api'
@@ -42,9 +40,10 @@ const props = withDefaults(
   },
 )
 
-// Internal confirm + modal state
-const confirmOpen = ref(false)
-const pending = ref<{ id: string; row: number; col: number } | null>(null)
+// Emit to let parent optionally own confirmation modal
+const emit = defineEmits<{
+  (e: 'request-reveal', payload: { id: string; row: number; col: number }): void
+}>()
 
 async function performReveal(id: string): Promise<RevealResult> {
   await grid.reveal(id)
@@ -55,15 +54,10 @@ async function performReveal(id: string): Promise<RevealResult> {
   return { type: 'none' as const, amount: 0 }
 }
 
-function onModalClosed() {
-  pending.value = null
-}
-
 async function onReveal(i: number) {
   if (status.isRevealing || isRevealed(i) || grid.userHasRevealed()) return
   if (props.confirmBeforeReveal) {
-    pending.value = { id: cellIdFromIndex(i), row: getRow(i), col: getCol(i) }
-    confirmOpen.value = true
+    emit('request-reveal', { id: cellIdFromIndex(i), row: getRow(i), col: getCol(i) })
     return
   }
   await grid.reveal(cellIdFromIndex(i))
@@ -89,6 +83,9 @@ const { onGridMove, onGridLeave } = useGridHoverTooltip({
   revealedById,
   userNameById: session.userNameById,
 })
+
+// Expose reveal method so parent can call via template ref from its modal
+defineExpose({ performReveal })
 </script>
 
 <template>
@@ -102,6 +99,7 @@ const { onGridMove, onGridLeave } = useGridHoverTooltip({
       v-for="id in cells"
       :key="id"
       class="cell"
+      type="button"
       v-memo="[
         isRevealed(id),
         isCellDisabled(id),
@@ -140,13 +138,6 @@ const { onGridMove, onGridLeave } = useGridHoverTooltip({
       </span>
     </button>
   </div>
-  <!-- Internal two-step RevealModal -->
-  <RevealModal
-    v-model="confirmOpen"
-    :pending="pending"
-    :performReveal="performReveal"
-    @closed="onModalClosed"
-  />
 </template>
 
 <style scoped>
@@ -195,11 +186,6 @@ const { onGridMove, onGridLeave } = useGridHoverTooltip({
   box-shadow: none;
 }
 
-/* Closed (not yet opened) */
-.cell.closed {
-  background: var(--surface-alt);
-}
-
 /* Closed + playable vs blocked distinction */
 .cell.closed.closed-playable {
   cursor: pointer;
@@ -208,21 +194,23 @@ const { onGridMove, onGridLeave } = useGridHoverTooltip({
   background: color-mix(in srgb, var(--surface-alt) 80%, white);
 }
 
-.cell.closed.closed-blocked,
-.cell:disabled.closed {
+.cell:disabled {
   cursor: not-allowed;
   background: color-mix(in srgb, var(--surface-alt) 85%, white);
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--border-subtle) 75%, white);
   filter: grayscale(0.2);
 }
 
-/* Revealed + prize variants */
-/* Avoid outlines on revealed cells to prevent seams between adjacent revealed tiles */
-.cell.revealed.consolation {
+/* Ensure disabled styles do not override revealed transparency */
+.cell.revealed:disabled {
+  background: transparent;
   box-shadow: none;
+  filter: none;
 }
 
-.cell.revealed.grand {
+/* Revealed + prize variants */
+/* Avoid outlines on revealed cells to prevent seams between adjacent revealed tiles */
+.cell.revealed {
   box-shadow: none;
 }
 
@@ -306,18 +294,16 @@ const { onGridMove, onGridLeave } = useGridHoverTooltip({
   margin: auto;
 }
 .cell .expose[data-type='grand'] {
-  color: #b8860b; /* darkgoldenrod */
+  color: var(--color-accent-gold);
   text-shadow: 0 0 4px rgba(255, 223, 0, 0.7);
 }
 .cell .expose[data-type='consolation'] {
-  color: #0b6db8; /* blue accent */
+  color: var(--state-info);
   text-shadow: 0 0 4px rgba(0, 123, 255, 0.5);
 }
 
 .cell:focus-visible {
-  outline: 0;
-  box-shadow:
-    inset 0 0 0 2px var(--color-accent-gold),
-    inset 0 0 0 4px color-mix(in srgb, var(--color-primary-green) 30%, transparent);
+  outline: none;
+  box-shadow: var(--focus-ring);
 }
 </style>
