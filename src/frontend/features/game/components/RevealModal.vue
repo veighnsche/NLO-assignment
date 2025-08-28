@@ -14,21 +14,21 @@
     <!-- Step 2: Result -->
     <div v-else>
       <h2 id="result-title">Uitslag</h2>
-      <div class="result-card" :class="['result-' + result.type]">
-        <p v-if="result.type === 'none'">Helaas, geen prijs deze keer.</p>
-        <p v-else-if="result.type === 'consolation'">
-          Gefeliciteerd! Je hebt een <strong>Troostprijs</strong> gewonnen
-          <template v-if="result.amount"
-            >van <strong>{{ nfCurrency.format(result.amount) }}</strong></template
-          >.
-        </p>
-        <p v-else-if="result.type === 'grand'">
-          Fantastisch! Je hebt de <strong>Hoofdprijs</strong> gewonnen
-          <template v-if="result.amount"
-            >van <strong>{{ nfCurrency.format(result.amount) }}</strong></template
-          >!
-          <Icon icon="mdi:party-popper" aria-hidden="true" />
-        </p>
+      <div class="result-video" :class="['result-' + result.type]">
+        <video
+          v-if="videoSrc"
+          :src="videoSrc"
+          controls
+          autoplay
+          muted
+          playsinline
+          @ended="onVideoEnded"
+          class="result-video-el"
+          aria-label="Resultaat video"
+        >
+          Je browser ondersteunt de video tag niet.
+        </video>
+        <p v-else>Video niet beschikbaar.</p>
       </div>
     </div>
 
@@ -50,10 +50,8 @@
 
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import { Icon } from '@iconify/vue'
 import Modal from '@/frontend/ui/Modal.vue'
 import Button from '@/frontend/ui/Button.vue'
-import { nfCurrency } from '@/frontend/lib/format'
 import type { RevealResult } from '@/frontend/types/api'
 
 const props = defineProps<{
@@ -77,6 +75,19 @@ const result = ref<RevealResult>({ type: 'none', amount: 0 })
 const busy = ref(false)
 const errorMsg = ref<string | null>(null)
 
+const videoSrc = computed(() => {
+  switch (result.value.type) {
+    case 'none':
+      return '/lost.mp4'
+    case 'consolation':
+      return '/won-consolation.mp4'
+    case 'grand':
+      return '/won-grand.mp4'
+    default:
+      return ''
+  }
+})
+
 watch(
   () => props.modelValue,
   (opened) => {
@@ -97,6 +108,9 @@ function onCancel() {
 
 async function onConfirm() {
   if (!props.pending || busy.value) return
+  try {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  } catch {}
   busy.value = true
   errorMsg.value = null
   try {
@@ -115,6 +129,10 @@ function onCloseResult() {
   open.value = false
   emit('closed')
 }
+
+function onVideoEnded() {
+  onCloseResult()
+}
 </script>
 
 <style scoped>
@@ -128,6 +146,21 @@ function onCloseResult() {
   border-radius: var(--radius-md);
   background: var(--surface-elevated);
   border: 1px solid var(--border-subtle);
+}
+
+.result-video {
+  margin-top: 8px;
+  padding: 8px;
+  border-radius: var(--radius-md);
+  background: var(--surface-elevated);
+  border: 1px solid var(--border-subtle);
+}
+
+.result-video-el {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  display: block;
+  border-radius: var(--radius-sm);
 }
 
 .result-none {
