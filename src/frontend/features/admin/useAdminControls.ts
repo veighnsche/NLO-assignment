@@ -1,5 +1,6 @@
 import { useGridStore } from '@/frontend/features/game/store/grid'
 import { useExposedStore } from '@/frontend/features/admin/store/exposed'
+import { useAdminUiStore } from '@/frontend/features/admin/store/adminUI'
 import { useBotStore } from '@/frontend/features/game/store/bot'
 import { useSessionStore } from '@/frontend/features/game/store/session'
 import {
@@ -14,6 +15,7 @@ import {
 export function useAdminControls() {
   const grid = useGridStore()
   const exposed = useExposedStore()
+  const adminUi = useAdminUiStore()
   const bot = useBotStore()
   const session = useSessionStore()
 
@@ -27,6 +29,8 @@ export function useAdminControls() {
     }
     // Clear any admin-exposed overlay so it doesn't show stale targets after reseed
     exposed.clearTargets()
+    // Also reset the UI toggle so the AdminBar button shows "Toon prijzen" again
+    adminUi.toggleExposed(false)
     await grid.refresh()
   }
 

@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { reactive, nextTick } from 'vue'
 import { mount } from '@vue/test-utils'
 import { createPinia } from 'pinia'
 
@@ -18,8 +19,9 @@ const SliderStub = {
 }
 
 // Mocks for Pinia stores consumed by AdminBar
+let adminUiStoreMock: any
 vi.mock('@/frontend/features/admin/store/adminUI', () => ({
-  useAdminUiStore: () => ({ showExposed: false, toggleExposed: vi.fn() }),
+  useAdminUiStore: () => adminUiStoreMock,
 }))
 const refreshCurrentPlayerMock = vi.fn()
 vi.mock('@/frontend/features/game/store/session', () => ({
@@ -57,6 +59,17 @@ function mountAdminBar() {
 }
 
 beforeEach(() => {
+  // Reset a reactive admin UI store mock each test so template reacts to changes
+  adminUiStoreMock = reactive({
+    showExposed: false,
+    toggleExposed: vi.fn((force?: boolean) => {
+      if (typeof force === 'boolean') {
+        adminUiStoreMock.showExposed = force
+      } else {
+        adminUiStoreMock.showExposed = !adminUiStoreMock.showExposed
+      }
+    }),
+  })
   controls = {
     reset: vi.fn().mockResolvedValue(undefined),
     setBotSpeed: vi.fn().mockResolvedValue(undefined),
@@ -155,5 +168,35 @@ describe('AdminBar toasts', () => {
     await btn.trigger('click')
     await wrapper.vm.$nextTick()
     expect(wrapper.html()).toContain('Herstellen botsnelheid mislukt')
+  })
+
+  it('resets expose button label to default after game reset', async () => {
+    const wrapper = mountAdminBar()
+    // Initially should show "Toon prijzen"
+    let exposeBtn = wrapper.findAll('button').find((b) => /Toon prijzen/i.test(b.text()))
+    expect(exposeBtn).toBeTruthy()
+
+    // Simulate prizes exposed -> label becomes "Verberg prijzen"
+    adminUiStoreMock.showExposed = true
+    await nextTick()
+    exposeBtn = wrapper.findAll('button').find((b) => /Verberg prijzen/i.test(b.text()))
+    expect(exposeBtn).toBeTruthy()
+
+    // Open reset modal
+    const resetOpenBtn = wrapper.findAll('button').find((b) => b.text().includes('Reset spel'))!
+    await resetOpenBtn.trigger('click')
+
+    // Make reset implementation also reset the store toggle (simulating implementation)
+    controls.reset.mockImplementationOnce(async () => {
+      adminUiStoreMock.toggleExposed(false)
+    })
+
+    const confirmBtn = wrapper.findAll('button').find((b) => b.text().includes('Resetten'))!
+    await confirmBtn.trigger('click')
+    await nextTick()
+
+    // Button label should be back to default
+    exposeBtn = wrapper.findAll('button').find((b) => /Toon prijzen/i.test(b.text()))
+    expect(exposeBtn).toBeTruthy()
   })
 })
