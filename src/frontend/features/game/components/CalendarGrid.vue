@@ -158,7 +158,9 @@ const { onGridMove, onGridLeave } = useGridHoverTooltip({
   width: 100%;
   user-select: none;
   box-sizing: border-box;
-  max-width: 100vw; /* ensure grid stays within viewport */
+  /* Constrain width to create side space so page background is visible */
+  max-width: min(1200px, 100vw - 2rem);
+  margin-inline: auto; /* center the grid within the page */
   border: 1px solid var(--border-subtle);
   /* Background image composed of two halves stacked vertically */
   background-image: url('/top-half.png'), url('/bottom-half.png');
