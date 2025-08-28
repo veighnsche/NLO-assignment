@@ -1,3 +1,5 @@
+[English](TESTING.md) | [Nederlands](TESTING.nl.md)
+
 # Testing Guide
 
 This project uses Vitest + Vue Test Utils for unit tests.

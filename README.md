@@ -1,3 +1,5 @@
+[English](README.md) | [Nederlands](README.nl.md)
+
 # NLO
 
 ![Coverage](public/coverage.svg)
@@ -253,7 +255,7 @@ Client functions live under `src/frontend/features/game/api.ts` and `src/fronten
 Run unit tests:
 
 ```sh
-pnpm test:unit
+pnpm test
 ```
 
 MSW server auto-starts in `src/setupTests.ts`.

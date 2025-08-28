@@ -1,6 +1,11 @@
+[English](MANUAL_TESTING.md) | [Nederlands](MANUAL_TESTING.nl.md)
+
 # Manual Testing Guide
 
 This guide helps you manually test the game using the Admin Bar to expose winning cells and validate different states, including winning a consolation prize and the grand prize.
+
+Preferred: open the deployed app at https://nlo-assignment.pages.dev/.
+Alternatively, for local development, follow the steps below.
 
 ## Prerequisites
 - Install deps: `pnpm install`
@@ -41,3 +46,4 @@ This guide helps you manually test the game using the Admin Bar to expose winnin
 ## Notes
 - The Admin Bar is intended for testing/dev only and should not be used in production.
 - If the app appears to be initializing, wait for the initial screen to complete before interacting with the grid/admin controls.
+
