@@ -2,52 +2,99 @@
 defineOptions({ name: 'AppHeader' })
 import { computed } from 'vue'
 import { useSessionStore } from '@/frontend/features/game/store/session'
+import PrizeBadge from '@/frontend/ui/PrizeBadge.vue'
 import PlayStateBanner from '@/frontend/features/game/components/PlayStateBanner.vue'
 
 const props = defineProps<{
   title?: string
-  // Header no longer handles metrics; keep optional title only
 }>()
 
 const session = useSessionStore()
+
 // Active player name (admin-selected or assigned)
 const playerName = computed(() => session.activePlayerName)
+
+
+// Prize model (frontend mirrors backend constants: 100 and 25,000)
+const CONSOLATION_COUNT = 100
+const CONSOLATION_AMOUNT = 100
+const GRAND_COUNT = 1
+const GRAND_AMOUNT = 25000
+
+// Labels can be built inline in template; avoid unused computed values
 </script>
 
 <template>
   <div class="game-header">
-    <h2 v-if="props.title">{{ props.title }}</h2>
-    <div class="greeting" aria-live="polite">Hallo, {{ playerName || '—' }}</div>
-    <!-- Single-source Play State Banner -->
-    <PlayStateBanner />
+    <div class="ds-container">
+      <h2 v-if="props.title" class="overline">{{ props.title }}</h2>
+
+      <!-- Spectacular greeting -->
+      <div class="greeting spectacular" aria-live="polite">
+        <span class="hi">Hallo</span>
+        <span class="name">{{ playerName || '—' }}</span>
+      </div>
+
+      <!-- Prize highlights -->
+      <div class="prize-strip" role="group" aria-label="Te winnen prijzen">
+        <PrizeBadge
+          variant="consolation"
+          :count="CONSOLATION_COUNT"
+          :amount="CONSOLATION_AMOUNT"
+          label="troostprijs"
+          aria-label="Honderd troostprijzen van 100 euro"
+        />
+        <PrizeBadge
+          variant="grand"
+          :count="GRAND_COUNT"
+          :amount="GRAND_AMOUNT"
+          label="hoofdprijs"
+          aria-label="Eén hoofdprijs van 25.000 euro"
+        />
+      </div>
+
+      <!-- Single-source Play State Banner remains -->
+      <PlayStateBanner />
+    </div>
   </div>
 </template>
 
 <style scoped>
-.game-header {
+.game-header > .ds-container {
   padding: 0.5rem 1rem 0.25rem;
 }
 
-h2 {
+/* Overline label */
+.overline {
   margin: 0 0 0.25rem 0;
+  font-size: var(--fs-overline);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: color-mix(in srgb, var(--text) 72%, var(--border-subtle));
+}
+
+/* Spectacular greeting */
+.greeting.spectacular {
+  margin: 2px 0 6px 0;
+  font-family: var(--font-family-display);
+  font-weight: var(--font-weight-bold);
+  font-size: clamp(22px, 3.4vw, 34px);
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.greeting .hi {
+  color: var(--color-accent-gold);
+}
+.greeting .name {
   color: var(--color-primary-green);
-  position: relative;
-  padding-bottom: 0.25rem;
 }
 
-/* Gold underline accent */
-h2::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  width: 64px;
-  height: 3px;
-  background: var(--color-accent-gold);
-  border-radius: var(--radius-sm);
-}
-
-.greeting {
-  margin: 0 0 0.25rem 0;
+/* Prize strip */
+.prize-strip {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 4px 0 8px 0;
 }
 </style>

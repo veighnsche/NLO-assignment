@@ -39,7 +39,7 @@ const canOpen = computed(
 
       <div class="metric consolation" aria-label="Aantal geopende troostprijzen">
         <Icon class="emoji" icon="mdi:gift" aria-hidden="true" />
-        <span class="label">Troostprijzen:</span>
+        <span class="label">Troostprijzen geopend:</span>
         <span class="value">{{ consolationOpenedCount }} / {{ consolationTotal }}</span>
       </div>
 
