@@ -12,7 +12,6 @@ import {
   getAdminTargets,
   getCurrentPlayer,
   setCurrentPlayer,
-  listEligibleUsers,
   assignUserForClient,
   resolveUsers,
   pickRandomEligibleUser,
@@ -212,23 +211,6 @@ export const handlers = [
       const body = await safeJson<{ playerId?: string | null }>(request, {})
       const res = await setCurrentPlayer(body.playerId ?? null)
       if ('error' in res) return HttpResponse.json(res, { status: statusForDomainError(res.error) })
-      return HttpResponse.json(res)
-    } catch (err) {
-      return HttpResponse.json({ error: String(err) }, { status: 500 })
-    }
-  }),
-
-  http.get('/api/admin/eligible-users', ({ request }) => {
-    try {
-      const url = new URL(request.url)
-      const offset = Number(url.searchParams.get('offset') ?? '0')
-      const limit = Number(url.searchParams.get('limit') ?? '100')
-      const query = url.searchParams.get('query') ?? undefined
-      const res = listEligibleUsers(
-        Number.isFinite(offset) ? offset : 0,
-        Number.isFinite(limit) ? limit : 100,
-        query,
-      )
       return HttpResponse.json(res)
     } catch (err) {
       return HttpResponse.json({ error: String(err) }, { status: 500 })

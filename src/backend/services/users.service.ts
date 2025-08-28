@@ -53,24 +53,6 @@ export async function setCurrentPlayer(
   return { ok: true }
 }
 
-export function listEligibleUsers(
-  offset = 0,
-  limit = 100,
-  query?: string,
-): { total: number; users: Array<{ id: string; name: string }> } {
-  const users = getUsersMemory()
-  if (!users) return { total: 0, users: [] }
-  const all = Object.values(users).filter((u) => !u.played)
-  let filtered = all
-  if (query && query.trim()) {
-    const q = query.trim().toLowerCase()
-    filtered = all.filter((u) => u.id.toLowerCase().includes(q) || u.name.toLowerCase().includes(q))
-  }
-  const total = filtered.length
-  const page = filtered.slice(Math.max(0, offset), Math.max(0, offset) + Math.max(0, limit))
-  return { total, users: page.map((u) => ({ id: u.id, name: u.name })) }
-}
-
 export function assignUserForClient(clientId: string): { id: string; name: string } {
   const memory = getMemory()
   ensureBooted(memory)

@@ -4,7 +4,6 @@ import {
   pickRandomEligibleUser,
   getCurrentPlayer,
   setCurrentPlayer,
-  listEligibleUsers,
   assignUserForClient,
   resolveUsers,
 } from '@/backend/services/users.service'
@@ -58,19 +57,6 @@ describe('services/users.service', () => {
     expect(res).toEqual({ error: 'NOT_ELIGIBLE' })
   })
 
-  it('listEligibleUsers paginates and filters', async () => {
-    const { total, users } = listEligibleUsers(0, 10)
-    expect(total).toBeGreaterThan(0)
-    expect(users.length).toBeLessThanOrEqual(10)
-
-    // filter by part of an id or name from first page
-    const sample = users[0]
-    const byId = listEligibleUsers(0, 100, sample.id.slice(0, 3))
-    expect(byId.total).toBeGreaterThan(0)
-
-    const byName = listEligibleUsers(0, 100, sample.name.split(' ')[0])
-    expect(byName.total).toBeGreaterThan(0)
-  })
 
   it('assignUserForClient is deterministic per clientId', async () => {
     const a1 = assignUserForClient('client-xyz')
@@ -97,11 +83,6 @@ describe('services/users.service', () => {
     expect(res).toEqual({ error: 'NO_ELIGIBLE' })
   })
 
-  it('listEligibleUsers returns empty when users missing', () => {
-    setUsersMemory(null)
-    const res = listEligibleUsers(0, 10)
-    expect(res).toEqual({ total: 0, users: [] })
-  })
 
   it('assignUserForClient throws when users missing', () => {
     setUsersMemory(null)

@@ -187,33 +187,6 @@ describe('api.handlers (MSW integration)', () => {
     expect(bad.status).toBe(403)
   })
 
-  it('GET /api/admin/eligible-users paginates and filters', async () => {
-    // page size 5
-    let r = await get('/api/admin/eligible-users?offset=0&limit=5')
-    expect(r.status).toBe(200)
-    let j = await r.json()
-    expect(j).toHaveProperty('total')
-    expect(j).toHaveProperty('users')
-    expect(j.users.length).toBeLessThanOrEqual(5)
-
-    // Use a substring of a returned name as query
-    if (j.users.length > 0) {
-      const q = j.users[0].name.split(' ')[0]
-      r = await get(`/api/admin/eligible-users?offset=0&limit=100&query=${encodeURIComponent(q)}`)
-      expect(r.status).toBe(200)
-      j = await r.json()
-      expect(j.total).toBeGreaterThan(0)
-    }
-  })
-
-  it('GET /api/admin/eligible-users tolerates invalid offset/limit by defaulting', async () => {
-    const r = await get('/api/admin/eligible-users?offset=not-a-number&limit=nah')
-    expect(r.status).toBe(200)
-    const j = await r.json()
-    expect(j).toHaveProperty('total')
-    expect(Array.isArray(j.users)).toBe(true)
-  })
-
   it('POST /api/bot/step maps NOT_BOOTED to 503', async () => {
     // Force backend memory to null so botStep returns NOT_BOOTED
     setMemory(null)

@@ -13,7 +13,6 @@ import {
   apiAdminGetCurrentPlayer,
   apiAdminSetCurrentPlayer,
   apiAdminPickRandomPlayer,
-  apiAdminEligibleUsers,
 } from '../api'
 
 afterEach(() => {
@@ -80,16 +79,5 @@ describe('admin api wrappers', () => {
     const res = await apiAdminPickRandomPlayer()
     expect(res).toBe(payload)
     expect(jsonFetch).toHaveBeenCalledWith('/api/admin/pick-random-player', { method: 'POST' })
-  })
-
-  it('apiAdminEligibleUsers builds query params', async () => {
-    const payload = { total: 0, users: [] }
-    ;(jsonFetch as any).mockResolvedValueOnce(payload)
-    const res = await apiAdminEligibleUsers(5, 10, 'al')
-    expect(res).toBe(payload)
-    expect((jsonFetch as any).mock.calls[0][0]).toContain('/api/admin/eligible-users?')
-    expect((jsonFetch as any).mock.calls[0][0]).toContain('offset=5')
-    expect((jsonFetch as any).mock.calls[0][0]).toContain('limit=10')
-    expect((jsonFetch as any).mock.calls[0][0]).toContain('query=al')
   })
 })

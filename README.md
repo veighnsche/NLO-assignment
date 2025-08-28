@@ -229,7 +229,6 @@ Admin:
 - `POST /api/admin/pick-random-player` — Pick a random eligible user.
 - `GET /api/admin/current-player` — Get current selected player.
 - `POST /api/admin/current-player` — Set current player `{ playerId|null }`.
-- `GET /api/admin/eligible-users?offset=&limit=&query=` — Paginated eligible users.
 
 Users:
 

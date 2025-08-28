@@ -11,7 +11,6 @@ export { setBotDelayRange, getBotDelayRange } from './services/bot.service'
 export {
   getCurrentPlayer,
   setCurrentPlayer,
-  listEligibleUsers,
   assignUserForClient,
   resolveUsers,
   pickRandomEligibleUser,

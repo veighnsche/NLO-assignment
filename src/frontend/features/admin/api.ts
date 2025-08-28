@@ -48,15 +48,3 @@ export async function apiAdminPickRandomPlayer(): Promise<
 > {
   return jsonFetch('/api/admin/pick-random-player', { method: 'POST' })
 }
-
-export async function apiAdminEligibleUsers(
-  offset = 0,
-  limit = 100,
-  query?: string,
-): Promise<{ total: number; users: Array<{ id: string; name: string }> }> {
-  const params = new URLSearchParams()
-  params.set('offset', String(offset))
-  params.set('limit', String(limit))
-  if (query) params.set('query', query)
-  return jsonFetch(`/api/admin/eligible-users?${params.toString()}`)
-}
