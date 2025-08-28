@@ -238,7 +238,7 @@ const { onGridMove, onGridLeave } = useGridHoverTooltip({
 
 /* Optional: tweak emoji sizing */
 .cell .reveal {
-  font-size: 0.9rem;
+  font-size: 1rem;
 }
 
 /* Admin-only exposure styles (closed cells only) */
@@ -247,6 +247,32 @@ const { onGridMove, onGridLeave } = useGridHoverTooltip({
   box-shadow:
     inset 0 0 0 2px color-mix(in srgb, var(--border-subtle) 40%, gold),
     0 0 6px rgba(255, 215, 0, 0.35);
+}
+/* Emphasize revealed prize icons without obscuring background image */
+.cell.revealed .reveal {
+  color: rgba(255, 255, 255, 0.65);
+  text-shadow: 0 0 3px rgba(0, 0, 0, 0.35);
+}
+.cell.revealed.grand .reveal,
+.cell.revealed.consolation .reveal {
+  /* Slight size bump and a gentle, one-time pulse */
+  transform: scale(1.05);
+  animation: cell-pulse 900ms ease-out 1;
+}
+
+@keyframes cell-pulse {
+  0% {
+    transform: scale(0.9);
+    filter: drop-shadow(0 0 0px rgba(255, 255, 255, 0));
+  }
+  40% {
+    transform: scale(1.15);
+    filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.65));
+  }
+  100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 0px rgba(255, 255, 255, 0));
+  }
 }
 .cell .expose {
   opacity: 0.95;
