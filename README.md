@@ -159,9 +159,14 @@ pnpm dev
 ```
 
 4. Verify MSW
-
 - **[Expected]** Network shows `GET /mockServiceWorker.js` 200 (content-type JavaScript).
 - **[Code path]** `src/main.ts` dynamically imports `src/backend/msw/browser.ts` in dev and starts the worker.
+
+### MSW in production (demo)
+This project intentionally enables MSW in production builds for demo purposes.
+- Source: `.env.production` sets `VITE_ENABLE_MSW=true` so `src/main.ts` starts the worker in prod, too.
+- Implication: All API calls are served by the in-browser mock worker; there is no real backend.
+- Changing later: Set `VITE_ENABLE_MSW=false` (or remove the key) for real deployments and wire a live API.
 
 ## Architecture
 
@@ -234,6 +239,12 @@ Users:
 
 - `POST /api/users/assign` — Assign or retrieve a user for a client; sets `nlo-client-id` cookie when missing.
 - `POST /api/users/resolve` — Resolve user details by ids `{ ids: string[] }`.
+
+### Users — assignment semantics
+- `assignUserForClient(clientId)` provides a deterministic mapping of a client id to a user. It does not filter by eligibility (`played === false`).
+- Eligibility for actually playing is enforced elsewhere (e.g., admin selection via `pickRandomEligibleUser()` / `setCurrentPlayer()` and the reveal flow).
+- Rationale: Assignment is used primarily to label a session consistently; game logic guards actual play.
+- If you ever need assignment to return only eligible users, filter to `!played` before choosing.
 
 Client functions live under `src/frontend/features/game/api.ts` and `src/frontend/features/admin/api.ts`, mapping 1:1 to these endpoints.
 

@@ -53,6 +53,19 @@ export async function setCurrentPlayer(
   return { ok: true }
 }
 
+/**
+ * Deterministically map a client identifier to a user record.
+ *
+ * Semantics:
+ * - Uses seeded RNG mixed with the provided clientId to pick a user id from the full users map.
+ * - Does NOT filter out users who have already played. This function is intended to provide
+ *   a stable display identity for a client/session. Actual play eligibility is enforced by
+ *   admin/user selection and reveal logic (e.g., `pickRandomEligibleUser()` / `setCurrentPlayer()`),
+ *   and by guards in the reveal service.
+ *
+ * If you need this to return only eligible users, filter the source ids to `!played` before
+ * choosing an index with the RNG.
+ */
 export function assignUserForClient(clientId: string): { id: string; name: string } {
   const memory = getMemory()
   ensureBooted(memory)
