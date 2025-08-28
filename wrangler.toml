@@ -1,22 +1,13 @@
 # Cloudflare configuration for deploying this Vite (Vue 3) app to Pages
 # Docs: https://developers.cloudflare.com/pages/framework-guides/deploy-a-vite3-project/
 
-name = "nlo"
 compatibility_date = "2025-08-28"
 
-# Pages-specific settings
-[pages]
-# If this is your first deploy with `wrangler pages deploy`, this will become the Pages project name
-project_name = "nlo"
-# Where `pnpm build` outputs files
-build_output_dir = "dist"
+# Cloudflare Pages expects this key in wrangler.toml when configuring via Wrangler
+pages_build_output_dir = "dist"
 
 # Local build command (Wrangler will run this if you deploy without a pre-built `dist`)
 [build]
 command = "pnpm build"
-
-# Example: define environment variables for your app (none needed now)
-# [vars]
-# API_BASE_URL = "https://api.example.com"
 
 # To add Cloudflare Pages Functions later, create a `functions/` directory.
