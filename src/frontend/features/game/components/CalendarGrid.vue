@@ -185,6 +185,7 @@ const { onGridMove, onGridLeave } = useGridHoverTooltip({
   min-width: 0; /* allow shrinking inside 1fr tracks */
   min-height: 0;
   box-sizing: border-box;
+  overflow: hidden; /* ensure inner highlights/icons never bleed outside the tile */
 }
 
 .cell.revealed {
@@ -243,6 +244,14 @@ const { onGridMove, onGridLeave } = useGridHoverTooltip({
   font-size: 1rem;
 }
 
+/* Ensure inner content is centered regardless of icon intrinsic metrics */
+.cell > .reveal,
+.cell > .expose {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
 /* Admin-only exposure styles (closed cells only) */
 .cell.closed.exposed {
   /* stronger outline + subtle glow */
@@ -258,7 +267,7 @@ const { onGridMove, onGridLeave } = useGridHoverTooltip({
 .cell.revealed.grand .reveal,
 .cell.revealed.consolation .reveal {
   /* Slight size bump and a gentle, one-time pulse */
-  transform: scale(1.05);
+  transform: scale(1);
   animation: cell-pulse 900ms ease-out 1;
 }
 
@@ -268,7 +277,7 @@ const { onGridMove, onGridLeave } = useGridHoverTooltip({
     filter: drop-shadow(0 0 0px rgba(255, 255, 255, 0));
   }
   40% {
-    transform: scale(1.15);
+    transform: scale(1.02);
     filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.65));
   }
   100% {
@@ -281,6 +290,20 @@ const { onGridMove, onGridLeave } = useGridHoverTooltip({
   font-size: 1.2rem;
   line-height: 1;
   filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.25));
+}
+.cell .expose :deep(svg) {
+  /* Keep the exposed icon within the bounds of the cell on very small tiles */
+  width: 60%;
+  height: 60%;
+  display: block;
+  margin: auto;
+}
+.cell .reveal :deep(svg) {
+  /* Keep revealed prize icons reasonably small as well */
+  width: 50%;
+  height: 50%;
+  display: block;
+  margin: auto;
 }
 .cell .expose[data-type='grand'] {
   color: #b8860b; /* darkgoldenrod */
