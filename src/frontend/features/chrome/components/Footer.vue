@@ -103,9 +103,9 @@ const remaining = computed(() => Math.max(0, grid.total - grid.openedCount))
 }
 
 .footer-container {
-  max-width: 1200px;
+  max-width: var(--container-max);
   margin: 0 auto;
-  padding: 0 24px; /* horizontal margins */
+  padding-inline: var(--container-gutter); /* horizontal margins */
 }
 
 .footer-grid {

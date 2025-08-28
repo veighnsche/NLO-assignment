@@ -13,6 +13,10 @@
   --bp-lg: 900px;
   --bp-xl: 1200px;
 
+  /* Shared container tokens */
+  --container-max: 1200px;
+  --container-gutter: 24px;
+
   /* Header layout tokens */
   --header-topbar-direction: column; /* stacks by default */
   --header-topbar-justify: flex-start;

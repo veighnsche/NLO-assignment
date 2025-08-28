@@ -30,6 +30,9 @@ const tooltipRef = ref<GridTooltipApi | null>(null)
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-md);
   position: relative;
+  /* Constrain width and keep gutters from screen edges */
+  width: min(100% - calc(var(--container-gutter) * 2), var(--container-max));
+  margin-inline: auto;
 }
 
 /* Decorative gold accent at the top to echo festive vibe */
