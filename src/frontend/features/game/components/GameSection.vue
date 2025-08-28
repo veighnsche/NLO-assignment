@@ -27,11 +27,15 @@ const tooltipRef = ref<GridTooltipApi | null>(null)
 <style scoped>
 .game-section {
   padding: 1rem;
-  background: var(--surface-elevated);
+  /* Decorative gold accent at the top implemented as a background stripe */
+  background:
+    linear-gradient(var(--color-accent-gold), var(--color-accent-gold)) top / 100% 4px no-repeat,
+    var(--surface-elevated);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-md);
   position: relative;
+  margin-top: 1rem; /* space above the card */
   /* Constrain width and keep gutters from screen edges */
   width: min(100% - calc(var(--container-gutter) * 2), var(--container-max));
   margin-inline: auto;
@@ -47,18 +51,7 @@ const tooltipRef = ref<GridTooltipApi | null>(null)
   pointer-events: none; /* allow interactions with the grid beneath */
 }
 
-/* Decorative gold accent at the top to echo festive vibe */
-.game-section::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: var(--color-accent-gold);
-  border-top-left-radius: var(--radius-lg);
-  border-top-right-radius: var(--radius-lg);
-}
+/* Removed ::before; gold stripe handled via background gradient above */
 
 .confirm-text {
   margin: 0 0 12px;

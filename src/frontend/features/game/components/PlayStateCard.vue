@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { Icon } from '@iconify/vue'
 import { useGridStore } from '@/frontend/features/game/store/grid'
 import { useSessionStore } from '@/frontend/features/game/store/session'
 
@@ -73,13 +72,6 @@ const mediaUrl = computed(() => props.backgroundImage ?? imageMap.value[state.va
         backgroundPosition: 'center',
       }"
     >
-      <!-- Simple icon-centered visual by state; could be replaced with an image -->
-      <div class="media-overlay">
-        <Icon v-if="state === 'can-open'" icon="mdi:lock-open-variant" aria-hidden="true" />
-        <Icon v-else-if="state === 'lost'" icon="mdi:close-octagon" aria-hidden="true" />
-        <Icon v-else-if="state === 'consolation'" icon="mdi:gift" aria-hidden="true" />
-        <Icon v-else icon="mdi:diamond-stone" aria-hidden="true" />
-      </div>
     </div>
 
     <div class="card-content">
@@ -113,15 +105,6 @@ const mediaUrl = computed(() => props.backgroundImage ?? imageMap.value[state.va
   width: 100%;
   background: var(--card-media-bg, linear-gradient(180deg, rgba(0, 0, 0, 0.08), rgba(0, 0, 0, 0)));
   position: relative;
-}
-
-.media-overlay {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  color: color-mix(in srgb, #000 10%, #fff);
-  font-size: clamp(28px, 6vw, 48px);
 }
 
 .card-content {
