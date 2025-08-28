@@ -42,18 +42,14 @@ describe('PlayStateCard.vue', () => {
   })
 
   it('shows consolation when my revealed prize is consolation', () => {
-    mockGrid.revealed = [
-      { id: 'c1', revealedBy: 'p1', prize: { type: 'consolation' } },
-    ]
+    mockGrid.revealed = [{ id: 'c1', revealedBy: 'p1', prize: { type: 'consolation' } }]
     const wrapper = mount(PlayStateCard)
     expect(wrapper.classes()).toContain('state--consolation')
     expect(wrapper.find('.label').text()).toContain('troostprijs')
   })
 
   it('shows grand when my revealed prize is grand', () => {
-    mockGrid.revealed = [
-      { id: 'c1', revealedBy: 'p1', prize: { type: 'grand' } },
-    ]
+    mockGrid.revealed = [{ id: 'c1', revealedBy: 'p1', prize: { type: 'grand' } }]
     const wrapper = mount(PlayStateCard)
     expect(wrapper.classes()).toContain('state--grand')
     expect(wrapper.find('.label').text()).toContain('hoofdprijs')

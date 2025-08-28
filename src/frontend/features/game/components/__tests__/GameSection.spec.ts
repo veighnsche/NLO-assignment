@@ -17,7 +17,11 @@ vi.mock('../CalendarGrid.vue', () => ({
 }))
 
 vi.mock('../GridTooltip.vue', () => ({
-  default: { name: 'GridTooltip', inheritAttrs: false, template: `<div class="tooltip-stub"></div>` },
+  default: {
+    name: 'GridTooltip',
+    inheritAttrs: false,
+    template: `<div class="tooltip-stub"></div>`,
+  },
 }))
 
 vi.mock('../RevealModal.vue', () => ({

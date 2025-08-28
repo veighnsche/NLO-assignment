@@ -21,9 +21,7 @@ describe('jsonFetch', () => {
   })
 
   it('returns undefined for 204 No Content', async () => {
-    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(
-      new Response(null, { status: 204 }) as any,
-    )
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(new Response(null, { status: 204 }) as any)
 
     const res = await jsonFetch<void>('/api/empty')
     expect(res).toBeUndefined()

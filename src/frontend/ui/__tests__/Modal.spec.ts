@@ -3,7 +3,13 @@ import { mount } from '@vue/test-utils'
 import Modal from '../Modal.vue'
 import { nextTick } from 'vue'
 
-function mountModal(props: any = {}, slots: any = { default: '<button id="inside">OK</button>', footer: '<button id="footer">Close</button>' }) {
+function mountModal(
+  props: any = {},
+  slots: any = {
+    default: '<button id="inside">OK</button>',
+    footer: '<button id="footer">Close</button>',
+  },
+) {
   return mount(Modal, {
     attachTo: document.body, // ensure Teleport target exists
     props: { modelValue: false, ...props },
@@ -72,7 +78,10 @@ describe('UiModal', () => {
   })
 
   it('tabs focus cycles inside modal', async () => {
-    const w = mountModal({ modelValue: true }, { default: '<button id="a">A</button><button id="b">B</button>' })
+    const w = mountModal(
+      { modelValue: true },
+      { default: '<button id="a">A</button><button id="b">B</button>' },
+    )
     await flush()
     const dialog = document.body.querySelector('.modal') as HTMLElement
     const a = dialog.querySelector('#a') as HTMLButtonElement

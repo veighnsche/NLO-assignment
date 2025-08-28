@@ -46,7 +46,10 @@ afterEach(() => {
     }
   }
   Object.defineProperty(globalThis, 'navigator', { value: originalNavigator, configurable: true })
-  Object.defineProperty(globalThis, 'location', { value: { ...globalThis.location, reload: originalReload }, configurable: true })
+  Object.defineProperty(globalThis, 'location', {
+    value: { ...globalThis.location, reload: originalReload },
+    configurable: true,
+  })
   vi.resetModules()
   vi.restoreAllMocks()
 })

@@ -57,7 +57,9 @@ const imageMap = computed(() => ({
 }))
 
 // Allow explicit override via backgroundImage prop; otherwise use the per-state image
-const mediaUrl = computed(() => props.backgroundImage ?? imageMap.value[state.value as keyof typeof imageMap.value])
+const mediaUrl = computed(
+  () => props.backgroundImage ?? imageMap.value[state.value as keyof typeof imageMap.value],
+)
 </script>
 
 <template>
@@ -71,8 +73,7 @@ const mediaUrl = computed(() => props.backgroundImage ?? imageMap.value[state.va
         backgroundSize: 'cover',
         backgroundPosition: 'center',
       }"
-    >
-    </div>
+    ></div>
 
     <div class="card-content">
       <div class="headline">Speelstatus</div>
@@ -162,14 +163,37 @@ const mediaUrl = computed(() => props.backgroundImage ?? imageMap.value[state.va
 }
 
 .playstate-card.state--lost {
-  --glow-color: color-mix(in srgb, color-mix(in srgb, var(--text) 40%, var(--border-subtle)) 18%, transparent);
+  --glow-color: color-mix(
+    in srgb,
+    color-mix(in srgb, var(--text) 40%, var(--border-subtle)) 18%,
+    transparent
+  );
   --card-bg: linear-gradient(
     135deg,
-    color-mix(in srgb, color-mix(in srgb, var(--text) 50%, var(--border-subtle)) 18%, var(--surface-contrast)) 0%,
-    color-mix(in srgb, color-mix(in srgb, var(--text) 50%, var(--border-subtle)) 10%, var(--surface-contrast)) 45%,
-    color-mix(in srgb, color-mix(in srgb, var(--text) 40%, var(--border-subtle)) 20%, var(--surface)) 100%
+    color-mix(
+        in srgb,
+        color-mix(in srgb, var(--text) 50%, var(--border-subtle)) 18%,
+        var(--surface-contrast)
+      )
+      0%,
+    color-mix(
+        in srgb,
+        color-mix(in srgb, var(--text) 50%, var(--border-subtle)) 10%,
+        var(--surface-contrast)
+      )
+      45%,
+    color-mix(
+        in srgb,
+        color-mix(in srgb, var(--text) 40%, var(--border-subtle)) 20%,
+        var(--surface)
+      )
+      100%
   );
-  --card-border: color-mix(in srgb, color-mix(in srgb, var(--text) 40%, var(--border-subtle)) 35%, var(--border-subtle));
+  --card-border: color-mix(
+    in srgb,
+    color-mix(in srgb, var(--text) 40%, var(--border-subtle)) 35%,
+    var(--border-subtle)
+  );
 }
 
 .playstate-card.state--can-open {

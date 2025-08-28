@@ -103,15 +103,12 @@ const grandState = computed<PrizeCardState>(() => {
   background-color: var(--header-bg);
   /* Fade out the image towards the bottom using an overlay gradient */
   background-image:
-    linear-gradient(
-      to bottom,
-      rgba(0, 0, 0, 0) 60%,
-      var(--bg) 85%,
-      var(--bg) 100%
-    ),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0) 60%, var(--bg) 85%, var(--bg) 100%),
     url('/header-bg.png');
   background-repeat: no-repeat, no-repeat;
-  background-size: 100% 100%, cover;
+  background-size:
+    100% 100%,
+    cover;
   background-position: center, center;
   color: var(--header-text);
   /* Remove hard divider; use a very subtle shadow instead to avoid a harsh seam */

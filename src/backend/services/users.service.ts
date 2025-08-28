@@ -3,7 +3,6 @@ import { mixSeedWithString } from '../domain/shared/rng'
 import type { User } from '../domain/users/model'
 import { bumpVersion, persistMeta } from '../infra/meta'
 
-
 export async function pickRandomEligibleUser(): Promise<
   { ok: true; playerId: string } | { error: 'NO_ELIGIBLE' }
 > {

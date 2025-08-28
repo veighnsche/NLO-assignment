@@ -24,16 +24,31 @@ vi.mock('@/frontend/features/game/composables/useGridTooltip', () => {
   const onLeave = vi.fn()
   return {
     useGridTooltip: () => ({
-      open, x, y, text, opener, revealed,
-      prizeLabel, prizeAmountText, prizeClass, statusClass, whenText,
-      onHover, onMove, onLeave,
+      open,
+      x,
+      y,
+      text,
+      opener,
+      revealed,
+      prizeLabel,
+      prizeAmountText,
+      prizeClass,
+      statusClass,
+      whenText,
+      onHover,
+      onMove,
+      onLeave,
     }),
   }
 })
 
 // Stub Tooltip container to a simple div mirroring slot
 vi.mock('@/frontend/ui/Tooltip.vue', () => ({
-  default: { name: 'Tooltip', template: '<div><slot /></div>', props: ['open', 'x', 'y', 'placement', 'offset', 'maxWidth'] },
+  default: {
+    name: 'Tooltip',
+    template: '<div><slot /></div>',
+    props: ['open', 'x', 'y', 'placement', 'offset', 'maxWidth'],
+  },
 }))
 
 describe('GridTooltip.vue', () => {

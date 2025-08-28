@@ -13,11 +13,13 @@ function makeButton(idx?: string) {
 describe('useGridHoverTooltip', () => {
   let tooltip: { api: GridTooltipApi; get: () => GridTooltipApi }
   beforeEach(() => {
-    vi.spyOn(globalThis, 'requestAnimationFrame' as any).mockImplementation((cb: FrameRequestCallback) => {
-      // run immediately
-      cb(0)
-      return 1 as any
-    })
+    vi.spyOn(globalThis, 'requestAnimationFrame' as any).mockImplementation(
+      (cb: FrameRequestCallback) => {
+        // run immediately
+        cb(0)
+        return 1 as any
+      },
+    )
     const api: GridTooltipApi = {
       hover: vi.fn(),
       move: vi.fn(),
@@ -56,17 +58,19 @@ describe('useGridHoverTooltip', () => {
   })
 
   it('updates with opener/prize when cell is revealed', () => {
-    const revealedById = ref(new Map<string, any>([
-      [
-        'c-0',
-        {
-          revealed: true,
-          revealedBy: 'u1',
-          prize: { type: 'consolation', amount: 100 },
-          revealedAt: '2024-01-02T03:04:05Z',
-        },
-      ],
-    ]))
+    const revealedById = ref(
+      new Map<string, any>([
+        [
+          'c-0',
+          {
+            revealed: true,
+            revealedBy: 'u1',
+            prize: { type: 'consolation', amount: 100 },
+            revealedAt: '2024-01-02T03:04:05Z',
+          },
+        ],
+      ]),
+    )
     const { onGridMove } = useGridHoverTooltip({
       getTooltip: () => tooltip.get(),
       getRow: () => 1,

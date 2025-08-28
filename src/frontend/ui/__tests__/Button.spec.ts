@@ -12,7 +12,13 @@ describe('UiButton', () => {
   })
 
   it('applies classes for color/variant/size and flags', () => {
-    const w = mountBtn({ color: 'primary', variant: 'outline', size: 'lg', block: true, icon: true })
+    const w = mountBtn({
+      color: 'primary',
+      variant: 'outline',
+      size: 'lg',
+      block: true,
+      icon: true,
+    })
     const el = w.get('button')
     expect(el.classes()).toContain('color-primary')
     expect(el.classes()).toContain('variant-outline')

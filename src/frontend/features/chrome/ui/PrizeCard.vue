@@ -49,10 +49,12 @@ const grid = useGridStore()
 const session = useSessionStore()
 
 // Consolation remaining
-const consolationOpenedCount = computed(() =>
-  grid.revealed.filter((c) => c.prize?.type === 'consolation').length,
+const consolationOpenedCount = computed(
+  () => grid.revealed.filter((c) => c.prize?.type === 'consolation').length,
 )
-const consolationLeft = computed(() => Math.max(0, (grid.consolationTotal ?? 0) - consolationOpenedCount.value))
+const consolationLeft = computed(() =>
+  Math.max(0, (grid.consolationTotal ?? 0) - consolationOpenedCount.value),
+)
 
 // Grand prize winner
 const grandReveal = computed(() => grid.revealed.find((c) => c.prize?.type === 'grand') ?? null)
@@ -82,7 +84,12 @@ const resolvedStateClass = computed(() => {
 </script>
 
 <template>
-  <div class="prize-card" :class="[variant, resolvedStateClass]" :aria-label="resolvedAriaLabel" role="group">
+  <div
+    class="prize-card"
+    :class="[variant, resolvedStateClass]"
+    :aria-label="resolvedAriaLabel"
+    role="group"
+  >
     <div
       class="card-media"
       aria-hidden="true"

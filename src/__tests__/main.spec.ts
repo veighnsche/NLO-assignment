@@ -58,10 +58,10 @@ describe('main bootstrap', () => {
   it('creates app, installs pinia, sets active pinia, sets up connectivity and mounts', async () => {
     await import('@/main')
 
-    const { createApp } = await import('vue') as any
-    const { createPinia, setActivePinia } = await import('pinia') as any
-    const { setupConnectivity } = await import('@/frontend/lib/connectivity') as any
-    const msw = await import('@/backend/msw/browser') as any
+    const { createApp } = (await import('vue')) as any
+    const { createPinia, setActivePinia } = (await import('pinia')) as any
+    const { setupConnectivity } = (await import('@/frontend/lib/connectivity')) as any
+    const msw = (await import('@/backend/msw/browser')) as any
 
     expect(createApp).toHaveBeenCalled()
     expect(createPinia).toHaveBeenCalled()

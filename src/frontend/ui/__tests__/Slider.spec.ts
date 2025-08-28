@@ -4,7 +4,9 @@ import Slider from '../Slider.vue'
 
 describe('Slider', () => {
   it('renders label, input and value with suffix', () => {
-    const w = mount(Slider, { props: { modelValue: 1.5, label: 'Speed', suffix: 'x', decimals: 1 } })
+    const w = mount(Slider, {
+      props: { modelValue: 1.5, label: 'Speed', suffix: 'x', decimals: 1 },
+    })
     expect(w.find('.label').text()).toBe('Speed')
     expect(w.find('input[type="range"]').exists()).toBe(true)
     expect(w.find('.value').text()).toBe('1.5x')

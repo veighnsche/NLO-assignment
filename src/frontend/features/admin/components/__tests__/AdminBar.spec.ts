@@ -9,7 +9,10 @@ const ButtonStub = {
   template: '<button type="button" v-bind="$attrs" @click="$emit(\'click\')"><slot /></button>',
 }
 const ModalStub = {
-  props: { modelValue: { type: Boolean, default: false }, ariaLabelledby: { type: String, default: '' } },
+  props: {
+    modelValue: { type: Boolean, default: false },
+    ariaLabelledby: { type: String, default: '' },
+  },
   emits: ['update:modelValue'],
   template:
     '<div v-if="modelValue" class="modal-stub"><slot /><div class="footer"><slot name="footer" /></div></div>',
@@ -25,7 +28,11 @@ vi.mock('@/frontend/features/admin/store/adminUI', () => ({
 }))
 const refreshCurrentPlayerMock = vi.fn()
 vi.mock('@/frontend/features/game/store/session', () => ({
-  useSessionStore: () => ({ activePlayerName: '', refreshCurrentPlayer: refreshCurrentPlayerMock, userNameById: () => '' }),
+  useSessionStore: () => ({
+    activePlayerName: '',
+    refreshCurrentPlayer: refreshCurrentPlayerMock,
+    userNameById: () => '',
+  }),
 }))
 vi.mock('@/frontend/features/game/store/status', () => ({
   useStatusStore: () => ({ isBooting: false }),
@@ -42,20 +49,23 @@ import AdminBar from '@/frontend/features/admin/components/AdminBar.vue'
 import ToastContainer from '@/frontend/ui/ToastContainer.vue'
 
 function mountAdminBar() {
-  return mount({
-    components: { AdminBar, ToastContainer },
-    template: '<div><AdminBar /><ToastContainer /></div>',
-  }, {
-    global: {
-      plugins: [createPinia()],
-      stubs: {
-        Button: ButtonStub,
-        Modal: ModalStub,
-        Slider: SliderStub,
-        Icon: true,
+  return mount(
+    {
+      components: { AdminBar, ToastContainer },
+      template: '<div><AdminBar /><ToastContainer /></div>',
+    },
+    {
+      global: {
+        plugins: [createPinia()],
+        stubs: {
+          Button: ButtonStub,
+          Modal: ModalStub,
+          Slider: SliderStub,
+          Icon: true,
+        },
       },
     },
-  })
+  )
 }
 
 beforeEach(() => {

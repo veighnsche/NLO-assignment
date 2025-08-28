@@ -19,7 +19,10 @@ describe('getStableClientId', () => {
   })
 
   afterEach(() => {
-    Object.defineProperty(globalThis, 'localStorage', { value: originalLocalStorage, configurable: true })
+    Object.defineProperty(globalThis, 'localStorage', {
+      value: originalLocalStorage,
+      configurable: true,
+    })
     vi.restoreAllMocks()
   })
 

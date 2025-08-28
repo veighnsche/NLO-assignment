@@ -18,12 +18,21 @@ describe('UiTooltip', () => {
 
   it('uses placement class and style variables for position and options', () => {
     const w = mount(Tooltip, {
-      props: { open: true, teleport: false, x: 100, y: 200, placement: 'bottom', offset: 12, zIndex: 1234, maxWidth: '300px' },
+      props: {
+        open: true,
+        teleport: false,
+        x: 100,
+        y: 200,
+        placement: 'bottom',
+        offset: 12,
+        zIndex: 1234,
+        maxWidth: '300px',
+      },
       slots: { default: 'B' },
     })
     const el = w.get('[role="tooltip"]').element as HTMLElement
     expect(el.classList.contains('tt-bottom')).toBe(true)
-    const style = (el.getAttribute('style') || '')
+    const style = el.getAttribute('style') || ''
     expect(style).toContain('--tt-left: 100px')
     expect(style).toContain('--tt-top: 200px')
     expect(style).toContain('--tt-offset: 12px')

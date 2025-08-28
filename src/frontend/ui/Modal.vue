@@ -1,6 +1,10 @@
 <template>
   <teleport to="body">
-    <div v-if="modelValue" class="modal-overlay flex items-center justify-center" @click.self="onOverlayClick">
+    <div
+      v-if="modelValue"
+      class="modal-overlay flex items-center justify-center"
+      @click.self="onOverlayClick"
+    >
       <div
         ref="dialogRef"
         class="modal"

@@ -57,7 +57,6 @@ describe('services/users.service', () => {
     expect(res).toEqual({ error: 'NOT_ELIGIBLE' })
   })
 
-
   it('assignUserForClient is deterministic per clientId', async () => {
     const a1 = assignUserForClient('client-xyz')
     const a2 = assignUserForClient('client-xyz')
@@ -82,7 +81,6 @@ describe('services/users.service', () => {
     const res = await pickRandomEligibleUser()
     expect(res).toEqual({ error: 'NO_ELIGIBLE' })
   })
-
 
   it('assignUserForClient throws when users missing', () => {
     setUsersMemory(null)

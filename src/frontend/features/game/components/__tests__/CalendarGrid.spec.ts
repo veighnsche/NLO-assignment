@@ -13,7 +13,11 @@ vi.mock('@/frontend/features/game/composables/useGridCells', () => {
   return {
     useGridCells: () => ({
       cells,
-      grid: { reveal: vi.fn(), revealed: [{ id: '1', prize: { type: 'consolation' } }], userHasRevealed: () => false },
+      grid: {
+        reveal: vi.fn(),
+        revealed: [{ id: '1', prize: { type: 'consolation' } }],
+        userHasRevealed: () => false,
+      },
       revealedById: new Map<string, any>(),
       getRow: (i: number) => i + 1,
       getCol: (i: number) => i + 1,
@@ -38,8 +42,12 @@ vi.mock('@/frontend/features/game/composables/useGridHoverTooltip', () => {
   }
 })
 
-vi.mock('@/frontend/features/game/store/status', () => ({ useStatusStore: () => ({ isRevealing: false }) }))
-vi.mock('@/frontend/features/game/store/session', () => ({ useSessionStore: () => ({ userNameById: () => 'Test' }) }))
+vi.mock('@/frontend/features/game/store/status', () => ({
+  useStatusStore: () => ({ isRevealing: false }),
+}))
+vi.mock('@/frontend/features/game/store/session', () => ({
+  useSessionStore: () => ({ userNameById: () => 'Test' }),
+}))
 
 describe('CalendarGrid.vue', () => {
   it('renders a small grid and responds to click', async () => {

@@ -9,7 +9,14 @@ vi.mock('@/frontend/lib/clientId', () => ({
 
 import { jsonFetch } from '@/frontend/lib/http'
 import { getStableClientId } from '@/frontend/lib/clientId'
-import { apiBoot, apiSnapshot, apiReveal, apiBotStep, apiUsersAssign, apiUsersResolve } from '../api'
+import {
+  apiBoot,
+  apiSnapshot,
+  apiReveal,
+  apiBotStep,
+  apiUsersAssign,
+  apiUsersResolve,
+} from '../api'
 
 afterEach(() => {
   vi.clearAllMocks()

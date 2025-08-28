@@ -20,11 +20,12 @@ const consolationOpenedCount = computed(
         c.prize?.type === 'consolation',
     ).length,
 )
-const grandReveal = computed(() =>
-  grid.revealed.find(
-    (c: { prize?: { type?: 'consolation' | 'grand' | 'none' }; revealedBy?: string }) =>
-      c.prize?.type === 'grand',
-  ) ?? null,
+const grandReveal = computed(
+  () =>
+    grid.revealed.find(
+      (c: { prize?: { type?: 'consolation' | 'grand' | 'none' }; revealedBy?: string }) =>
+        c.prize?.type === 'grand',
+    ) ?? null,
 )
 const grandOpened = computed(() => Boolean(grandReveal.value))
 const grandWinnerName = computed(() => session.userNameById(grandReveal.value?.revealedBy ?? null))
@@ -57,7 +58,9 @@ const canOpen = computed(
         <Icon class="emoji" icon="mdi:diamond-stone" aria-hidden="true" />
         <span class="label">Hoofdprijs:</span>
         <span class="value">{{ grandOpened ? 'Gevonden door' : 'Nog verborgen' }}</span>
-        <span v-if="grandOpened && grandWinnerName" class="winner" aria-live="polite">{{ grandWinnerName }}</span>
+        <span v-if="grandOpened && grandWinnerName" class="winner" aria-live="polite">{{
+          grandWinnerName
+        }}</span>
         <span v-if="grandOpened" class="burst" aria-hidden="true"></span>
       </div>
 
@@ -79,7 +82,6 @@ const canOpen = computed(
 </template>
 
 <style scoped>
-
 .meta-row {
   display: flex;
   flex-wrap: wrap;

@@ -27,8 +27,8 @@ import { useBotStore } from '../bot'
 import { apiBotStep } from '../../api'
 
 // Access mocks for assertions
-const statusModule = await import('../status') as any
-const gridModule = await import('../grid') as any
+const statusModule = (await import('../status')) as any
+const gridModule = (await import('../grid')) as any
 
 beforeEach(() => {
   setActivePinia(createPinia())
