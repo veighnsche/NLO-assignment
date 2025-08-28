@@ -54,6 +54,36 @@ pnpm lint
 - **Persistence** Opened cells and prizes persist via IndexedDB.
 - **Simulated multi-user** A bot periodically reveals cells to emulate other users.
 
+## Typography (Global)
+
+This project uses a minimal, NLO-inspired typography system with performance in mind.
+
+- Families
+  - UI/body: Nunito Sans (weights 400, 600, 700)
+  - Display: Fredoka (weight 700)
+- Loading
+  - Imported via Google Fonts in `index.html` with `display=swap` and `preconnect`.
+  - Only required weights are loaded; subset defaults to latin.
+- Tokens and Scale
+  - Defined in `src/frontend/styles/theme.css`:
+    - Families: `--font-family-ui`, `--font-family-display`
+    - Weights: `--font-weight-regular|semibold|bold`
+    - Fluid sizes: `--fs-h1..--fs-h6`, `--fs-body`, `--fs-small`, `--fs-overline`, `--fs-button`
+  - Applied globally in `src/frontend/styles/global.css`:
+    - Default font-family set to UI family.
+    - `h1–h3` mapped to Display family bold; `h4–h6` use UI semibold.
+    - Controls (buttons, inputs, selects, textareas) inherit fonts and use `--fs-button`.
+    - Numeric utilities: `.num-tabular` (tabular lining) and `.num-proportional`.
+- Design system helpers updated in `src/frontend/styles/design-system.css` to use tokens.
+
+Adjusting the scale or families
+- Edit tokens in `theme.css`. All components derive from these tokens; avoid component-scoped font overrides.
+
+Performance & a11y
+- Minimal weights; `swap` to reduce CLS; strong fallbacks in stacks.
+- Verify Lighthouse/PSI (CLS should remain stable). If needed, preload a single critical weight.
+
+
 ## Quick start
 
 1. Install deps

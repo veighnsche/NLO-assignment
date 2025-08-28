@@ -6,7 +6,7 @@ body {
   margin: 0;
   padding: 0;
   min-height: 100%;
-  font-family: var(--font-sans);
+  font-family: var(--font-family-ui);
   line-height: var(--line-height-base);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -17,4 +17,82 @@ body {
   min-height: 100vh;
   /* Account for fixed topbar height */
   padding-top: 56px;
+}
+
+/* Typography scale mapping */
+h1 {
+  font-family: var(--font-family-display);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--fs-h1);
+  line-height: 1.1;
+  margin: 0 0 0.5em 0;
+}
+h2 {
+  font-family: var(--font-family-display);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--fs-h2);
+  line-height: 1.15;
+  margin: 0 0 0.6em 0;
+}
+h3 {
+  font-family: var(--font-family-display);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--fs-h3);
+  line-height: 1.2;
+  margin: 0 0 0.6em 0;
+}
+h4 {
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--fs-h4);
+  margin: 0 0 0.6em 0;
+}
+h5 {
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--fs-h5);
+  margin: 0 0 0.6em 0;
+}
+h6 {
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--fs-h6);
+  margin: 0 0 0.6em 0;
+}
+
+p,
+li,
+label,
+small,
+span,
+div,
+td,
+th {
+  font-weight: var(--font-weight-regular);
+  font-size: var(--fs-body);
+}
+
+small,
+.text-small {
+  font-size: var(--fs-small);
+}
+
+.overline {
+  font-size: var(--fs-overline);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: var(--font-weight-bold);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  font-size: var(--fs-button);
+}
+
+/* Numeric alignment utilities */
+.num-tabular {
+  font-variant-numeric: tabular-nums lining-nums;
+}
+.num-proportional {
+  font-variant-numeric: proportional-nums;
 }
